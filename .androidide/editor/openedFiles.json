@@ -4,44 +4,14 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/RouteData.java",
       "selection": {
         "end": {
-          "column": 53,
-          "index": 2719,
-          "line": 94
+          "column": 5,
+          "index": 1179,
+          "line": 50
         },
         "start": {
-          "column": 53,
-          "index": 2719,
-          "line": 94
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/World.java",
-      "selection": {
-        "end": {
-          "column": 35,
-          "index": 1324,
-          "line": 57
-        },
-        "start": {
-          "column": 35,
-          "index": 1324,
-          "line": 57
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/UnitMath.java",
-      "selection": {
-        "end": {
-          "column": 20,
-          "index": 1460,
-          "line": 58
-        },
-        "start": {
-          "column": 20,
-          "index": 1460,
-          "line": 58
+          "column": 5,
+          "index": 1179,
+          "line": 50
         }
       }
     }

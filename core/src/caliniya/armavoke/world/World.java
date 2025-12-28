@@ -19,13 +19,13 @@ public class World {
 
   public boolean test = true; // 还早着
 
-  public Ar<Floor> floors = new Ar<Floor>(10000);
-  public Ar<ENVBlock> envblocks = new Ar<ENVBlock>(10000);
+  public Ar<Floor> floors = new Ar<Floor>(40000);
+  public Ar<ENVBlock> envblocks = new Ar<ENVBlock>(40000);
 
   public World() {
     test = true;
-    W = 100;
-    H = 100;
+    W = 2000;
+    H = 2000;
   }
 
   public World(int W, int H, boolean space) {
@@ -129,5 +129,9 @@ public class World {
     // （未来可以给 ENVBlock 加一个 isSolid 属性）
     // 目前我们假设只要有环境块就不能通过
     return block != null;
+  }
+
+  public boolean isSolid(int index) {
+    return isSolid(indexToX(index) , indexToY(indexToY(index)));
   }
 }

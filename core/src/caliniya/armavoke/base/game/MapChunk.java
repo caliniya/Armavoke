@@ -95,14 +95,13 @@ public class MapChunk implements Disposable {
         if (dirty) bake();
 
         TextureRegion region = new TextureRegion(fbo.getTexture());
-        // 修正 FBO 的 Y 轴翻转
+        // Y 轴翻转
         region.flip(false, true);
 
         // 计算在世界坐标中的绘制位置
         float worldDrawX = chunkX * PIXEL_SIZE + PIXEL_SIZE / 2f;
         float worldDrawY = chunkY * PIXEL_SIZE + PIXEL_SIZE / 2f;
         
-        // 绘制 FBO 纹理
         Draw.rect(region, worldDrawX, worldDrawY, PIXEL_SIZE, PIXEL_SIZE);
     }
 

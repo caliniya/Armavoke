@@ -44,7 +44,7 @@ public class MapRender extends BasicSystem<MapRender> {
     }
   }
 
-  /** 重新开始渲染 通常在加载新存档后调用，用于适应新的地图尺寸并重绘内容 注意：必须在 GL 线程(主线程)调用，或者使用 Core.app.post() */
+  /** 重新开始渲染 */
   public void rebuildAll() {
     if (chunks != null) {
       for (int x = 0; x < chunksW; x++) {

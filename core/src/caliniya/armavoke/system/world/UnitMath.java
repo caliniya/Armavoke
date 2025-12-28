@@ -54,7 +54,7 @@ public class UnitMath extends BasicSystem<UnitMath> {
     int ty = (int) (u.targetY / WorldData.TILE_SIZE);
 
     if (sx != tx || sy != ty) {
-      u.path = RouteData.findPath(sx, sy, tx, ty, 4, 0);
+      //u.path = RouteData.findPath(sx, sy, tx, ty, 4, 0);
 
       // 第一个点(起点)不要去
       if (u.path != null && !u.path.isEmpty()) {
