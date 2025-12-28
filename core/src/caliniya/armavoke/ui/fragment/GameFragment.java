@@ -59,6 +59,7 @@ public class GameFragment {
         } catch (Exception e) {
             Log.err("Load failed", e);
         }
+        
     });
 
     // 添加按钮到右侧表格，并设置间距

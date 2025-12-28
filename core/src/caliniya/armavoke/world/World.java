@@ -38,17 +38,50 @@ public class World {
 
   public void init() {
     if (test) {
-      // 初始化地板和环境块数组
+      floors.ensureCapacity(W * H);
+      envblocks.ensureCapacity(W * H);
+
+      // 1. 初始化空地图
       for (int i = 0; i < W * H; i++) {
         floors.add(Floors.TestFloor);
-        envblocks.add((ENVBlock)null); // 默认所有地方都没有环境块
+        envblocks.add((ENVBlock) null);
       }
 
-      // 放置一堵墙作为障碍物来测试寻路
-      // 在 x=5 的地方画一条垂直的墙
-      for (int y = 0; y < 50; y++) {
-        int index = coordToIndex(5, y);
-        envblocks.set(index, ENVBlocks.a);
+      int padding = 5;
+
+      // 2. 随机生成 3x3 的方块簇
+      // 概率可以调高一点，比如 0.01 (1%)，因为我们不再是逐格生成
+      for (int y = padding; y < H - padding; y++) {
+        for (int x = padding; x < W - padding; x++) {
+
+          // 如果随机命中，则以此 (x,y) 为中心生成一个 3x3 方块
+          if (Math.random() < 0.003) {
+
+            // 遍历 (x-1, y-1) 到 (x+1, y+1) 的区域
+            for (int offsetY = -1; offsetY <= 1; offsetY++) {
+              for (int offsetX = -1; offsetX <= 1; offsetX++) {
+                int placeX = x + offsetX;
+                int placeY = y + offsetY;
+
+                // 确保生成位置在地图内
+                if (isValidCoord(placeX, placeY)) {
+                  int index = coordToIndex(placeX, placeY);
+                  envblocks.set(index, ENVBlocks.a);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 3. 生成固定的测试墙体 (例如一条直线)
+      // 这个循环应该在外面，只执行一次
+      for (int y = 0; y < 15; y++) {
+        int x = 10;
+        if (isValidCoord(x, y)) {
+          int index = coordToIndex(x, y);
+          envblocks.set(index, ENVBlocks.a);
+        }
       }
     }
   }

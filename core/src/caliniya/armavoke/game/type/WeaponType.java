@@ -11,7 +11,7 @@ public class WeaponType {
     public TextureRegion region;
     
     public float w = 10f, h = 10f;
-    public float range = 100f;
+    public float range = 1000f;
     public float rotateSpeed = 5f;
     public float reload = 60f;
     public float x = 0f, y = 0f;

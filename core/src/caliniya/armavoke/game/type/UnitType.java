@@ -6,10 +6,15 @@ import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.data.WorldData;
 
 public class UnitType extends ContentType {
 
-  public float speed = 5f, health = 100f;
+  public float speed = 6f,//格每秒
+   health = 100f,
+   speedt,//像素每帧
+   rotationSpeend = 50f//旋转速度(单位帧每度？)
+   ;
   public float w = 100f, h = 180f;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>().add(new WeaponType("aa"));
@@ -23,6 +28,7 @@ public class UnitType extends ContentType {
 
   // 加载资源 (在 Assets 加载完成后调用)
   public void load() {
+    this.speedt = (speed * WorldData.TILE_SIZE) / 60f;
     region = Core.atlas.find(name, "white");
     cell = Core.atlas.find(name + "-cell", "white");
     for (WeaponType weapon : weapons) {

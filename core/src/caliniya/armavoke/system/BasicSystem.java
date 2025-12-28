@@ -10,23 +10,35 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
   public boolean inited = false;
   public int index = 0;
 
-  // 默认不开线程，或者通过构造/init参数指定(注意，是this.)
   protected boolean isThreaded = false;
 
   private volatile boolean threadRunning = false;
+
+  private volatile boolean paused = false;
+  private final Object pauseLock = new Object(); // 用于线程同步锁
+
   private Thread systemThread;
-  protected long threadSleepMs = 16; // 约60FPS
+  protected long threadSleepMs = 16;
+
+  public float delta = 1f;
+  private static final double NS_PER_TICK = 1_000_000_000.0 / 60.0;
+  private static final float MAX_DELTA = 4.0f;
+
+  private long lastTime;
+  private long now;
+  private long elapsedNs;
+  private long logicStartNs;
+  private long logicDurationMs;
+  private long sleepTimeMs;
 
   /** 普通初始化 */
   public T init() {
-    // 如果子类在构造时就设置了 isThreaded = true，这里也会启动
-    // 但更推荐使用带参数的 init(boolean threaded)
     return init(this.isThreaded);
   }
 
-  /** 带参数初始化，显式决定是否开启线程 */
+  /** 带参数初始化 */
   public T init(boolean runInThread) {
-    if (inited) return (T) this; // 防止重复初始化
+    if (inited) return (T) this;
 
     this.isThreaded = runInThread;
     this.inited = true;
@@ -39,46 +51,91 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
     return (T) this;
   }
 
-  // 注意：如果在后台线程运行 update，任何对 Arc 核心图形(绘制、纹理等)的操作都会导致崩溃。
-  // 数学计算系统通常只处理逻辑（位置、寻路、伤害），不要在 update() 里调用 draw()。
+  public T init(boolean runInThread, boolean pause) {
+    
+    if (pause) {
+      Events.on(EventType.GamePause.class, event -> setPaused(event.pause));
+    }
+    
+    return (T) init(runInThread);
+  }
+
   public void update() {}
 
   public void dispose() {
     stopThread();
   }
 
+  /**
+   * 设置系统的暂停状态
+   *
+   * @param paused true为暂停，false为恢复
+   */
+  public void setPaused(boolean paused) {
+    synchronized (pauseLock) {
+      this.paused = paused;
+      if (!paused) {
+        // 如果是取消暂停，唤醒线程
+        pauseLock.notifyAll();
+      }
+    }
+  }
+
+  /** 获取当前是否暂停 */
+  public boolean isPaused() {
+    return paused;
+  }
+
   private void startThread() {
-    if (threadRunning) return; // 防止重复启动
+    if (threadRunning) return;
 
     threadRunning = true;
 
-    // 使用守护线程确保主程序退出时线程自动结束
     systemThread =
         Threads.daemon(
             "System-" + this.getClass().getSimpleName(),
             () -> {
               Log.info("System thread started: @", this.getClass().getSimpleName());
+
+              // 初始化基准时间
+              lastTime = System.nanoTime();
+
               while (threadRunning) {
                 try {
-                  long start = System.currentTimeMillis();
+                  synchronized (pauseLock) {
+                    // 如果处于暂停状态，且线程还运行，就挂起
+                    while (paused && threadRunning) {
+                      pauseLock.wait(); // 线程在此处停止，不消耗CPU
+
+                      lastTime = System.nanoTime();
+                    }
+                  }
+
+                  now = System.nanoTime();
+                  elapsedNs = now - lastTime;
+                  lastTime = now;
+
+                  delta = (float) (elapsedNs / NS_PER_TICK);
+
+                  delta = Math.min(delta, MAX_DELTA);
+                  if (delta < 0.001f) delta = 0.001f;
+
+                  logicStartNs = System.nanoTime();
 
                   update();
 
-                  // 简单的帧率控制：减去 update 耗时
-                  long elapsed = System.currentTimeMillis() - start;
-                  long sleep = threadSleepMs - elapsed;
+                  logicDurationMs = (System.nanoTime() - logicStartNs) / 1_000_000;
+                  sleepTimeMs = threadSleepMs - logicDurationMs;
 
-                  if (sleep > 0) {
-                    Thread.sleep(sleep);
+                  if (sleepTimeMs > 0) {
+                    Thread.sleep(sleepTimeMs);
                   } else {
-                    // 如果 update 太慢，可能会让出一下 CPU
                     Thread.yield();
                   }
 
                 } catch (InterruptedException e) {
                   threadRunning = false;
-                  // 恢复中断状态是好习惯，虽然这里已经是要退出了:)
-                  Thread.currentThread().interrupt();
+                  Thread.currentThread().interrupt(); // 恢复状态
                 } catch (Exception e) {
                   Log.err("Error in system thread: @", this.getClass().getSimpleName(), e);
                 }
@@ -89,10 +146,10 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
 
   private void stopThread() {
     threadRunning = false;
+    // 如果线程正在 wait() 状态，interrupt 会让它抛出 InterruptedException 从而退出循环
     if (systemThread != null) {
       systemThread.interrupt();
       try {
-        // 等待线程真正结束(够用了)
         systemThread.join(100);
       } catch (Exception ignored) {
       }
@@ -103,5 +160,5 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
   @Override
   public int compareTo(BasicSystem<?> other) {
     return this.index > other.index ? 1 : this.index < other.index ? -1 : 0;
-  } // 两个三元运算符的抽象语法()
+  }
 }

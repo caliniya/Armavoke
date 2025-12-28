@@ -4,7 +4,8 @@ public class EventType {
   
   public enum events{
     Mapinit,
-    ThreadedStop;
+    ThreadedStop,//线程终止
+    ;
   }
   
   public static class GameInit {}
@@ -14,6 +15,14 @@ public class EventType {
 
     public CommandChange(boolean enabled) {
       this.enabled = enabled;
+    }
+  }
+
+public static class GamePause {
+    public final boolean pause;
+
+    public GamePause(boolean pause) {
+      this.pause = pause;
     }
   }
 }

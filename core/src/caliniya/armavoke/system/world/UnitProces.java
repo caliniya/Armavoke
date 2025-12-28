@@ -3,6 +3,7 @@ package caliniya.armavoke.system.world;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Log;
+import arc.util.Time;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.TeamData;
@@ -21,6 +22,7 @@ public class UnitProces extends BasicSystem<UnitProces> {
 
   @Override
   public void update() {
+    
     Ar<Unit> list = WorldData.units;
 
     for (int i = 0; i < list.size; i++) {
@@ -33,7 +35,7 @@ public class UnitProces extends BasicSystem<UnitProces> {
 
       if (!(u.path == null) && !u.path.isEmpty()) {
         float distToTarget = Mathf.dst(u.x, u.y, u.targetX, u.targetY);
-        if (distToTarget <= u.speed) {
+        if (distToTarget <= u.speed * this.delta) {
           // 强制吸附到目标点
           u.x = u.targetX;
           u.y = u.targetY;
@@ -43,8 +45,8 @@ public class UnitProces extends BasicSystem<UnitProces> {
           // 到达终点后，不再需要计算旋转，且防止后续误判
         } else {
           // 正常移动
-          u.x += u.speedX;
-          u.y += u.speedY;
+          u.x += u.speedX * this.delta;
+          u.y += u.speedY * this.delta;
           u.rotation = u.angle - 90;
         }
       }
@@ -54,7 +56,7 @@ public class UnitProces extends BasicSystem<UnitProces> {
         u.rotation = u.angle - 90;
       }
 
-      // --- 3. 网格更新 ---
+      // 网格更新
       if (u.x != oldX || u.y != oldY) {
         updateChunkPosition(u);
       }

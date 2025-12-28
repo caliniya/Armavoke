@@ -195,6 +195,7 @@ public class GameIO {
           u.read(r);
         }
       }
+      RouteData.init();
       
 
     } catch (IOException e) {

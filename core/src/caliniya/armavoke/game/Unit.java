@@ -30,8 +30,12 @@ public class Unit implements Poolable {
 
   // --- 物理属性 ---
   public float x, y;
-  public float speedX, speedY, angle; // 速度分量 (每帧移动的像素量),速度方向
+  public float speedX, speedY, angle , // 速度分量 (每帧移动的像素量),速度方向
+  rotationSpeend
+  ; 
   public float rotation; // 渲染朝向 (度)
+  
+  public boolean shooting;
 
   // --- 导航属性 ---
   public float targetX, targetY;
@@ -42,7 +46,7 @@ public class Unit implements Poolable {
 
   // --- 状态属性 ---
   public boolean isSelected = false;
-  public float health, w, h, speed; // speed 这里指最大标量速度
+  public float health, w, h, speed; // speed 这里指最大标量速度，单位像素每帧(单位类型中同名的实际上是格每秒，从speedt(像素每帧)中获取)
   public TextureRegion region, cell;
   public int currentChunkIndex = -1;
   public float pathFindCooldown = 0f;
@@ -75,7 +79,8 @@ public class Unit implements Poolable {
     }
     this.w = this.type.w;
     this.h = this.type.h;
-    this.speed = this.type.speed;
+    this.speed = this.type.speedt;
+    this.rotationSpeend = this.type.rotationSpeend;
     this.region = this.type.region;
     this.cell = this.type.cell;
 
@@ -189,6 +194,7 @@ public class Unit implements Poolable {
     this.targetX = r.f();
     this.targetY = r.f();
     byte teamId = r.b();
+    
     if (teamId >= 0 && teamId < TeamTypes.values().length) {
       this.team = TeamTypes.values()[teamId];
     } else {
@@ -200,7 +206,7 @@ public class Unit implements Poolable {
 
     updateTeamData();
 
-    // 重置寻路状态，让它重新计算路径
+    // 重置寻路状态
     this.path = null;
     this.pathIndex = 0;
     this.pathed = false;
