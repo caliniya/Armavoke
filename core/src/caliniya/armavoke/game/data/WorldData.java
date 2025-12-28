@@ -39,7 +39,6 @@ public class WorldData {
     world = new World();
     world.test = true;
     world.init();
-    Teams.init();
 
     // 1. 初始化网格尺寸
     // 即使地图大小不能整除32，也要向上取整多算一个格子，防止越界
@@ -52,6 +51,7 @@ public class WorldData {
     for (int i = 0; i < totalChunks; i++) {
       unitGrid[i] = new Ar<>(16); // 预设每个格子大概有16个单位，减少扩容开销
     }
+    Teams.init();
   }
 
   public static void clearunits() {

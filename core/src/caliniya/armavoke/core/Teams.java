@@ -1,5 +1,6 @@
 package caliniya.armavoke.core;
 
+import arc.util.Log;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
@@ -14,7 +15,8 @@ public class Teams {
     public static void init() {
         TeamTypes[] allTeams = TeamTypes.values();
         datas = new TeamData[allTeams.length];
-
+        
+        Log.info(allTeams.length);
         for (int i = 0; i < allTeams.length; i++) {
             datas[i] = new TeamData(allTeams[i]);
         }

@@ -19,13 +19,13 @@ public class World {
 
   public boolean test = true; // 还早着
 
-  public Ar<Floor> floors = new Ar<Floor>(40000);
-  public Ar<ENVBlock> envblocks = new Ar<ENVBlock>(40000);
+  public Ar<Floor> floors = new Ar<Floor>(10000);
+  public Ar<ENVBlock> envblocks = new Ar<ENVBlock>(10000);
 
   public World() {
     test = true;
-    W = 2000;
-    H = 2000;
+    W = 100;
+    H = 100;
   }
 
   public World(int W, int H, boolean space) {
@@ -84,6 +84,20 @@ public class World {
         }
       }
     }
+
+    int testX = 5;
+    int testY = 0;
+    int testIndex = coordToIndex(testX, testY);
+    // 强制清空周围，确保它是孤立的
+    for (int i = -2; i <= 2; i++)
+      for (int j = 0; j <= 2; j++)
+        if (isValidCoord(testX + i, testY + j))
+          envblocks.set(coordToIndex(testX + i, testY + j), null);
+
+    // 放置目标块
+    envblocks.set(testIndex, ENVBlocks.a);
+    Log.info("TEST BLOCK PLACED AT: x=@, y=@, index=@", testX, testY, testIndex);
+    Log.info("Stack trace:", new RuntimeException("Trace World Init"));
   }
 
   public int indexToX(int ind) {
@@ -132,6 +146,6 @@ public class World {
   }
 
   public boolean isSolid(int index) {
-    return isSolid(indexToX(index) , indexToY(indexToY(index)));
+    return isSolid(indexToX(index), indexToY(index));
   }
 }

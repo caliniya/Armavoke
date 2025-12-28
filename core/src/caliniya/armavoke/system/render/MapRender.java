@@ -3,6 +3,14 @@ package caliniya.armavoke.system.render;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Camera;
+import arc.graphics.g2d.Font;
+import caliniya.armavoke.ui.Fonts;
+import caliniya.armavoke.game.data.RouteData;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.Color;
+import arc.util.Align;
+import arc.graphics.g2d.GlyphLayout;
 import arc.math.Mathf;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.game.data.WorldData;
@@ -19,10 +27,13 @@ public class MapRender extends BasicSystem<MapRender> {
   private MapChunk[][] chunks;
   private int chunksW, chunksH;
 
+  public boolean debug = true;
+  private final GlyphLayout layout = new GlyphLayout();
+
   @Override
   public MapRender init() {
-    Events.run(EventType.events.Mapinit , () -> rebuildAll());
-    WorldData.initWorld();
+    Events.run(EventType.events.Mapinit, () -> rebuildAll());
+    //WorldData.initWorld();
     world = WorldData.world;
     this.index = 8;
     initChunks();
@@ -106,8 +117,65 @@ public class MapRender extends BasicSystem<MapRender> {
         }
       }
     }
+    drawDebugInfo(viewLeft, viewBottom, viewRight, viewTop);
   }
 
+  /** 绘制调试层：红色障碍块 + 距离场数值 */
+  private void drawDebugInfo(float viewLeft, float viewBottom, float viewRight, float viewTop) {
+    int startX = Mathf.clamp((int) (viewLeft / TILE_SIZE), 0, world.W - 1);
+    int startY = Mathf.clamp((int) (viewBottom / TILE_SIZE), 0, world.H - 1);
+    int endX = Mathf.clamp((int) (viewRight / TILE_SIZE), 0, world.W - 1);
+    int endY = Mathf.clamp((int) (viewTop / TILE_SIZE), 0, world.H - 1);
+
+    Font font = Fonts.def;
+    float fontScale = 0.25f;
+    font.getData().setScale(fontScale);
+
+    // 获取调试数据
+    // 请确保你在 RouteData 实现了 getDebugSolidMap (或者把变量设为 public)
+    // 假设 RouteData.layers 是 public 的
+    boolean[] solidMap = RouteData.layers[0].solidMap;
+    
+    // 如果还没初始化，就不画
+    if (solidMap == null) return;
+
+    for (int y = startY; y <= endY; y++) {
+      for (int x = startX; x <= endX; x++) {
+        
+        // 【关键】使用 World 的标准方法计算索引
+        int index = WorldData.world.coordToIndex(x, y);
+        
+        float drawX = x * TILE_SIZE + TILE_SIZE / 2f;
+        float drawY = y * TILE_SIZE + TILE_SIZE / 2f;
+
+        // ----------------------------------------------------
+        // 诊断 1: 绘制障碍物 (红色背景)
+        // ----------------------------------------------------
+        if (index >= 0 && index < solidMap.length && solidMap[index]) {
+          Draw.color(1f, 0f, 0f, 0.5f); // 半透明红
+          Fill.rect(drawX, drawY, TILE_SIZE, TILE_SIZE);
+        }
+
+        // ----------------------------------------------------
+        // 诊断 2: 绘制坐标文本 (白色)
+        // 格式: "x,y"
+        // ----------------------------------------------------
+        Draw.color(Color.white);
+        font.draw(x + "," + y, drawX, drawY + 8f, Align.center);
+
+        // ----------------------------------------------------
+        // 诊断 3: 绘制内存索引 (黄色)
+        // 格式: "[index]"
+        // ----------------------------------------------------
+        Draw.color(Color.yellow);
+        font.draw("[" + index + "]", drawX, drawY - 4f, Align.center);
+      }
+    }
+
+    Draw.color();
+    font.getData().setScale(1f);
+  }
+  
   public void flagUpdate(int worldGridX, int worldGridY) {
     int cx = worldGridX / MapChunk.SIZE;
     int cy = worldGridY / MapChunk.SIZE;

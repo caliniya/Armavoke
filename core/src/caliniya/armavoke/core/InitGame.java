@@ -22,7 +22,7 @@ public class InitGame {
   public static void testinit() {
     Maps.load();
     WorldData.initWorld();
-    //RouteData.init();
+    RouteData.init();
     Armavoke.addSystem(new MapRender().init(),new UnitRender().init());
     new UnitMath().init();
     new UnitProces().init();
