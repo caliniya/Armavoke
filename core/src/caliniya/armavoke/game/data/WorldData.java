@@ -112,8 +112,6 @@ public class WorldData {
       moveunits.clear();
     }
     unitGrid = null;
-    
-    Teams.init();
 
     world = new World(newW, newH, false);
     world.floors = new Ar<>(newW * newH);
@@ -128,6 +126,7 @@ public class WorldData {
     for (int i = 0; i < totalChunks; i++) {
       unitGrid[i] = new Ar<>(16);
     }
+    Teams.init();
     Events.fire(EventType.events.Mapinit);
     RouteData.init();
   }

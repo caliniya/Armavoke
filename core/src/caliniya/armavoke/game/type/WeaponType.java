@@ -2,34 +2,49 @@ package caliniya.armavoke.game.type;
 
 import arc.Core;
 import arc.graphics.g2d.TextureRegion;
-import caliniya.armavoke.base.game.ContentType;
-import caliniya.armavoke.base.type.CType;
 
-public class WeaponType {
+public class WeaponType implements Cloneable {
     
     public String name;
     public TextureRegion region;
     
-    public float w = 10f, h = 10f;
+    // 基础属性
     public float range = 1000f;
     public float rotateSpeed = 5f;
     public float reload = 60f;
     public float x = 0f, y = 0f;
+    public float shootX = 0f, shootY = 0f; // 枪口偏移
+
+    // 镜像控制
+    public boolean mirror = true;
+    public boolean flipSprite = false;
+    public boolean alternate = true;
+    public int otherSide = -1;
+    
+    // 【新增】标记是否为生成的镜像副本
+    public boolean isMirror = false;
 
     public WeaponType(String name) {
         this.name = name;
     }
 
-    /**
-     * 在 UnitType.load() 中被调用
-     * @param parentUnit 该武器所属的单位类型
-     */
-    public void load(UnitType parentUnit) {
-      
-        // 拼接名称： "unitname-weaponname"
-        String textureName = parentUnit.name + "-" + this.name;
-        
-        // 加载纹理
-        region = Core.atlas.find(textureName , "white");
+    public void load(String parentUnitName) {
+        String textureName = parentUnitName + "-" + this.name;
+        region = Core.atlas.find(textureName, "white");
+    }
+
+    public void flip() {
+        this.x *= -1;
+        this.shootX *= -1; // 枪口X通常也要反转
+        this.flipSprite = !this.flipSprite;
+        this.isMirror = true; // 标记为镜像
+    }
+
+    public WeaponType copy() {
+        try {
+            return (WeaponType) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

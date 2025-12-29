@@ -24,21 +24,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class GameIO {
-  //各种进制表示()
-  //41 52 4D 41 56 4F 4B 45
-  //65  82  77  65  86  79  75  69 
-  //E843693BC3831D6954E55EF5B583195D2423E943
-  //146D2A0B6CA06F940DCF7E43CB5E067B
-  //6291349D
-  //QVJNQVZPS0U=
-  //01000001 01010010 01001101 01000001 01010110 01001111 01001011 01000101
-  private static final String MAGIC = "ARMAVOKE";
+
+  private static final String MAGIC = "AEVS";
   private static final int SAVE_VERSION = 1;
 
   public static Map readMeta(Fi file) {
     try (DataInputStream stream = new DataInputStream(file.read())) {
         Reads r = new Reads(stream);
-        String magic = new String(r.b(8));
+        String magic = new String(r.b(4));
         if (!magic.equals(MAGIC)) return null;
         int ver = r.i();
         int w = r.i();
@@ -142,7 +135,7 @@ public class GameIO {
       Reads r = new Reads(stream);
 
       // Magic
-      String magic = new String(r.b(8));
+      String magic = new String(r.b(4));
       if (!magic.equals(MAGIC)) throw new IOException("Invalid file format");
 
       int ver = r.i();

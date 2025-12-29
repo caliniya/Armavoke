@@ -1,50 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/Teams.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/content/UnitTypes.java",
       "selection": {
         "end": {
-          "column": 51,
-          "index": 542,
-          "line": 19
+          "column": 42,
+          "index": 486,
+          "line": 17
         },
         "start": {
-          "column": 51,
-          "index": 542,
-          "line": 19
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/TeamData.java",
-      "selection": {
-        "end": {
-          "column": 3,
-          "index": 856,
-          "line": 36
-        },
-        "start": {
-          "column": 3,
-          "index": 856,
-          "line": 36
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java",
-      "selection": {
-        "end": {
-          "column": 0,
-          "index": 3151,
-          "line": 134
-        },
-        "start": {
-          "column": 0,
-          "index": 3151,
-          "line": 134
+          "column": 42,
+          "index": 486,
+          "line": 17
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/content/UnitTypes.java"
 }

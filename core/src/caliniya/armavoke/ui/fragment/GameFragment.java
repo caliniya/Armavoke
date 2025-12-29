@@ -7,6 +7,8 @@ import arc.files.Fi;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.game.data.RouteData;
+import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
 import caliniya.armavoke.ui.Button;
 
@@ -14,7 +16,7 @@ public class GameFragment {
 
   private boolean isCommandEnabled = false;
   private Button commandBtn;
-  private Button saveBtn, loadBtn;
+  private Button saveBtn, loadBtn , RBtn;
 
   public void build() {
     // 主容器，填满屏幕
@@ -61,11 +63,19 @@ public class GameFragment {
         }
         
     });
+    
+    RBtn = new Button("Reload", () -> {
+      WorldData.reBuildAll(100,100);
+      WorldData.initWorld();
+      RouteData.init();
+    });
 
     // 添加按钮到右侧表格，并设置间距
     rightTable.add(saveBtn).size(80f, 50f).margin(5f);
     rightTable.row(); // 换行，或者并在同一行
     rightTable.add(loadBtn).size(80f, 50f).margin(5f);
+    rightTable.row();
+    rightTable.add(RBtn).size(80,50).margin(5);
 
     // 将左右两个子表格添加到根表格中
     // 使用 expand() 和 bottom() 来正确定位

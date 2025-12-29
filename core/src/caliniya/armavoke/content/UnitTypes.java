@@ -1,5 +1,6 @@
 package caliniya.armavoke.content;
 
+import caliniya.armavoke.game.type.WeaponType;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.Armavoke;
 import caliniya.armavoke.game.Unit;
@@ -14,6 +15,7 @@ public class UnitTypes {
   
 	public static void load() {
 		test = new UnitType("testunit"){{
+      this.addWeapons(new WeaponType("aa"));
       this.load();
     }};
 	}

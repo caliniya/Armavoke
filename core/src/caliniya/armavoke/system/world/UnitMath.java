@@ -54,7 +54,7 @@ public class UnitMath extends BasicSystem<UnitMath> {
     int ty = (int) (u.targetY / WorldData.TILE_SIZE);
 
     if (sx != tx || sy != ty) {
-      u.path = RouteData.findPath(sx, sy, tx, ty, 4, 0);
+      u.path = RouteData.findPath(sx, sy, tx, ty, 2, 1);
 
       // 第一个点(起点)不要去
       if (u.path != null && !u.path.isEmpty()) {
@@ -71,10 +71,7 @@ public class UnitMath extends BasicSystem<UnitMath> {
         u.speedX = 0;
         u.speedY = 0;
 
-        // 注意：这里如果只是因为移除了起点导致为空，不代表"寻路失败"，
-        // 而是代表"剩下的路就是直线走过去"，所以这里不要急着 stopAndRemove。
-        // 下面的 calculateVelocity 会检测到 empty 并调用 handleFinalApproach，逻辑是闭环的。
-
+        // 如果只是因为移除了起点导致为空，不代表"寻路失败"，而是代表 剩下的路就是直线走过
         // 只有当 findPath 本身返回 null (不可达) 时才视为失败
         if (u.path == null) {
           stopAndRemove(u);

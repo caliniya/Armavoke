@@ -56,4 +56,9 @@ public class Units {
 
         return (Unit) result[0];
     }
+  
+  public static void method() {
+  	
+  }
+  
 }

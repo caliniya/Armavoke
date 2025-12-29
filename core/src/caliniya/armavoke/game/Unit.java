@@ -57,9 +57,9 @@ public class Unit implements Poolable {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
     u.team = team;
-    u.init();
     u.x = x;
     u.y = y;
+    u.init();
     return u;
   }
 

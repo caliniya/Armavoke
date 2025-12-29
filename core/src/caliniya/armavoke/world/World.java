@@ -24,8 +24,8 @@ public class World {
 
   public World() {
     test = true;
-    W = 100;
-    H = 100;
+    W = 1000;
+    H = 1000;
   }
 
   public World(int W, int H, boolean space) {

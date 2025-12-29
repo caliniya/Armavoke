@@ -6,6 +6,7 @@ import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.OS;
 import arc.util.Time;
+import caliniya.armavoke.Init;
 import caliniya.armavoke.game.data.WorldData;
 
 public class DebugFragment {
@@ -30,6 +31,11 @@ public class DebugFragment {
                         sb.append("FPS: ").append(Core.graphics.getFramesPerSecond()).append("\n");
                         sb.append("Mem: ")
                             .append(Core.app.getJavaHeap() / 1024 / 1024)
+                            .append("  +  ")
+                            .append(Runtime.getRuntime().totalMemory() / 1024 / 1024)
+                            .append("  +  ")
+                            .append(Runtime.getRuntime().freeMemory() / 1024 / 1024)
+                            .append("  all  ")
                             .append(" MB\n");
 
                         // 世界数据检查
@@ -50,7 +56,7 @@ public class DebugFragment {
                               .append("\n");
                         }
 
-                        //sb.append("timedelta").append(Time.delta);
+                        // sb.append("timedelta").append(Time.delta);
 
                         sb.append("Java: ").append(OS.javaVersion);
                         sb.append("Android: ").append(Core.app.getVersion());
