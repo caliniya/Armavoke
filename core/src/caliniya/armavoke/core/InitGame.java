@@ -1,5 +1,6 @@
 package caliniya.armavoke.core;
 
+
 import arc.Core;
 import arc.Events;
 import arc.util.Log;
@@ -23,9 +24,10 @@ public class InitGame {
     Maps.load();
     WorldData.initWorld();
     RouteData.init();
-    Armavoke.addSystem(new MapRender().init(),new UnitRender().init());
+    Armavoke.addSystem(new MapRender().init(),new UnitRender().init() , new BulletSystem().init());
     new UnitMath().init();
     new UnitProces().init();
+    
     Unit ttt = UnitTypes.test.create(500 , 500);
     Unit ta = UnitTypes.test.create(1000,1000);
     ta.team = TeamTypes.Veto;

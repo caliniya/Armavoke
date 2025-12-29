@@ -8,14 +8,17 @@ import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.system.render.MapRender;
 import caliniya.armavoke.world.World;
 import arc.math.Mathf;
+import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.type.*;
 
 public class WorldData {
   public static World world;
 
   // 全局单位列表 (用于逻辑更新)
-  public static Ar<Unit> units = new Ar<>(10);
+  public static Ar<Unit> units = new Ar<>(100);
   // 有移动目标的单位
   public static Ar<Unit> moveunits = new Ar<>(5);
+  public static Ar<Bullet> bullets = new Ar<>(1000);
 
   // --- 空间划分网格相关 ---
   // 每个区块包含的瓦片数量 (32x32个地块)

@@ -7,13 +7,15 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.type.*;
 
 public class UnitType extends ContentType {
 
   public float speed = 6f, // 格每秒
       health = 100f,
       speedt, // 像素每帧
-      rotationSpeend = 50f // 旋转速度(单位帧每度？)
+      rotationSpeend = 1f // 旋转速度(单位帧每度？)
   ;
   public float w = 100f, h = 180f;
 

@@ -1,9 +1,10 @@
-package caliniya.armavoke.game;
+package caliniya.armavoke.type;
 
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
-import caliniya.armavoke.game.type.WeaponType;
+import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.type.type.WeaponType;
 
 public class Weapon {
   public final WeaponType type;
@@ -74,21 +75,29 @@ public class Weapon {
     }
   }
 
-  private void shoot(float x, float y, float angle) {
+  private void shoot(float wx, float wy, float angle) {
     // 1. 重置自身冷却
     this.reloadTimer = type.reload;
 
-    // 2. 发射子弹 (这里只是伪代码)
-    // Bullet.create(type.bullet, x, y, angle ...);
+    // 2. 计算枪口位置 (如果有 shootX/Y 偏移)
+    // 注意：这里是相对于武器自身的旋转
+    float bulletX = wx + Angles.trnsx(angle, type.shootX, type.shootY);
+    float bulletY = wy + Angles.trnsy(angle, type.shootX, type.shootY);
 
-    // 3. 强制同步逻辑 (这是为了防止长期运行后的误差累积)
-    // 如果我是主武器，且开启交替模式
+    // 3. 发射子弹
+    if (type.bullet != null) {
+      Bullet.create(type.bullet, owner, bulletX, bulletY, angle);
+    }
+    // 4. 强制同步逻辑 (交替射击)
     if (!type.isMirror && type.otherSide != -1 && type.alternate) {
-      Weapon mirror = owner.weapons.get(type.otherSide);
-
-      // 强制把镜像武器的冷却设为总冷却的一半
-      // 这样即使之前因为卡顿或其他原因导致节奏乱了，主武器一开火，立刻纠正副武器节奏
-      mirror.reloadTimer = type.reload / 2f;
+      // 确保索引有效
+      if (type.otherSide < owner.weapons.size) {
+        Weapon mirror = owner.weapons.get(type.otherSide);
+        // 强制同步：把镜像武器的冷却设为总冷却的一半
+        if (mirror != null) {
+          mirror.reloadTimer = type.reload / 2f;
+        }
+      }
     }
   }
 }

@@ -10,14 +10,32 @@ import static arc.Core.*;
 
 public class UI {
   
-  public static DebugFragment de;
-  // 跟踪当前是否显示
+  //调试显示器
+  public static DebugFragment debug;
+  //主游戏ui
+  public static GameFragment game;
+  //游戏菜单ui
+  public static MenuFragment menu;
+  
+  
   private static boolean isDebugShown = false;
+  
+  public static void initAll(){
+    if(debug == null) {
+    	debug = new DebugFragment();
+    }
+    if(game == null) {
+    	game = new GameFragment();
+    }
+    if(menu == null) {
+    	menu = new MenuFragment();
+    }
+  }
 
   public static void Menu() {
     scene.clear();
-    new MenuFragment().build();
-    if (isDebugShown) de.add(); 
+    menu.build();
+    if (isDebugShown) debug.add(); 
   }
 
   // 加载界面渲染逻辑
@@ -49,11 +67,11 @@ public class UI {
 
   public static void Game() {
     scene.clear();
-    new GameFragment().build();
+    game.build();
     
     // 如果之前开启了 debug，进入游戏时需要重新添加回 scene
-    if (isDebugShown && de != null) {
-        de.add();
+    if (isDebugShown && debug != null) {
+        debug.add();
     }
   }
 
@@ -62,17 +80,17 @@ public class UI {
    */
   public static void Debug() {
     // 懒加载初始化
-    if(de == null) {
-        de = new DebugFragment();
+    if(debug == null) {
+        debug = new DebugFragment();
     }
 
     if (isDebugShown) {
         // 如果当前是显示的，则关闭
-        de.remove();
+        debug.remove();
         isDebugShown = false;
     } else {
         // 如果当前是关闭的，则显示
-        de.add();
+        debug.add();
         isDebugShown = true;
     }
   }

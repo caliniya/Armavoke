@@ -50,6 +50,7 @@ public class Armavoke extends ApplicationCore {
 
     // 资源加载完成后的初始化
     if (assets.update() && !assinited) {
+      UI.initAll();
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
       Styles.load();
       UI.Menu();

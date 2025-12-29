@@ -17,7 +17,8 @@ import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.game.type.UnitType;
 import caliniya.armavoke.core.*;
-import caliniya.armavoke.game.type.WeaponType;
+import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.type.*;
 
 public class Unit implements Poolable {
 
@@ -31,11 +32,11 @@ public class Unit implements Poolable {
   // --- 物理属性 ---
   public float x, y;
   public float speedX, speedY, angle , // 速度分量 (每帧移动的像素量),速度方向
-  rotationSpeend
+  rotationSpeed
   ; 
   public float rotation; // 渲染朝向 (度)
   
-  public boolean shooting;
+  public boolean shooting = false;
 
   // --- 导航属性 ---
   public float targetX, targetY;
@@ -80,14 +81,16 @@ public class Unit implements Poolable {
     this.w = this.type.w;
     this.h = this.type.h;
     this.speed = this.type.speedt;
-    this.rotationSpeend = this.type.rotationSpeend;
+    this.rotationSpeed = this.type.rotationSpeend;
     this.region = this.type.region;
     this.cell = this.type.cell;
 
     this.health = this.type.health;
 
     this.team = TeamTypes.Evoke;
-
+    
+    shooting = false;
+    
     weapons.clear();
     for (WeaponType wType : type.weapons) {
       weapons.add(new Weapon(wType, this));
@@ -165,7 +168,7 @@ public class Unit implements Poolable {
 
   public void updateWeapons() {
     for (Weapon weapon : weapons) {
-      weapon.update();
+      weapon.update(targetX , targetY ,shooting);
     }
   }
 
