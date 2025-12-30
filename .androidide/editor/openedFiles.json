@@ -1,20 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletSystem.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 1355,
-          "line": 49
+          "column": 5,
+          "index": 1115,
+          "line": 50
         },
         "start": {
-          "column": 0,
-          "index": 1355,
-          "line": 49
+          "column": 5,
+          "index": 1115,
+          "line": 50
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletSystem.java"
 }

@@ -20,9 +20,6 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
   @Override
   public void update() {
     // 遍历所有子弹
-    // 注意：由于 update 过程中子弹可能会销毁(remove)，
-    // 我们通常倒序遍历，或者使用 remove 安全的迭代方式
-    //暂时先这样
     Ar<Bullet> list = WorldData.bullets;
 
     for (int i = list.size - 1; i >= 0; i--) {
@@ -39,7 +36,6 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
       return;
     }
 
-    // 移动 (简单的欧拉积分)
     float nextX = b.x + b.velX;
     float nextY = b.y + b.velY;
 
@@ -48,22 +44,15 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
     Unit hitTarget = checkCollision(b, nextX, nextY);
 
     if (hitTarget != null) {
-      // 命中单位
+      // 命中
       b.x = nextX;
       b.y = nextY;
       b.type.hit(b, hitTarget);
-    } else if (WorldData.world.isSolid(
-        (int) (nextX / WorldData.TILE_SIZE), (int) (nextY / WorldData.TILE_SIZE))) {
-      // 命中墙壁
-      b.x = nextX;
-      b.y = nextY;
-      b.type.despawn(b);
-    } else {
+    }else {
       // 未命中，正常移动
       b.x = nextX;
       b.y = nextY;
 
-      // 调用类型特定的更新逻辑 (特效等)
       b.type.update(b);
     }
   }
