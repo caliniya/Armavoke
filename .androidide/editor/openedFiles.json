@@ -1,35 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Init.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/.github/workflows/main-build.yml",
       "selection": {
         "end": {
-          "column": 40,
-          "index": 2352,
-          "line": 81
+          "column": 160,
+          "index": 896,
+          "line": 38
         },
         "start": {
-          "column": 40,
-          "index": 2352,
-          "line": 81
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle",
-      "selection": {
-        "end": {
-          "column": 49,
-          "index": 1050,
-          "line": 35
-        },
-        "start": {
-          "column": 49,
-          "index": 1050,
-          "line": 35
+          "column": 160,
+          "index": 896,
+          "line": 38
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/.github/workflows/main-build.yml"
 }

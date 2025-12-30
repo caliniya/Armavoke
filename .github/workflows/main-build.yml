@@ -36,4 +36,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: android/build/outputs/apk/debug/android-debug.apk,android-old/build/outputs/apk/debug/android-debug.apk,desktop/build/output/Armavoke-1.0.jarp
+        files: android/build/outputs/apk/debug/android-debug.apk,android-old/build/outputs/apk/debug/android-old-debug.apk,desktop/build/output/Armavoke-1.0.jar
