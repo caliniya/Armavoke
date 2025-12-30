@@ -1,20 +1,35 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/android-old/res/layout/error_activity.xml",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Init.java",
       "selection": {
         "end": {
-          "column": 15,
-          "index": 2807,
-          "line": 80
+          "column": 40,
+          "index": 2352,
+          "line": 81
         },
         "start": {
-          "column": 15,
-          "index": 2807,
-          "line": 80
+          "column": 40,
+          "index": 2352,
+          "line": 81
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle",
+      "selection": {
+        "end": {
+          "column": 49,
+          "index": 1050,
+          "line": 35
+        },
+        "start": {
+          "column": 49,
+          "index": 1050,
+          "line": 35
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/android-old/res/layout/error_activity.xml"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/desktop/build.gradle"
 }
