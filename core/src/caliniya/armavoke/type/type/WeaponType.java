@@ -21,7 +21,7 @@ public class WeaponType implements Cloneable {
   public boolean alternate = true;
   public int otherSide = -1;
 
-  // 【新增】标记是否为生成的镜像副本
+  // 标记是否为生成的镜像副本
   public boolean isMirror = false;
 
   public BulletType bullet;
@@ -38,7 +38,7 @@ public class WeaponType implements Cloneable {
 
   public void flip() {
     this.x *= -1;
-    this.shootX *= -1; // 枪口X通常也要反转
+    this.shootX *= -1; // 枪口X也要反转
     this.flipSprite = !this.flipSprite;
     this.isMirror = true; // 标记为镜像
   }

@@ -17,7 +17,6 @@ public class Bullet implements Poolable {
     public float rotation;
     public float time = 0f; // 已存活时间
     
-    // 链表结构，用于 BulletSystem 中快速遍历 (可选优化)
     // public Bullet next; 
 
     protected Bullet() {}
@@ -43,7 +42,7 @@ public class Bullet implements Poolable {
         this.velX = arc.math.Mathf.cosDeg(angle) * type.speed;
         this.velY = arc.math.Mathf.sinDeg(angle) * type.speed;
         
-        // 加入全局子弹列表 (WorldData 需要新增 bullets 列表)
+        // 加入全局子弹列表
         WorldData.bullets.add(this);
     }
 

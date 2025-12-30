@@ -25,10 +25,6 @@ public class UnitMath extends BasicSystem<UnitMath> {
       processList.addAll(WorldData.moveunits);
     }
 
-    // 获取当前帧的时间增量 (delta)
-    // 假设 BasicSystem 已经正确计算了 this.delta
-    float dt = this.delta;
-
     for (int i = 0; i < processList.size; ++i) {
       Unit u = processList.get(i);
 
@@ -45,11 +41,10 @@ public class UnitMath extends BasicSystem<UnitMath> {
         u.velocityDirty = true;
       }
 
-      calculateVelocity(u, dt);
+      calculateVelocity(u, this.delta);
     }
   }
 
-  // calculatePath 保持不变...
   private void calculatePath(Unit u) {
     int sx = (int) (u.x / WorldData.TILE_SIZE);
     int sy = (int) (u.y / WorldData.TILE_SIZE);
@@ -103,10 +98,10 @@ public class UnitMath extends BasicSystem<UnitMath> {
 
       float dist = Mathf.dst(u.x, u.y, nextX, nextY);
 
-      if (dist <= u.speed * dt) { // 注意这里要乘以 dt
+      if (dist <= u.speed * this.delta) {
         u.pathIndex++;
         u.velocityDirty = true;
-        calculateVelocity(u, dt); // 递归
+        calculateVelocity(u, this.delta); // 递归
         return;
       }
 
@@ -114,17 +109,17 @@ public class UnitMath extends BasicSystem<UnitMath> {
       float targetAngle = Angles.angle(u.x, u.y, nextX, nextY);
 
       // 应用转向与移动逻辑
-      applyMovementLogic(u, targetAngle, dt);
+      applyMovementLogic(u, targetAngle, this.delta);
 
     } else {
-      handleFinalApproach(u, dt);
+      handleFinalApproach(u, this.delta);
     }
   }
 
   private void handleFinalApproach(Unit u, float dt) {
     float distToFinal = Mathf.dst(u.x, u.y, u.targetX, u.targetY);
 
-    if (distToFinal > u.speed * dt) {
+    if (distToFinal > u.speed * this.delta) {
       float targetAngle = Angles.angle(u.x, u.y, u.targetX, u.targetY);
       applyMovementLogic(u, targetAngle, dt);
     } else {
@@ -135,48 +130,37 @@ public class UnitMath extends BasicSystem<UnitMath> {
   /** 核心逻辑：根据 shooting 状态处理转向和速度 */
   private void applyMovementLogic(Unit u, float targetAngle, float dt) {
 
-    // 1. 如果正在射击 (Shooting = true)
-    // 这里的逻辑通常是：单位可以任意方向移动（侧滑），不强制转身
-    // 或者：单位瞬间转身，忽略转速限制
+    // 如果正在射击 (Shooting = true)
+    // 单位可以直接全向移动
+
     if (u.shooting) {
-      // 直接将移动角度设为目标角度 (瞬间转身/全向移动)
+      // 直接将移动角度设为目标角度 (全向移动)
       u.angle = targetAngle;
 
       // 全速前进
       u.speedX = Mathf.cosDeg(u.angle) * u.speed;
       u.speedY = Mathf.sinDeg(u.angle) * u.speed;
 
-      // 注意：shooting 时，rotation 通常由 WeaponControl 控制去瞄准敌人
+      // 注意：shooting 时，rotation 由 WeaponControl 控制去瞄准敌人
       // 如果这里不管，rotation 会保持之前的样子，这符合"侧向移动"
     }
-    // 2. 如果没在射击 (Shooting = false)
+    // 如果没在射击 (Shooting = false)
     // 必须先转身，角度对准了才能走
     else {
       // 平滑转向当前移动方向
       // rotationSpeed 是 度/tick，乘以 dt 得到当前帧允许转多少度
       u.angle = Angles.moveToward(u.angle, targetAngle, u.rotationSpeed * dt);
 
-      // 只有当朝向基本对准目标时 (例如误差小于 10 度)，才产生位移
-      // 否则原地转圈
       if (Angles.within(u.angle, targetAngle, 5f)) {
-        // 随着角度越来越准，速度可以从 0 加速到 max (可选，这里简单处理为全速)
         u.speedX = Mathf.cosDeg(u.angle) * u.speed;
         u.speedY = Mathf.sinDeg(u.angle) * u.speed;
       } else {
-        // 还在转身中，原地不动
         u.speedX = 0;
         u.speedY = 0;
       }
 
-      // 非射击状态下，渲染朝向通常跟随移动方向
-      // u.rotation = u.angle - 90;
-      // 注意：你在 UnitProces 里可能还会覆盖这个 rotation
     }
-
-    // 由于我们现在每一帧都在动态计算 angle (MoveToward)，
-    // 之前的 velocityDirty 优化在这里不再适用（或者说逻辑变了）。
-    // 现在的逻辑是：每一帧都在微调，所以每一帧都要算 sin/cos。
-    // 对于后台线程来说，这完全没问题。
+    
     u.velocityDirty = false;
   }
 

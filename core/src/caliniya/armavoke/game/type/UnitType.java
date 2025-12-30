@@ -50,14 +50,14 @@ public class UnitType extends ContentType {
 
   public void addWeapons(WeaponType... newWeapons) {
     for (WeaponType weapon : newWeapons) {
-      // 1. 添加主武器
+      // 添加主武器
       weapon.isMirror = false;
       weapons.add(weapon);
 
-      // 2. 处理镜像
+      // 处理镜像
       if (weapon.mirror) {
         WeaponType copy = weapon.copy();
-        copy.flip(); // 这里会把 copy.isMirror 设为 true
+        copy.flip();
         // 建立索引关联
         // 主武器索引 = size-1, 镜像索引 = size
         weapon.otherSide = weapons.size;

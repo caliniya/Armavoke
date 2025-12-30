@@ -1,20 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/type/BulletType.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java",
       "selection": {
         "end": {
-          "column": 24,
-          "index": 397,
-          "line": 15
+          "column": 0,
+          "index": 3533,
+          "line": 138
         },
         "start": {
-          "column": 24,
-          "index": 397,
-          "line": 15
+          "column": 0,
+          "index": 3533,
+          "line": 138
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/type/BulletType.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java"
 }

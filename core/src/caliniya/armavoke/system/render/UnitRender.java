@@ -36,17 +36,16 @@ public class UnitRender extends BasicSystem<UnitRender> {
       }
     }
 
-    // 2. 绘制子弹 (新增)
+
     for (int i = 0; i < WorldData.bullets.size; i++) {
       Bullet b = WorldData.bullets.get(i);
-      // 假设子弹最大也就 32 像素，稍微给大点范围
       if (shouldDraw(b.x, b.y, 64f)) {
         drawBullet(b);
       }
     }
   }
 
-  // 通用的剔除方法 (重载)
+  // 通用的剔除方法
   private boolean shouldDraw(float x, float y, float size) {
     float viewX = Core.camera.position.x;
     float viewY = Core.camera.position.y;
@@ -57,22 +56,11 @@ public class UnitRender extends BasicSystem<UnitRender> {
   }
 
   // 子弹绘制逻辑
-  // 子弹绘制逻辑
   private void drawBullet(Bullet b) {
     if (b.type == null) return;
 
-    // 1. 尝试调用正常的绘制
     b.type.draw(b);
-
-    // 2. 【调试】强制绘制蓝色矩形
-    // 即使 type.draw 没画出来，这行代码也能保证你能看到子弹的位置
-    // 调试完毕后记得删除或注释掉
-    if (debug) {
-      Draw.color(Color.blue);
-      // 使用 Fill.square 绘制一个小方块，大小为 4 (半径2)
-      Fill.square(b.x, b.y, 4f, b.rotation);
-      Draw.color(); // 重置颜色
-    }
+    
   }
 
   private void drawUnit(Unit u) {

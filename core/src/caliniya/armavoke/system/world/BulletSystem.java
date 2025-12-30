@@ -9,13 +9,11 @@ import caliniya.armavoke.type.Bullet;
 
 public class BulletSystem extends BasicSystem<BulletSystem> {
 
-  // 碰撞检测辅助矩形 (复用对象以减少GC)
+  // 碰撞检测辅助矩形
   private final Rect hitRect = new Rect();
 
   @Override
   public BulletSystem init() {
-    // 建议在主线程运行，或者独立的物理线程
-    // 因为涉及大量对象销毁和可能的逻辑回调
     return super.init(true);
   }
 
@@ -24,6 +22,7 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
     // 遍历所有子弹
     // 注意：由于 update 过程中子弹可能会销毁(remove)，
     // 我们通常倒序遍历，或者使用 remove 安全的迭代方式
+    //暂时先这样
     Ar<Bullet> list = WorldData.bullets;
 
     for (int i = list.size - 1; i >= 0; i--) {
@@ -33,25 +32,24 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
   }
 
   private void updateBullet(Bullet b) {
-    // 1. 生命周期检查
-    b.time += 1f; // 假设每帧 +1
+    // 生命周期检查
+    b.time += 1f;
     if (b.time >= b.type.lifetime) {
       b.type.despawn(b);
       return;
     }
 
-    // 2. 移动 (简单的欧拉积分)
-    // 对于极高速子弹，建议使用 Raycast 分步检测，这里演示标准移动
+    // 移动 (简单的欧拉积分)
     float nextX = b.x + b.velX;
     float nextY = b.y + b.velY;
 
-    // 3. 碰撞检测
+    // 碰撞检测
     // 我们需要检测 (nextX, nextY) 是否撞到了敌人
     Unit hitTarget = checkCollision(b, nextX, nextY);
 
     if (hitTarget != null) {
       // 命中单位
-      b.x = nextX; // 可选：移动到命中位置
+      b.x = nextX;
       b.y = nextY;
       b.type.hit(b, hitTarget);
     } else if (WorldData.world.isSolid(
@@ -70,11 +68,10 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
     }
   }
 
-  /** 核心：基于网格的高效碰撞检测 */
-  /** 核心：基于网格的 AABB 高效碰撞检测 */
+  /** 基于网格的 AABB 碰撞检测 */
   private Unit checkCollision(Bullet b, float checkX, float checkY) {
-    // 1. 计算子弹的 AABB (在 checkX, checkY 位置)
-    float bHalfW = b.type.hitW; // 假设 hitSize 是半宽/半高，或者你有专门的 hitW/hitH
+    // 计算子弹的 AABB (在 checkX, checkY 位置)
+    float bHalfW = b.type.hitW;
     float bHalfH = b.type.hitH;
 
     float bMinX = checkX - bHalfW;
@@ -82,7 +79,7 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
     float bMaxX = checkX + bHalfW;
     float bMaxY = checkY + bHalfH;
 
-    // 2. 空间网格查询
+    // 空间网格查询
     int cx = (int) (checkX / WorldData.CHUNK_PIXEL_SIZE);
     int cy = (int) (checkY / WorldData.CHUNK_PIXEL_SIZE);
 
@@ -105,7 +102,7 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
           if (u == null || u.health <= 0) continue;
           if (u.team == b.team) continue;
 
-          // --- AABB 碰撞检测核心 ---
+          // AABB 碰撞检测
           // Unit 的体积是 w * h，中心在 u.x, u.y
           float uHalfW = u.w / 2f;
           float uHalfH = u.h / 2f;
@@ -117,9 +114,8 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
 
           // 矩形重叠判定：两个矩形相交当且仅当它们在 X 轴和 Y 轴上的投影都重叠
           // 逻辑：!(b在u左边 || b在u右边 || b在u上面 || b在u下面)
-          // 优化写法：
           if (bMaxX >= uMinX && bMinX <= uMaxX && bMaxY >= uMinY && bMinY <= uMaxY) {
-            return u; // 命中！
+            return u;
           }
         }
       }

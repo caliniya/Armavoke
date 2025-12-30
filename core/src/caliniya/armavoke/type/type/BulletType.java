@@ -12,33 +12,27 @@ public class BulletType {
 
   public float speed = 6f;
   public float damage = 10f;
-  public float lifetime = 600f; // 存活帧数
+  public float lifetime = 600f;
   public float hitW = 20f;
   public float hitH = 20f;
   
   // 渲染相关
-  public float drawSize = 1f; // 整体缩放比例 (可选)
+  public float drawSize = 1f; // 整体缩放比例
   public Color frontColor = Color.white; // 子弹前景色
-  public Color backColor = Color.gray;   // 子弹背景色 (如果有双层绘制)
+  public Color backColor = Color.gray;   // 子弹背景色
 
   public TextureRegion region;
-
-  // 子弹类型：0=常规，1=激光(射线检测)，2=导弹(追踪)...
-  // 也可以通过继承 BulletType 来实现多态
-
+  
   public BulletType() {
   }
 
   public void load() {
-    // 加载纹理，通常是 "weaponName-bullet"
     this.region = Core.atlas.find("bullet");
   }
 
   /** 子弹更新逻辑 (每帧调用) */
   public void update(Bullet b) {
-    // 默认直线飞行
-    // 子弹位置更新通常在 BulletSystem 统一处理以获得最佳性能
-    // 这里可以处理特效、追踪逻辑等
+    // TODO: 具体实现
   }
 
   /** 子弹绘制逻辑 */
