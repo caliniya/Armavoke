@@ -5,25 +5,26 @@ on:
       - "v*.*.*"
       
 permissions:
-   contents: write
+  contents: write
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - name: check out
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
+    
     - name: set JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: zulu
+    
     - name: set Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          log-accepted-android-sdk-licenses: false
+      uses: android-actions/setup-android@v3
+      with:
+        log-accepted-android-sdk-licenses: false
 
     - name: Build with Gradle
       run: ./gradlew build
@@ -32,4 +33,4 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: /android/build/outputs/apk/debug/android-debug.apk
+        files: android/build/outputs/apk/debug/android-debug.apk
