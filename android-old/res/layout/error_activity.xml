@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
-    <!-- Toolbar -->
     <LinearLayout
         android:layout_height="?android:attr/actionBarSize"
         android:layout_width="match_parent"
@@ -17,6 +16,7 @@
         android:id="@+id/toolbar"
         android:foreground="?android:attr/selectableItemBackgroundBorderless">
 
+
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -24,9 +24,9 @@
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:text="@string/error_occurred" />
+
     </LinearLayout>
 
-    <!-- Error Message Container (FrameLayout) -->
     <FrameLayout
         android:layout_height="0dp"
         android:layout_width="match_parent"
@@ -35,31 +35,30 @@
         android:id="@+id/cardView"
         android:foreground="?android:attr/selectableItemBackgroundBorderless">
 
-        <!-- ScrollView for Error Message -->
         <ScrollView
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:fillViewport="true"
-            android:layout_marginBottom="16dp"> <!-- 底部留出 8dp 空间 -->
+            android:layout_marginBottom="16dp"
+            android:fillViewport="true">
 
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_margin="16dp"
                 android:id="@+id/error_info_text_view" />
+
         </ScrollView>
 
-        <!-- 底部黑色分割线 -->
         <View
             android:layout_height="1dp"
             android:layout_width="match_parent"
+            android:layout_marginEnd="16dp"
             android:background="@android:color/white"
-            android:layout_gravity="bottom"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp" />
+            android:layout_gravity="bottom" />
+
     </FrameLayout>
 
-    <!-- Buttons -->
     <Button
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -81,4 +80,5 @@
         android:layout_marginStart="16dp"
         android:id="@+id/restart_button"
         android:text="@string/restart" />
+
 </LinearLayout>
