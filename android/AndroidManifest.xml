@@ -15,7 +15,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:ignore="UnusedAttribute">
-        android:requestLegacyExternalStorage="true"
 
         <!-- 主 Activity（游戏入口） -->
         <activity
