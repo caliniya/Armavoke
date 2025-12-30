@@ -1,0 +1,20 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/android-old/res/layout/error_activity.xml",
+      "selection": {
+        "end": {
+          "column": 15,
+          "index": 2807,
+          "line": 80
+        },
+        "start": {
+          "column": 15,
+          "index": 2807,
+          "line": 80
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/android-old/res/layout/error_activity.xml"
+}

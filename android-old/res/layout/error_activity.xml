@@ -1,84 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_height="match_parent"
+     android:layout_width="match_parent"
+     android:orientation="vertical"
+     android:fitsSystemWindows="true">
 
     <LinearLayout
-        android:layout_height="?android:attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:paddingEnd="16dp"
-        android:background="@android:color/white"
-        android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:id="@+id/toolbar"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless">
-
+         android:layout_height="?android:attr/actionBarSize"
+         android:layout_width="match_parent"
+         android:paddingEnd="16dp"
+         android:background="@android:color/white"
+         android:gravity="center_vertical"
+         android:paddingStart="16dp"
+         android:id="@+id/toolbar">
 
         <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textSize="20sp"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:text="@string/error_occurred" />
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             android:textSize="20sp"
+             android:textColor="@android:color/black"
+             android:textStyle="bold"
+             android:text="@string/error_occurred" />
 
     </LinearLayout>
 
     <FrameLayout
-        android:layout_height="0dp"
-        android:layout_width="match_parent"
-        android:background="@android:color/white"
-        android:layout_weight="1"
-        android:id="@+id/cardView"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless">
+         android:layout_height="0dp"
+         android:layout_width="match_parent"
+         android:background="@android:color/white"
+         android:layout_weight="1"
+         android:id="@+id/cardView">
 
         <ScrollView
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="16dp"
-            android:fillViewport="true">
+             android:layout_height="match_parent"
+             android:layout_width="match_parent"
+             android:layout_marginBottom="16dp"
+             android:fillViewport="true">
 
             <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_margin="16dp"
-                android:id="@+id/error_info_text_view" />
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:layout_margin="16dp"
+                 android:id="@+id/error_info_text_view" />
 
         </ScrollView>
 
         <View
-            android:layout_height="1dp"
-            android:layout_width="match_parent"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/white"
-            android:layout_marginStart="16dp"
-            android:layout_gravity="bottom" />
+             android:layout_height="1dp"
+             android:layout_width="match_parent"
+             android:layout_marginEnd="16dp"
+             android:background="@android:color/white"
+             android:layout_marginStart="16dp"
+             android:layout_gravity="bottom" />
 
     </FrameLayout>
 
     <Button
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:drawable/edit_text"
-        android:textColor="@android:color/black"
-        android:layout_marginStart="16dp"
-        android:id="@+id/copy_button"
-        android:text="@string/copy_error_report" />
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:layout_marginBottom="8dp"
+         android:layout_marginEnd="16dp"
+         android:background="@android:drawable/edit_text"
+         android:textColor="@android:color/black"
+         android:layout_marginStart="16dp"
+         android:id="@+id/copy_button"
+         android:text="@string/copy_error_report" />
 
     <Button
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:drawable/edit_text"
-        android:textColor="@android:color/black"
-        android:layout_marginStart="16dp"
-        android:id="@+id/restart_button"
-        android:text="@string/restart" />
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:layout_marginBottom="16dp"
+         android:layout_marginEnd="16dp"
+         android:background="@android:drawable/edit_text"
+         android:textColor="@android:color/black"
+         android:layout_marginStart="16dp"
+         android:id="@+id/restart_button"
+         android:text="@string/restart" />
 
 </LinearLayout>
