@@ -18,8 +18,8 @@ public class WorldData {
   public static Ar<Unit> units = new Ar<>(100);
   // 有移动目标的单位
   public static Ar<Unit> moveunits = new Ar<>(5);
-  public static Ar<Bullet> bullets = new Ar<>(1000);
-
+  public static Ar<Bullet> bullets = new Ar<>(false, 1000);
+  
   // --- 空间划分网格相关 ---
   // 每个区块包含的瓦片数量 (32x32个地块)
   public static final int CHUNK_SIZE = 32;
@@ -60,10 +60,9 @@ public class WorldData {
   public static void clearunits() {
     if (units != null) {
       units.each(
-        unit -> {
-          unit.reset();
-        }
-      );
+          unit -> {
+            unit.reset();
+          });
       units.clear();
     }
 
@@ -102,13 +101,12 @@ public class WorldData {
    * @param newH 新地图的高
    */
   public static void reBuildAll(int newW, int newH) {
-    
+
     if (units != null) {
       units.each(
-        unit -> {
-          unit.reset();
-        }
-      );
+          unit -> {
+            unit.reset();
+          });
       units.clear();
     }
     if (moveunits != null) {

@@ -13,23 +13,17 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
   protected boolean isThreaded = false;
 
   private volatile boolean threadRunning = false;
-
   private volatile boolean paused = false;
-  private final Object pauseLock = new Object(); // 用于线程同步锁
+  private final Object pauseLock = new Object();
 
   private Thread systemThread;
-  protected long threadSleepMs = 16;
+
+  // 目标帧率 60FPS -> 每帧 16,666,666 ns
+  protected long targetNs = 16_666_666L;
 
   public float delta = 1f;
   private static final double NS_PER_TICK = 1_000_000_000.0 / 60.0;
   private static final float MAX_DELTA = 4.0f;
-
-  private long lastTime;
-  private long now;
-  private long elapsedNs;
-  private long logicStartNs;
-  private long logicDurationMs;
-  private long sleepTimeMs;
 
   /** 普通初始化 */
   public T init() {
@@ -52,11 +46,9 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
   }
 
   public T init(boolean runInThread, boolean pause) {
-    
     if (pause) {
       Events.on(EventType.GamePause.class, event -> setPaused(event.pause));
     }
-    
     return (T) init(runInThread);
   }
 
@@ -66,22 +58,15 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
     stopThread();
   }
 
-  /**
-   * 设置系统的暂停状态
-   *
-   * @param paused true为暂停，false为恢复
-   */
   public void setPaused(boolean paused) {
     synchronized (pauseLock) {
       this.paused = paused;
       if (!paused) {
-        // 如果是取消暂停，唤醒线程
         pauseLock.notifyAll();
       }
     }
   }
 
-  /** 获取当前是否暂停 */
   public boolean isPaused() {
     return paused;
   }
@@ -97,45 +82,65 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
             () -> {
               Log.info("System thread started: @", this.getClass().getSimpleName());
 
-              // 初始化基准时间
-              lastTime = System.nanoTime();
+              long lastTime = System.nanoTime();
+              long timer = System.currentTimeMillis(); // 用于防止螺旋死亡(Spiral of Death)的可选检查
 
               while (threadRunning) {
                 try {
+                  // 1. 处理暂停
                   synchronized (pauseLock) {
-                    // 如果处于暂停状态，且线程还运行，就挂起
                     while (paused && threadRunning) {
-                      pauseLock.wait(); // 线程在此处停止，不消耗CPU
-
-                      lastTime = System.nanoTime();
+                      pauseLock.wait();
+                      lastTime = System.nanoTime(); // 唤醒后重置时间，防止巨大的 delta
                     }
                   }
 
-                  now = System.nanoTime();
-                  elapsedNs = now - lastTime;
+                  long now = System.nanoTime();
+                  long elapsedNs = now - lastTime;
                   lastTime = now;
 
+                  // 2. 计算 Delta
+                  // 使用双精度浮点数计算，减少累积误差
                   delta = (float) (elapsedNs / NS_PER_TICK);
 
-                  delta = Math.min(delta, MAX_DELTA);
-                  if (delta < 0.001f) delta = 0.001f;
+                  // 钳制 delta，防止极端卡顿后物理瞬移
+                  if (delta > MAX_DELTA) delta = MAX_DELTA;
+                  // 防止除以零或其他算术错误
+                  if (delta < 0.0001f) delta = 0.0001f;
 
-                  logicStartNs = System.nanoTime();
-
+                  // 3. 执行逻辑
+                  long updateStart = System.nanoTime();
                   update();
+                  long updateEnd = System.nanoTime();
 
-                  logicDurationMs = (System.nanoTime() - logicStartNs) / 1_000_000;
-                  sleepTimeMs = threadSleepMs - logicDurationMs;
+                  // 4. 精确休眠控制
+                  long logicDuration = updateEnd - updateStart;
+                  long sleepNs = targetNs - logicDuration;
 
-                  if (sleepTimeMs > 0) {
-                    Thread.sleep(sleepTimeMs);
+                  if (sleepNs > 0) {
+                    long sleepMs = sleepNs / 1_000_000;
+                    int sleepNanoPart = (int) (sleepNs % 1_000_000);
+
+                    // 策略：如果剩余时间 > 1ms，使用 Thread.sleep
+                    // 否则使用忙等待 (Busy Wait) 以保证精度
+                    if (sleepMs > 1) {
+                      // 这里故意少睡 1ms，留给下面的忙等待来修正精度
+                      Thread.sleep(sleepMs - 1);
+                    }
+
+                    // 忙等待直到达到目标时间
+                    while (System.nanoTime() - updateEnd < sleepNs) {
+                      // 自旋，不让出 CPU，获得纳秒级精度
+                      // Thread.onSpinWait(); // Java 9+ 可用，Android 可能没有
+                    }
                   } else {
+                    // 如果逻辑超时了，让出一点时间片防止死锁
                     Thread.yield();
                   }
 
                 } catch (InterruptedException e) {
                   threadRunning = false;
-                  Thread.currentThread().interrupt(); // 恢复状态
+                  Thread.currentThread().interrupt();
                 } catch (Exception e) {
                   Log.err("Error in system thread: @", this.getClass().getSimpleName(), e);
                 }
@@ -146,7 +151,6 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
 
   private void stopThread() {
     threadRunning = false;
-    // 如果线程正在 wait() 状态，interrupt 会让它抛出 InterruptedException 从而退出循环
     if (systemThread != null) {
       systemThread.interrupt();
       try {
@@ -159,6 +163,6 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
 
   @Override
   public int compareTo(BasicSystem<?> other) {
-    return this.index > other.index ? 1 : this.index < other.index ? -1 : 0;
+    return Integer.compare(this.index, other.index);
   }
 }

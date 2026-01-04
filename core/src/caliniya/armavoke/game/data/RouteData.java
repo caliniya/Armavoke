@@ -2,7 +2,7 @@ package caliniya.armavoke.game.data;
 
 import arc.math.Mathf;
 import arc.math.geom.Point2;
-import arc.struct.PQueue; // 使用 Arc 的 PQueue
+import arc.struct.PQueue;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.world.World;
@@ -78,8 +78,6 @@ public class RouteData {
     }
   }
 
-  // --- 核心算法部分 ---
-
   public static Ar<Point2> findPath(int sx, int sy, int tx, int ty, int unitSize, int capability) {
     capability = Mathf.clamp(capability, 0, MAX_CAPABILITY);
     NavLayer layer = layers[capability];
@@ -105,7 +103,7 @@ public class RouteData {
       if (nodeIndex[cIndex] != null && current != nodeIndex[cIndex]) continue;
 
       if (current.x == tx && current.y == ty) {
-        return reconstructPath(current);
+        return smoothPath(reconstructPath(current), layer, unitSize);
       }
 
       closedMap[cIndex] = true;
@@ -160,7 +158,6 @@ public class RouteData {
     int dx = Integer.compare(node.x - node.parent.x, 0);
     int dy = Integer.compare(node.y - node.parent.y, 0);
 
-    // 这里的 isPassable 已经非常快了(查表)，所以可以放心在剪枝逻辑中调用
     if (dx != 0 && dy == 0) { // 水平
       if (isPassable(layer, node.x + dx, node.y, unitSize)) {
         boolean forcedUp =
@@ -227,6 +224,66 @@ public class RouteData {
     return new int[] {};
   }
 
+  /** 路径平滑算法 (基于 Clearance 的宽体射线检测) */
+  private static Ar<Point2> smoothPath(Ar<Point2> path, NavLayer layer, int unitSize) {
+    if (path.size <= 2) return path;
+
+    Ar<Point2> smoothed = new Ar<>();
+    // 起点肯定要保留
+    smoothed.add(path.get(0));
+
+    int inputIndex = 0;
+    // 贪婪算法：从当前点(inputIndex)开始，尽可能往后找最远的一个能直线到达的点
+    while (inputIndex < path.size - 1) {
+      int nextIndex = inputIndex + 1;
+
+      // 从列表末尾倒着往前查，找到第一个能直线连通的点
+      for (int i = path.size - 1; i > inputIndex + 1; i--) {
+        Point2 start = path.get(inputIndex);
+        Point2 end = path.get(i);
+
+        // 使用宽体射线检测
+        if (lineCast(layer, (int) start.x, (int) start.y, (int) end.x, (int) end.y, unitSize)) {
+          nextIndex = i;
+          break; // 找到了最远的直达点，可以直接跳过去
+        }
+      }
+      smoothed.add(path.get(nextIndex));
+      inputIndex = nextIndex;
+    }
+    return smoothed;
+  } // 修复：这里缺少大括号
+
+  /** 宽体射线检测 */
+  private static boolean lineCast(NavLayer layer, int x0, int y0, int x1, int y1, int unitSize) {
+    int dx = Math.abs(x1 - x0);
+    int dy = Math.abs(y1 - y0);
+    int sx = x0 < x1 ? 1 : -1;
+    int sy = y0 < y1 ? 1 : -1;
+    int err = dx - dy;
+
+    int cx = x0;
+    int cy = y0;
+    while (true) {
+      if (!isPassable(layer, cx, cy, unitSize)) {
+        return false;
+      }
+
+      if (cx == x1 && cy == y1) break;
+
+      int e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        cx += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        cy += sy;
+      }
+    }
+    return true;
+  }
+
   private static Point2 jump(
       NavLayer layer, int cx, int cy, int dx, int dy, int tx, int ty, int unitSize) {
     int nx = cx + dx;
@@ -267,14 +324,11 @@ public class RouteData {
     return jump(layer, nx, ny, dx, dy, tx, ty, unitSize);
   }
 
-  // --- 工具方法 ---
-
   /** 判断是否可通过 优先查预计算的 sizeMap，如果是超大单位则回退到查 clearanceMap */
   public static boolean isPassable(NavLayer layer, int x, int y, int unitSize) {
     if (!isValid(x, y)) return false;
     int index = coordToIndex(x, y);
 
-    // 【核心优化】
     if (unitSize <= MAX_PRECALC_RADIUS) {
       // 直接查预计算好的 boolean 数组，速度极快
       // 注意 sizeMaps 存的是"是否阻挡"，所以取反

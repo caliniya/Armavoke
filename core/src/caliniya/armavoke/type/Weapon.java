@@ -1,8 +1,7 @@
 package caliniya.armavoke.type;
 
 import arc.math.Angles;
-import arc.math.Mathf;
-import arc.util.Time;
+import arc.util.Time; // 仅用于引用，逻辑中使用传入的 dt
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.type.WeaponType;
 
@@ -13,9 +12,7 @@ public class Weapon {
   public float rotation;
   public float reloadTimer = 0f;
 
-  // 当前正在瞄准的世界坐标 (由 Unit 传入)
   public float aimX, aimY;
-  // 是否正在开火 (由 Unit 传入)
   public boolean isShooting = false;
 
   public Weapon(WeaponType type, Unit owner) {
@@ -23,51 +20,46 @@ public class Weapon {
     this.owner = owner;
     this.rotation = 0f;
 
-    // 初始化交替射击的错开时间
-    // 如果我是镜像武器，且开启了交替射击，初始自带一半冷却
-    // 这样刚出生时按住开火，主武器先射，副武器会等一半时间再射
     if (type.isMirror && type.alternate) {
       this.reloadTimer = type.reload / 2f;
     }
   }
 
   /**
-   * 每帧更新
+   * 统一更新方法 (由 Unit.updateWeapons 调用)
    *
-   * @param targetX 目标X (如果没有目标，可以是鼠标位置或者前置点)
+   * @param dt 时间增量 (Time.delta)
+   * @param targetX 目标X
    * @param targetY 目标Y
-   * @param shootCmd 是否尝试射击
+   * @param shootCmd 是否开火
    */
-  public void update(float targetX, float targetY, boolean shootCmd) {
+  public void update(float dt, float targetX, float targetY, boolean shootCmd) {
     this.aimX = targetX;
     this.aimY = targetY;
     this.isShooting = shootCmd;
 
+    // 1. 冷却逻辑 (依赖 dt)
     if (reloadTimer > 0) {
-      reloadTimer -= Time.delta;
+      reloadTimer -= dt;
     }
 
-    // 旋转瞄准逻辑
+    // 2. 旋转逻辑 (依赖 dt)
+    // 计算武器的世界坐标 (用于计算角度)
+    // 注意：这里用 owner.rotation，因为武器是挂在单位身上的
     float wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
     float wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
 
     float targetAngle = Angles.angle(wx, wy, aimX, aimY);
+    // 目标相对角度 = 目标绝对角度 - 单位朝向 - 90 (素材默认朝上)
     float mountAngle = targetAngle - owner.rotation - 90;
 
-    this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * Time.delta);
+    // 平滑旋转
+    this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
 
-    // 射击逻辑
-    // 只有主武器负责触发射击检测？
-    // 或者每个武器独立检测？根据你的需求 "镜像武器不能自行冷却"，
-    // 其实是指：镜像武器的开火节奏受主武器影响。
-
-    // 如果我是镜像武器，且是交替模式，我不需要做特殊的"不能自行冷却"限制。
-    // 因为初始的 reloadTimer 已经让我错开了。
-    // 只要我不去重置另一半的冷却，我们就会各自按周期运行，保持相位差。
-
+    // 3. 射击判定
     if (isShooting && reloadTimer <= 0) {
-      // 检查角度是否对准 (例如偏差小于 10 度)
-      if (Angles.within(this.rotation, mountAngle, 10f)) {
+      // 允许一定的射击角度误差 (1度)
+      if (Angles.within(this.rotation, mountAngle, 1f)) {
         shoot(wx, wy, targetAngle);
       }
     }
@@ -76,20 +68,19 @@ public class Weapon {
   private void shoot(float wx, float wy, float angle) {
     this.reloadTimer = type.reload;
 
-    // 计算枪口位置 (如果有 shootX/Y 偏移)
-    // 注意：这里是相对于武器自身的旋转
+    // 计算枪口位置
     float bulletX = wx + Angles.trnsx(angle, type.shootX, type.shootY);
     float bulletY = wy + Angles.trnsy(angle, type.shootX, type.shootY);
 
     if (type.bullet != null) {
-      Bullet.create(type.bullet, owner, bulletX, bulletY, angle);
+      // 传递 owner 的速度用于惯性叠加
+      Bullet.create(type.bullet, owner, bulletX, bulletY, angle, owner.speedX, owner.speedY);
     }
-    // 强制同步逻辑 (交替射击)
+
+    // 交替射击同步
     if (!type.isMirror && type.otherSide != -1 && type.alternate) {
-      // 确保索引有效
       if (type.otherSide < owner.weapons.size) {
         Weapon mirror = owner.weapons.get(type.otherSide);
-        // 强制同步：把镜像武器的冷却设为总冷却的一半
         if (mirror != null) {
           mirror.reloadTimer = type.reload / 2f;
         }

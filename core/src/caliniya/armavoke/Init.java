@@ -79,7 +79,6 @@ public class Init {
 
     assets.load("sprites/sprites.aatls", TextureAtlas.class);
     inited();
-    throw new ArcRuntimeException("aa");
   }
 
   public static void inited() {

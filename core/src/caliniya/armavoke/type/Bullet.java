@@ -22,13 +22,13 @@ public class Bullet implements Poolable {
     protected Bullet() {}
 
     /** 工厂方法：创建并初始化子弹 */
-    public static Bullet create(BulletType type, Unit owner, float x, float y, float angle) {
+    public static Bullet create(BulletType type, Unit owner, float x, float y, float angle, float unitVx, float unitVy) {
         Bullet b = Pools.obtain(Bullet.class, Bullet::new);
-        b.init(type, owner, x, y, angle);
+        b.init(type, owner, x, y, angle, unitVx, unitVy);
         return b;
     }
 
-    public void init(BulletType type, Unit owner, float x, float y, float angle) {
+    public void init(BulletType type, Unit owner, float x, float y, float angle, float unitVx, float unitVy) {
         this.type = type;
         this.owner = owner;
         this.team = (owner != null) ? owner.team : TeamTypes.Abort;
@@ -38,14 +38,18 @@ public class Bullet implements Poolable {
         this.rotation = angle;
         this.time = 0f;
         
-        // 计算速度向量
-        this.velX = arc.math.Mathf.cosDeg(angle) * type.speed;
-        this.velY = arc.math.Mathf.sinDeg(angle) * type.speed;
+        //  计算子弹自身的推进速度
+        float bulletSpeed = type.speed;
+        float baseVx = arc.math.Mathf.cosDeg(angle) * bulletSpeed;
+        float baseVy = arc.math.Mathf.sinDeg(angle) * bulletSpeed;
         
-        // 加入全局子弹列表
+        float inertia = 1.0f; 
+        
+        this.velX = baseVx + (unitVx * inertia);
+        this.velY = baseVy + (unitVy * inertia);
+        
         WorldData.bullets.add(this);
     }
-
     @Override
     public void reset() {
         type = null;

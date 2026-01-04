@@ -96,8 +96,6 @@ public class World {
 
     // 放置目标块
     envblocks.set(testIndex, ENVBlocks.a);
-    Log.info("TEST BLOCK PLACED AT: x=@, y=@, index=@", testX, testY, testIndex);
-    Log.info("Stack trace:", new RuntimeException("Trace World Init"));
   }
 
   public int indexToX(int ind) {
@@ -119,7 +117,7 @@ public class World {
   }
 
   /**
-   * 【核心方法】检查一个网格坐标是否是障碍物 (无法通行)
+   *检查一个网格坐标是否是障碍物 (无法通行)
    *
    * @param x 网格 x 坐标
    * @param y 网格 y 坐标

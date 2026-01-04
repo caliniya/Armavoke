@@ -92,7 +92,6 @@ public class Armavoke extends ApplicationCore {
     }
     for(int i = 0; i < WorldData.units.size; ++i) {
     	Unit u = WorldData.units.get(i);
-      u.updateWeapons();
     }
     scene.act();
     scene.draw();

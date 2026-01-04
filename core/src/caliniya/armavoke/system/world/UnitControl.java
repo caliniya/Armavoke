@@ -127,8 +127,8 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   private boolean isPointInUnit(Unit unit, float px, float py) {
     if (unit == null || unit.type == null) return false;
-    float halfW = unit.w / 2f;
-    float halfH = unit.h / 2f;
+        float halfW = unit.size / 2f;
+    float halfH = unit.size / 2f;
     return Math.abs(unit.x - px) <= halfW && Math.abs(unit.y - py) <= halfH;
   }
 

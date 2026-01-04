@@ -13,8 +13,7 @@ public class BulletType {
   public float speed = 6f;
   public float damage = 10f;
   public float lifetime = 600f;
-  public float hitW = 20f;
-  public float hitH = 20f;
+  public float size = 60f;
   
   // 渲染相关
   public float drawSize = 1f; // 整体缩放比例
@@ -39,16 +38,13 @@ public class BulletType {
   public void draw(Bullet b) {
     if (region == null) return;
 
-    float drawW = hitW; 
-    float drawH = hitH; 
-
     // 1. 绘制背层 (光晕)
     Draw.color(backColor);
-    Draw.rect(region, b.x, b.y, drawW * 1.5f, drawH * 1.5f, b.rotation - 90);
+    Draw.rect(region, b.x, b.y, size * 1.5f, size * 1.5f, b.rotation - 90);
 
     // 2. 绘制前层 (核心)
     Draw.color(frontColor);
-    Draw.rect(region, b.x, b.y, drawW, drawH, b.rotation - 90);
+    Draw.rect(region, b.x, b.y, size, size, b.rotation - 90);
     
     Draw.color(); // 重置
   }

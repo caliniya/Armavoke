@@ -27,10 +27,10 @@ public class UnitRender extends BasicSystem<UnitRender> {
 
   @Override
   public void update() {
-    // 1. 绘制单位
+    // 绘制单位
     for (int i = 0; i < WorldData.units.size; i++) {
       Unit u = WorldData.units.get(i);
-      if (shouldDraw(u.x, u.y, u.w * 2)) {
+      if (shouldDraw(u.x, u.y, u.size * 2)) {
         drawUnit(u);
         if (debug) drawDebug(u);
       }
@@ -68,7 +68,7 @@ public class UnitRender extends BasicSystem<UnitRender> {
     if (u.isSelected) {
       Draw.color(Color.green);
       Lines.stroke(2f);
-      Lines.circle(u.x, u.y, (u.w + u.h) / 2 + 4);
+      Lines.circle(u.x, u.y, u.size + 4);
       Draw.color();
     }
 
@@ -96,7 +96,7 @@ public class UnitRender extends BasicSystem<UnitRender> {
     // 绘制碰撞体积
     Draw.color(Color.yellow);
     Lines.stroke(3f);
-    Lines.rect(u.x - u.w / 2f, u.y - u.h / 2f, u.w, u.h);
+    Lines.rect(u.x - u.size / 2f, u.y - u.size / 2f, u.size, u.size);
 
     // 绘制目标点连接线 (从单位中心到目标点)
     // 仅当目标点不在原点或单位附近时绘制

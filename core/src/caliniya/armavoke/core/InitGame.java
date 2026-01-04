@@ -11,6 +11,7 @@ import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.map.Maps;
+import caliniya.armavoke.system.game.GameProcess;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 
@@ -24,7 +25,8 @@ public class InitGame {
     Maps.load();
     WorldData.initWorld();
     RouteData.init();
-    Armavoke.addSystem(new MapRender().init(),new UnitRender().init() , new BulletSystem().init());
+    Armavoke.addSystem(new MapRender().init(),new UnitRender().init(), new GameProcess().init());
+    new BulletSystem().init();
     new UnitMath().init();
     new UnitProces().init();
     

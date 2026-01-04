@@ -17,7 +17,7 @@ public class UnitType extends ContentType {
       speedt, // 像素每帧
       rotationSpeend = 1f // 旋转速度(单位帧每度？)
   ;
-  public float w = 100f, h = 180f;
+  public float size = 100f;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();
 
