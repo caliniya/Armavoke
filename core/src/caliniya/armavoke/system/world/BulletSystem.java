@@ -29,7 +29,7 @@ public class BulletSystem extends BasicSystem<BulletSystem> {
       list.addAll(WorldData.bullets);
     }
 
-    for (int i = 1; i < list.size; i++) {
+    for (int i = 0; i < list.size; i++) {
       Bullet b = list.get(i);
       if(b == null || b.type == null) continue;
       updateBullet(b);

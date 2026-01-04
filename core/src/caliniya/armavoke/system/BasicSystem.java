@@ -18,12 +18,9 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
 
   private Thread systemThread;
 
-  // 目标帧率 60FPS -> 每帧 16,666,666 ns
+  // 目标帧率 60FPS -> 约 16.6 ms
+  // 用于限制后台线程的 CPU 占用率
   protected long targetNs = 16_666_666L;
-
-  public float delta = 1f;
-  private static final double NS_PER_TICK = 1_000_000_000.0 / 60.0;
-  private static final float MAX_DELTA = 4.0f;
 
   /** 普通初始化 */
   public T init() {
@@ -82,67 +79,46 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
             () -> {
               Log.info("System thread started: @", this.getClass().getSimpleName());
 
-              long lastTime = System.nanoTime();
-              long timer = System.currentTimeMillis(); // 用于防止螺旋死亡(Spiral of Death)的可选检查
-
               while (threadRunning) {
                 try {
                   // 1. 处理暂停
                   synchronized (pauseLock) {
                     while (paused && threadRunning) {
                       pauseLock.wait();
-                      lastTime = System.nanoTime(); // 唤醒后重置时间，防止巨大的 delta
                     }
                   }
 
-                  long now = System.nanoTime();
-                  long elapsedNs = now - lastTime;
-                  lastTime = now;
+                  // 2. 记录开始时间
+                  long startTime = System.nanoTime();
 
-                  // 2. 计算 Delta
-                  // 使用双精度浮点数计算，减少累积误差
-                  delta = (float) (elapsedNs / NS_PER_TICK);
+                  // 3. 执行逻辑 (包含内部异常捕获，防止单次错误杀掉线程)
+                  try {
+                    update();
+                  } catch (Exception e) {
+                    Log.err("Error in system thread: @", this.getClass().getSimpleName(), e);
+                  }
 
-                  // 钳制 delta，防止极端卡顿后物理瞬移
-                  if (delta > MAX_DELTA) delta = MAX_DELTA;
-                  // 防止除以零或其他算术错误
-                  if (delta < 0.0001f) delta = 0.0001f;
-
-                  // 3. 执行逻辑
-                  long updateStart = System.nanoTime();
-                  update();
-                  long updateEnd = System.nanoTime();
-
-                  // 4. 精确休眠控制
-                  long logicDuration = updateEnd - updateStart;
-                  long sleepNs = targetNs - logicDuration;
+                  // 4. 计算休眠时间
+                  long endTime = System.nanoTime();
+                  long elapsedNs = endTime - startTime;
+                  long sleepNs = targetNs - elapsedNs;
 
                   if (sleepNs > 0) {
                     long sleepMs = sleepNs / 1_000_000;
                     int sleepNanoPart = (int) (sleepNs % 1_000_000);
 
-                    // 策略：如果剩余时间 > 1ms，使用 Thread.sleep
-                    // 否则使用忙等待 (Busy Wait) 以保证精度
-                    if (sleepMs > 1) {
-                      // 这里故意少睡 1ms，留给下面的忙等待来修正精度
-                      Thread.sleep(sleepMs - 1);
-                    }
-
-                    // 忙等待直到达到目标时间
-                    while (System.nanoTime() - updateEnd < sleepNs) {
-                      // 自旋，不让出 CPU，获得纳秒级精度
-                      // Thread.onSpinWait(); // Java 9+ 可用，Android 可能没有
-                    }
+                    Thread.sleep(sleepMs, sleepNanoPart);
                   } else {
-                    // 如果逻辑超时了，让出一点时间片防止死锁
+                    // 如果运算超时，让出时间片，防止饿死其他线程
                     Thread.yield();
                   }
 
                 } catch (InterruptedException e) {
                   threadRunning = false;
-                  Thread.currentThread().interrupt();
+                  Thread.currentThread().interrupt(); // 恢复中断状态
                 } catch (Exception e) {
-                  Log.err("Error in system thread: @", this.getClass().getSimpleName(), e);
+                  // 捕获循环体外部的异常（如 sleep 以外的错误）
+                  Log.err("Critical error in system loop: @", this.getClass().getSimpleName(), e);
                 }
               }
               Log.info("System thread stopped: @", this.getClass().getSimpleName());
@@ -154,6 +130,7 @@ public abstract class BasicSystem<T extends BasicSystem<T>> implements Comparabl
     if (systemThread != null) {
       systemThread.interrupt();
       try {
+        // 等待线程稍微清理一下，避免立即销毁导致资源未释放
         systemThread.join(100);
       } catch (Exception ignored) {
       }

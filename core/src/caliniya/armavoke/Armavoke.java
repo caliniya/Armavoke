@@ -90,9 +90,6 @@ public class Armavoke extends ApplicationCore {
       camera.update();
       Draw.flush();
     }
-    for(int i = 0; i < WorldData.units.size; ++i) {
-    	Unit u = WorldData.units.get(i);
-    }
     scene.act();
     scene.draw();
   }

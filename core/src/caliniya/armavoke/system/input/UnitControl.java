@@ -1,4 +1,4 @@
-package caliniya.armavoke.system.world;
+package caliniya.armavoke.system.input;
 
 import arc.Core;
 import arc.Events;

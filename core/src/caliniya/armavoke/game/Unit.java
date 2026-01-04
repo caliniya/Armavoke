@@ -140,15 +140,12 @@ public class Unit implements Poolable {
   }
 
   /**
-   * 完整的物理与逻辑更新 (由 TimeProcess 调用)
-   *
    * @param dt 时间增量
    */
   public void update(float dt) {
     float oldX = this.x;
     float oldY = this.y;
 
-    // --- 1. 路径跟随与节点切换逻辑 ---
     // 如果有路径且还没走完
     if (path != null && !path.isEmpty()) {
       // 计算当前目标的坐标

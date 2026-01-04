@@ -50,6 +50,7 @@ public class Bullet implements Poolable {
         
         WorldData.bullets.add(this);
     }
+    
     @Override
     public void reset() {
         type = null;

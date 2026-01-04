@@ -1,7 +1,7 @@
 package caliniya.armavoke.type;
 
 import arc.math.Angles;
-import arc.util.Time; // 仅用于引用，逻辑中使用传入的 dt
+import arc.util.Time;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.type.WeaponType;
 

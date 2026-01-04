@@ -15,11 +15,11 @@ public class WorldData {
   public static World world;
 
   // 全局单位列表 (用于逻辑更新)
-  public static Ar<Unit> units = new Ar<>(100);
+  public static Ar<Unit> units;
   // 有移动目标的单位
-  public static Ar<Unit> moveunits = new Ar<>(5);
-  public static Ar<Bullet> bullets = new Ar<>(false, 1000);
-  
+  public static Ar<Unit> moveunits;
+  public static Ar<Bullet> bullets;
+
   // --- 空间划分网格相关 ---
   // 每个区块包含的瓦片数量 (32x32个地块)
   public static final int CHUNK_SIZE = 32;
@@ -42,6 +42,11 @@ public class WorldData {
     world = new World();
     world.test = true;
     world.init();
+
+    units = new Ar<>(100);
+    // 有移动目标的单位
+    moveunits = new Ar<>(5);
+    bullets = new Ar<>(false, 1000);
 
     // 1. 初始化网格尺寸
     // 即使地图大小不能整除32，也要向上取整多算一个格子，防止越界
