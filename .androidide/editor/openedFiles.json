@@ -1,0 +1,20 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/shaders/space.frag",
+      "selection": {
+        "end": {
+          "column": 40,
+          "index": 1217,
+          "line": 36
+        },
+        "start": {
+          "column": 40,
+          "index": 1217,
+          "line": 36
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/shaders/space.frag"
+}

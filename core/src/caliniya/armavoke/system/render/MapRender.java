@@ -17,6 +17,7 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
 import caliniya.armavoke.ui.Fonts;
 import caliniya.armavoke.world.World;
+import caliniya.armavoke.base.shaders.*;
 
 public class MapRender extends BasicSystem<MapRender> {
   public static final float TILE_SIZE = 32f;
@@ -27,17 +28,23 @@ public class MapRender extends BasicSystem<MapRender> {
   private MapChunk[][] chunks;
   private int chunksW, chunksH;
 
+  private SpaceShader spaceShader;
+
   public boolean debug = true;
   private final GlyphLayout layout = new GlyphLayout();
 
   @Override
   public MapRender init() {
     Events.run(EventType.events.Mapinit, () -> rebuildAll());
-    //WorldData.initWorld();
+    // WorldData.initWorld();
     world = WorldData.world;
-    this.index = 8;
+    this.index = 6;
     initChunks();
-
+    try {
+      spaceShader = new SpaceShader();
+    } catch (Exception e) {
+      arc.util.Log.err("Failed to load space shader", e);
+    }
     return super.init();
   }
 
@@ -106,6 +113,14 @@ public class MapRender extends BasicSystem<MapRender> {
     startY = Mathf.clamp(startY, 0, chunksH - 1);
     endX = Mathf.clamp(endX, 0, chunksW - 1);
     endY = Mathf.clamp(endY, 0, chunksH - 1);
+    
+    if (world.space && spaceShader != null) {
+        drawSpaceBackground();
+    } else {
+        // 如果不是太空，或者 Shader 加载失败，清空屏幕为默认颜色
+        // (Arc 的 application listener 通常会自动 clear，但为了保险可以手动 Fill)
+        Core.graphics.clear(Color.black); 
+    }
 
     // 只渲染视野内的区块
     for (int y = startY; y <= endY; y++) {
@@ -124,41 +139,34 @@ public class MapRender extends BasicSystem<MapRender> {
     int endX = Mathf.clamp((int) (viewRight / TILE_SIZE), 0, world.W - 1);
     int endY = Mathf.clamp((int) (viewTop / TILE_SIZE), 0, world.H - 1);
 
-    Font font = Fonts.def;
-    float fontScale = 0.5f;
-    font.getData().setScale(fontScale);
-    
     boolean[] solidMap = RouteData.layers[0].baseSolidMap;
     int[] clearanceMap = RouteData.layers[0].clearanceMap;
-    
+
     if (solidMap == null) return;
 
     for (int y = startY; y <= endY; y++) {
       for (int x = startX; x <= endX; x++) {
-        
+
         int index = WorldData.world.coordToIndex(x, y);
-        
+
         float drawX = x * TILE_SIZE + TILE_SIZE / 2f;
         float drawY = y * TILE_SIZE + TILE_SIZE / 2f;
-        
+
         if (index >= 0 && index < solidMap.length && solidMap[index]) {
           Draw.color(1f, 0f, 0f, 0.5f);
           Fill.rect(drawX, drawY, TILE_SIZE, TILE_SIZE);
         }
-              int clearance = clearanceMap[index];
-              
-              if (clearance == 0) Draw.color(Color.red);
-              else if (clearance < 3) Draw.color(Color.yellow);
-              else Draw.color(Color.green);
-              
-              font.draw(String.valueOf(clearance), drawX, drawY + 4f, Align.center);
-          }
+        int clearance = clearanceMap[index];
+
+        if (clearance == 0) Draw.color(Color.red);
+        else if (clearance < 3) Draw.color(Color.yellow);
+        else Draw.color(Color.green);
       }
+    }
 
     Draw.color();
-    font.getData().setScale(1f);
   }
-  
+
   public void flagUpdate(int worldGridX, int worldGridY) {
     int cx = worldGridX / MapChunk.SIZE;
     int cy = worldGridY / MapChunk.SIZE;
@@ -168,6 +176,25 @@ public class MapRender extends BasicSystem<MapRender> {
         chunks[cx][cy].dirty = true;
       }
     }
+  }
+
+  /** 使用 Shader 绘制一个覆盖全屏的矩形 */
+  private void drawSpaceBackground() {
+    // 开始使用自定义 Shader
+    Draw.shader(spaceShader);
+
+    // 绘制一个覆盖整个视口的矩形
+    // 这里的坐标是基于 Core.camera 的，所以我们需要获取当前相机的视野范围
+    float x = camera.position.x;
+    float y = camera.position.y;
+    float w = camera.width;
+    float h = camera.height;
+
+    // 填充矩形 (Shader 会根据像素位置自动计算颜色)
+    Fill.rect(x, y, w, h);
+
+    // 结束使用自定义 Shader (恢复默认 Shader)
+    Draw.shader();
   }
 
   @Override

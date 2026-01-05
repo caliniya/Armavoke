@@ -32,7 +32,7 @@ public class WeaponType implements Cloneable {
 
   public void load(String parentUnitName) {
     String textureName = parentUnitName + "-" + this.name;
-    region = Core.atlas.find(textureName, "white");
+    region = Core.atlas.find(textureName, "air");
     bullet.load();
   }
 

@@ -32,7 +32,7 @@ public class UnitType extends ContentType {
   public void load() {
     this.speedt = (speed * WorldData.TILE_SIZE) / 60f;
     region = Core.atlas.find(name, "white");
-    cell = Core.atlas.find(name + "-cell", "white");
+    cell = Core.atlas.find(name + "-cell", "air");
     for (WeaponType weapon : weapons) {
       weapon.load(this.name);
     }
