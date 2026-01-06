@@ -2,23 +2,62 @@ package caliniya.armavoke.base.shaders;
 
 import arc.Core;
 import arc.files.Fi;
+import arc.graphics.Camera;
+import arc.graphics.Gl;
+import arc.graphics.Texture;
+import arc.graphics.Texture.TextureWrap;
+import arc.graphics.g2d.Draw;
 import arc.graphics.gl.Shader;
+import arc.util.Disposable;
 import arc.util.Time;
 
-public class SpaceShader extends Shader {
+public class SpaceShader implements Disposable {
     
+    private Shader shader;
+    private Texture texture;
+    
+    // 视差系数
+    public float parallaxScale = 0.4f; 
+    // 基础缩放
+    public float baseScale = 1.0f; 
+
     public SpaceShader() {
-        super(
+        shader = new Shader(
             Core.files.internal("shaders/space.vert"),
             Core.files.internal("shaders/space.frag")
         );
+
+        texture = new Texture(Core.files.internal("sprites/space.png"));
+        
+        texture.setWrap(TextureWrap.repeat, TextureWrap.repeat);
+    }
+
+    public void render() {
+        Camera cam = Core.camera;
+        
+        float zoom = cam.width / Core.graphics.getWidth();
+        
+        zoom *= baseScale;
+
+        shader.bind();
+        
+        // 传递参数
+        shader.setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+        shader.setUniformf("u_camPos", cam.position.x, cam.position.y);
+        shader.setUniformf("u_zoom", zoom);
+        shader.setUniformf("u_texSize", (float)texture.width, (float)texture.height);
+        shader.setUniformf("u_parallax", parallaxScale);
+        
+        // 绑定纹理
+        texture.bind(0);
+        shader.setUniformi("u_texture", 0);
+        
+        Draw.blit(shader);
     }
 
     @Override
-    public void apply() {
-        // 设置 uniforms
-        setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-        setUniformf("u_camPos", Core.camera.position.x, Core.camera.position.y);
-        setUniformf("u_time", Time.time); // 传递时间
+    public void dispose() {
+        if (shader != null) shader.dispose();
+        if (texture != null) texture.dispose();
     }
 }

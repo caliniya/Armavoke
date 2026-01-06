@@ -39,6 +39,7 @@ public class MapRender extends BasicSystem<MapRender> {
     // WorldData.initWorld();
     world = WorldData.world;
     this.index = 6;
+    spaceShader = new SpaceShader();
     initChunks();
     try {
       spaceShader = new SpaceShader();
@@ -115,7 +116,7 @@ public class MapRender extends BasicSystem<MapRender> {
     endY = Mathf.clamp(endY, 0, chunksH - 1);
     
     if (world.space && spaceShader != null) {
-        drawSpaceBackground();
+        spaceShader.render();
     } else {
         // 如果不是太空，或者 Shader 加载失败，清空屏幕为默认颜色
         // (Arc 的 application listener 通常会自动 clear，但为了保险可以手动 Fill)
@@ -176,25 +177,6 @@ public class MapRender extends BasicSystem<MapRender> {
         chunks[cx][cy].dirty = true;
       }
     }
-  }
-
-  /** 使用 Shader 绘制一个覆盖全屏的矩形 */
-  private void drawSpaceBackground() {
-    // 开始使用自定义 Shader
-    Draw.shader(spaceShader);
-
-    // 绘制一个覆盖整个视口的矩形
-    // 这里的坐标是基于 Core.camera 的，所以我们需要获取当前相机的视野范围
-    float x = camera.position.x;
-    float y = camera.position.y;
-    float w = camera.width;
-    float h = camera.height;
-
-    // 填充矩形 (Shader 会根据像素位置自动计算颜色)
-    Fill.rect(x, y, w, h);
-
-    // 结束使用自定义 Shader (恢复默认 Shader)
-    Draw.shader();
   }
 
   @Override
