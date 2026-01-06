@@ -1,8 +1,13 @@
 package caliniya.armavoke;
 
+import arc.graphics.Camera;
+import arc.scene.Scene;
+import arc.util.viewport.ScreenViewport;
+import caliniya.armavoke.ui.Styles;
 import arc.graphics.g2d.SpriteBatch;
 import arc.input.InputMultiplexer;
 import arc.input.GestureDetector;
+import arc.util.Strings;
 import caliniya.armavoke.base.tool.Ar;
 import arc.graphics.g2d.Draw;
 import caliniya.armavoke.core.UI;
@@ -34,7 +39,6 @@ public class Armavoke extends ApplicationCore {
   @Override
   public void setup() {
     graphics.clear(Color.black);
-    camera.resize(graphics.getWidth(), graphics.getHeight());
   }
 
   @Override
@@ -47,15 +51,14 @@ public class Armavoke extends ApplicationCore {
   public void update() {
     super.update();
     graphics.clear(Color.black);
-
+    
     // 资源加载完成后的初始化
-    if (assets.update() && !assinited) {
-      UI.initAll();
+    if (assets.update() && !assinited) {         
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
+      UI.initAll();
       Styles.load();
       UI.Menu();
       UI.Debug();
-      scene.resize(graphics.getWidth(), graphics.getHeight());
       UnitControl unitCtrl = new UnitControl().init();
       camInput = new CameraInput().init();
       Log.info("loaded");
@@ -76,7 +79,7 @@ public class Armavoke extends ApplicationCore {
 
     // 加载界面
     if (!assinited) {
-      UI.Loading();
+      UI.Loading(assets.getProgress());
     } else {
       Draw.proj(camera);
 
@@ -101,7 +104,7 @@ public class Armavoke extends ApplicationCore {
         if (!s.inited) s.init();
         systems.add(s);
         added = true;
-      }// TODO: 应不应该重复添加
+      } // TODO: 应不应该重复添加
     }
     if (added) {
       systems.sort();

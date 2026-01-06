@@ -13,54 +13,81 @@ public class Weapon {
   public float reloadTimer = 0f;
 
   public float aimX, aimY;
-  public boolean isShooting = false;
+  public boolean isShooting = false , rotate;
+
+  // 武器挂载点的世界坐标
+  public float wx;
+  public float wy;
+
+  // 目标绝对角度 (从武器位置指向目标位置)
+  public float targetAngle;
+
+  // 目标相对角度 (目标相对于单位朝向的角度)
+  public float mountAngle;
 
   public Weapon(WeaponType type, Unit owner) {
     this.type = type;
     this.owner = owner;
     this.rotation = 0f;
+    this.rotate = type.rotate;
 
     if (type.isMirror && type.alternate) {
       this.reloadTimer = type.reload / 2f;
     }
   }
 
-  /**
-   * 统一更新方法 (由 Unit.updateWeapons 调用)
-   *
-   * @param dt 时间增量 (Time.delta)
-   * @param targetX 目标X
-   * @param targetY 目标Y
-   * @param shootCmd 是否开火
-   */
   public void update(float dt, float targetX, float targetY, boolean shootCmd) {
     this.aimX = targetX;
     this.aimY = targetY;
     this.isShooting = shootCmd;
 
-    // 1. 冷却逻辑 (依赖 dt)
+    // 冷却逻辑
     if (reloadTimer > 0) {
       reloadTimer -= dt;
     }
 
-    // 2. 旋转逻辑 (依赖 dt)
-    // 计算武器的世界坐标 (用于计算角度)
-    // 注意：这里用 owner.rotation，因为武器是挂在单位身上的
-    float wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
-    float wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
+    // 计算武器挂载点的世界坐标
+    wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
+    wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
 
-    float targetAngle = Angles.angle(wx, wy, aimX, aimY);
-    // 目标相对角度 = 目标绝对角度 - 单位朝向 - 90 (素材默认朝上)
-    float mountAngle = targetAngle - owner.rotation - 90;
+    // 旋转逻辑
+    if (rotate) {
+      // 炮塔：尝试旋转以对准相对角度
+      // 计算目标绝对角度 (从武器位置指向目标位置)
+      targetAngle = Angles.angle(wx, wy, aimX, aimY);
+      // 计算目标相对角度 (目标相对于单位朝向的角度)
+      mountAngle = targetAngle - owner.rotation - 90;
+      this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
+    } else {
+      // 固定武器：强制锁定为 0 (永远指向单位正前方)
+      this.rotation = 0f;
+    }
 
-    // 平滑旋转
-    this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
-
-    // 3. 射击判定
+    // 射击判定
     if (isShooting && reloadTimer <= 0) {
-      // 允许一定的射击角度误差 (1度)
-      if (Angles.within(this.rotation, mountAngle, 1f)) {
-        shoot(wx, wy, targetAngle);
+
+      boolean canShoot;
+      float shootAngle; // 最终的射击绝对角度
+
+      if (rotate) {
+        // 判定标准：炮塔自身的旋转角是否对准了理想挂载角
+        canShoot = Angles.within(this.rotation, mountAngle, 2f);
+
+        // 射击角度 = 单位朝向 + 90 + 炮塔偏转角
+        shootAngle = owner.rotation + 90 + this.rotation;
+      } else {
+        // 判定标准：单位的绝对朝向是否对准了目标的绝对角度
+        // owner.rotation + 90 代表单位正前方的绝对角度
+        float unitFacing = owner.rotation + 90;
+
+        canShoot = Angles.within(unitFacing, owner.angleToTarget, type.shootCone);
+
+        // 射击角度 = 单位正前方
+        shootAngle = unitFacing;
+      }
+
+      if (canShoot) {
+        shoot(wx, wy, shootAngle);
       }
     }
   }
@@ -68,7 +95,7 @@ public class Weapon {
   private void shoot(float wx, float wy, float angle) {
     this.reloadTimer = type.reload;
 
-    // 计算枪口位置
+    // 计算枪口位置 (基于传入的最终射击角度)
     float bulletX = wx + Angles.trnsx(angle, type.shootX, type.shootY);
     float bulletY = wy + Angles.trnsy(angle, type.shootX, type.shootY);
 

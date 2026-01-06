@@ -45,7 +45,7 @@ public class World {
       for (int y = padding; y < H - padding; y++) {
         for (int x = padding; x < W - padding; x++) {
           // 随机生成一簇障碍
-          if (Math.random() < 0.03) {
+          if (Math.random() < 0.003) {
             for (int oy = -1; oy <= 1; oy++) {
               for (int ox = -1; ox <= 1; ox++) {
                 int px = x + ox;

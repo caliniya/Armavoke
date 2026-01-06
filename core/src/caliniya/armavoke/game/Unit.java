@@ -27,12 +27,14 @@ public class Unit implements Poolable {
   public TeamData teamData;
 
   public Ar<Weapon> weapons = new Ar<>();
+  public Weapon mainFixedWeapon = null; // 缓存的主固定武器
 
   // --- 物理属性 ---
   public float x, y;
   public float speedX, speedY, angle; // 速度分量 (每帧移动的像素量), 速度方向
   public float rotationSpeed;
   public float rotation; // 渲染朝向 (度)
+  public float angleToTarget;
 
   public boolean shooting = false;
 
@@ -88,8 +90,13 @@ public class Unit implements Poolable {
     shooting = false;
 
     weapons.clear();
+    mainFixedWeapon = null;
     for (WeaponType wType : type.weapons) {
-      weapons.add(new Weapon(wType, this));
+      Weapon w = new Weapon(wType, this);
+      weapons.add(w);
+      if (!wType.rotate && mainFixedWeapon == null) {
+        mainFixedWeapon = w;
+      }
     }
 
     this.rotation = 0f;
@@ -140,58 +147,43 @@ public class Unit implements Poolable {
   }
 
   /**
+   * 单位更新逻辑
+   *
    * @param dt 时间增量
    */
   public void update(float dt) {
     float oldX = this.x;
     float oldY = this.y;
+    
+    if (path == null && Mathf.dst(x, y, targetX, targetY) < 2f) {
+      x = targetX;
+      y = targetY;
+    } else {
+      x += speedX * dt;
+      y += speedY * dt;
+    }
+    
+    if (shooting) {
+      // 射击模式下
+      if (mainFixedWeapon != null) {
+        
+        angleToTarget = Angles.angle(x, y, targetX, targetY);
+        
+        rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
 
-    // 如果有路径且还没走完
-    if (path != null && !path.isEmpty()) {
-      // 计算当前目标的坐标
-      float nextX, nextY;
-
-      // 如果是最后一个点，去往 targetX/Y (像素坐标)
-      if (pathIndex >= path.size - 1) {
-        nextX = targetX;
-        nextY = targetY;
       } else {
-        // 否则去往网格中心
-        Point2 node = path.get(pathIndex);
-        nextX = node.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-        nextY = node.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
+        if (Mathf.len(speedX, speedY) > 0.01f) {
+          rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
+        }
       }
-
-      float distToNode = Mathf.dst(x, y, nextX, nextY);
-
-      if (distToNode <= speed * dt && pathIndex < path.size - 1) {
-        pathIndex++;
-        velocityDirty = true; // 通知 UnitMath 重新计算速度向量
-      }
-
-      if (pathIndex >= path.size - 1 && distToNode <= speed * dt) {
-        // 吸附并停止
-        x = nextX;
-        y = nextY;
-        speedX = 0;
-        speedY = 0;
-      } else {
-        // 正常移动
-        x += speedX * dt;
-        y += speedY * dt;
+    } else {
+      // 非射击模式：始终朝向移动方向
+      if (Mathf.len(speedX, speedY) > 0.01f) {
+        rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
       }
     }
 
-    if (shooting) {
-      // 射击时：身体朝向目标
-      float angleToTarget = Angles.angle(x, y, targetX, targetY);
-      rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
-    } else {
-      // 移动时：身体朝向移动方向
-        rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
-      }
-
-    // --- 3. 空间网格更新 ---
+    // 空间网格更新
     if (x != oldX || y != oldY) {
       updateChunkPosition();
     }

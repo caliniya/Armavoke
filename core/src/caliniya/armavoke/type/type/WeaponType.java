@@ -25,6 +25,9 @@ public class WeaponType implements Cloneable {
   public boolean isMirror = false;
 
   public BulletType bullet;
+  
+  public boolean rotate = true; // 默认是可旋转炮塔，false 为固定武器
+  public float shootCone = 2f; // 固定武器允许开火的锥形角度 (只有单位对准了这个角度内才能开火)
 
   public WeaponType(String name) {
     this.name = name;

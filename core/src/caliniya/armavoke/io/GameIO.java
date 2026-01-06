@@ -2,7 +2,6 @@ package caliniya.armavoke.io;
 
 import arc.files.Fi;
 import arc.struct.ObjectIntMap;
-import arc.struct.Seq;
 import arc.struct.StringMap;
 import arc.util.Log;
 import arc.util.Nullable;
@@ -15,7 +14,6 @@ import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.game.type.UnitType;
 import caliniya.armavoke.map.Map;
-import caliniya.armavoke.world.Block;
 import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.world.Floor;
 
@@ -94,13 +92,13 @@ public class GameIO {
       w.s(floorPalette.size); 
       for (int i = 0; i < floorPalette.size; i++) {
           Floor f = floorPalette.get(i);
-          w.str(f == null ? "null" : f.getLName());
+          w.str(f == null ? "null" : f.internalName);
       }
 
       w.s(blockPalette.size);
       for (int i = 0; i < blockPalette.size; i++) {
           ENVBlock b = blockPalette.get(i);
-          w.str(b == null ? "null" : b.getLName());
+          w.str(b == null ? "null" : b.internalName);
       }
 
       for (int i = 0; i < total; i++) {
@@ -114,7 +112,7 @@ public class GameIO {
       // 6. Units
       w.i(WorldData.units.size);
       for (Unit u : WorldData.units) {
-        w.str(u.type.getLName());
+        w.str(u.type.internalName);
         u.write(w);
       }
 

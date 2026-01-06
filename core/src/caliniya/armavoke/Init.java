@@ -62,14 +62,7 @@ public class Init {
     scene = new Scene(new ScreenViewport(new Camera()));
     batch = new SpriteBatch();
     input.addProcessor(scene);
-    Fonts.loadSystem();
-    Fonts.loadFonts();
     Log.info("inited basic system");
-
-    if (assets == null) {
-      Log.info("init assets(unexpected)");
-      assets = new AssetManager();
-    }
 
     assets.load("sprites/white.png", Texture.class);
     assets.finishLoading();
@@ -77,6 +70,10 @@ public class Init {
     atlas = new TextureAtlas();
     atlas.addRegion("white", assets.get("sprites/white.png"), 1, 1, 1, 1);
 
+    UI.Loading(0f);
+
+    Fonts.loadSystem();
+    Fonts.loadFonts();
     assets.load("sprites/sprites.aatls", TextureAtlas.class);
     inited();
   }

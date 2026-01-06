@@ -14,6 +14,7 @@ import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.system.game.GameProcess;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
+import caliniya.armavoke.type.Weapon;
 
 public class InitGame {
 
@@ -32,6 +33,10 @@ public class InitGame {
     
     Unit ttt = UnitTypes.test.create(500 , 500);
     Unit ta = UnitTypes.test.create(1000,1000);
+    for(int i = 0; i < ta.weapons.size; ++i) {
+    	Weapon w = ta.weapons.get(i);
+      w.rotate = true;
+    }
     ta.team = TeamTypes.Veto;
   }
 }

@@ -17,9 +17,9 @@ public class SpaceShader implements Disposable {
     private Texture texture;
     
     // 视差系数
-    public float parallaxScale = 0.4f; 
+    public float parallaxScale = 0.2f; 
     // 基础缩放
-    public float baseScale = 1.0f; 
+    public float baseScale = 0.7f; 
 
     public SpaceShader() {
         shader = new Shader(
@@ -33,9 +33,8 @@ public class SpaceShader implements Disposable {
     }
 
     public void render() {
-        Camera cam = Core.camera;
         
-        float zoom = cam.width / Core.graphics.getWidth();
+        float zoom = Core.camera.width / Core.graphics.getWidth();
         
         zoom *= baseScale;
 
@@ -43,7 +42,7 @@ public class SpaceShader implements Disposable {
         
         // 传递参数
         shader.setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-        shader.setUniformf("u_camPos", cam.position.x, cam.position.y);
+        shader.setUniformf("u_camPos", Core.camera.position.x, Core.camera.position.y);
         shader.setUniformf("u_zoom", zoom);
         shader.setUniformf("u_texSize", (float)texture.width, (float)texture.height);
         shader.setUniformf("u_parallax", parallaxScale);

@@ -8,11 +8,14 @@ import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.geom.Point2;
+import arc.util.Align; // 新增引用
+import arc.util.Strings; // 新增引用
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.ui.Fonts; // 假设这是你的字体类，或者使用 arc.graphics.g2d.Fonts
 
 public class UnitRender extends BasicSystem<UnitRender> {
 
@@ -36,7 +39,6 @@ public class UnitRender extends BasicSystem<UnitRender> {
       }
     }
 
-
     for (int i = 0; i < WorldData.bullets.size; i++) {
       Bullet b = WorldData.bullets.get(i);
       if (shouldDraw(b.x, b.y, 64f)) {
@@ -58,9 +60,7 @@ public class UnitRender extends BasicSystem<UnitRender> {
   // 子弹绘制逻辑
   private void drawBullet(Bullet b) {
     if (b.type == null) return;
-
     b.type.draw(b);
-    
   }
 
   private void drawUnit(Unit u) {
@@ -75,58 +75,65 @@ public class UnitRender extends BasicSystem<UnitRender> {
     Draw.rect(u.region, u.x, u.y, u.rotation);
     Draw.rect(u.cell, u.x, u.y, u.rotation);
 
-    // 临时先写在这里
+    // 绘制武器
     for (Weapon weapon : u.weapons) {
       WeaponType w = weapon.type;
       TextureRegion reg = w.region;
-      // 计算武器的世界位置
-      // 假设 type.x 是左右偏移，type.y 是前后偏移
-      // Angles.trnsx/y 计算旋转后的偏移量
       float wx = u.x + Angles.trnsx(u.rotation, w.x, w.y);
       float wy = u.y + Angles.trnsy(u.rotation, w.x, w.y);
-      // 武器的绝对朝向 = 单位朝向 + 武器相对朝向
       float wRot = u.rotation + weapon.rotation;
-
       Draw.rect(reg, wx, wy, wRot);
     }
   }
 
   /** 绘制调试信息 */
   private void drawDebug(Unit u) {
-    // 绘制碰撞体积
+    // 1. 绘制碰撞体积 (黄色)
     Draw.color(Color.yellow);
     Lines.stroke(3f);
     Lines.rect(u.x - u.size / 2f, u.y - u.size / 2f, u.size, u.size);
 
-    // 绘制目标点连接线 (从单位中心到目标点)
-    // 仅当目标点不在原点或单位附近时绘制
+    // 2. 绘制速度向量 (洋红色)
+    // 只有当速度大于微小阈值时才绘制，避免视觉干扰
+    if (Math.abs(u.speedX) > 0.001f || Math.abs(u.speedY) > 0.001f) {
+        Draw.color(Color.magenta);
+        // 放大倍数，因为每帧移动的像素很少，放大后才能看清方向
+        float scale = 20f; 
+        Lines.line(u.x, u.y, u.x + u.speedX * scale, u.y + u.speedY * scale);
+        
+        // 绘制具体数值文本
+        // 使用 arc.graphics.g2d.Fonts.def 或者你自己定义的 Fonts
+        // 注意：字体绘制比较消耗性能，仅在Debug模式使用
+        Fonts.def.draw(
+            Strings.format(u.speedX + " " + u.speedY), 
+            u.x, 
+            u.y + u.size + 8f, // 显示在单位上方
+            Align.center
+        );
+    }
+
+    // 3. 绘制目标点连接线 (橙色)
     if (u.targetX != 0 || u.targetY != 0) {
       Draw.color(Color.orange);
       Lines.line(u.x, u.y, u.targetX, u.targetY);
-      // 绘制目标点的一个小叉叉
       float s = 8f;
       Lines.line(u.targetX - s, u.targetY - s, u.targetX + s, u.targetY + s);
       Lines.line(u.targetX - s, u.targetY + s, u.targetX + s, u.targetY - s);
     }
 
-    // 绘制寻路路径
+    // 4. 绘制寻路路径 (青色)
     if (u.path != null && !u.path.isEmpty()) {
       Draw.color(Color.cyan);
 
       float lastX = u.x;
       float lastY = u.y;
 
-      // 从当前路径索引开始绘制
       for (int i = u.pathIndex; i < u.path.size; i++) {
         Point2 p = u.path.get(i);
-        // 转换网格坐标到世界中心坐标
         float wx = p.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
         float wy = p.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
 
-        // 绘制连线
         Lines.line(lastX, lastY, wx, wy);
-
-        // 绘制节点小方块
         Fill.square(wx, wy, 3f);
         lastX = wx;
         lastY = wy;

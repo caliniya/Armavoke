@@ -24,6 +24,7 @@ public class UnitTypes {
                     mirror = true;
                     x = 100;
                     bullet = new BulletType();
+                    rotate = false;
                   }
                 });
             this.load();

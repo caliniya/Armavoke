@@ -39,7 +39,7 @@ public class UI {
   }
 
   // 加载界面渲染逻辑
-  public static void Loading() {
+  public static void Loading(float progress) {
     float screenW = graphics.getWidth();
     float screenH = graphics.getHeight();
     float centerX = screenW / 2f;
@@ -52,8 +52,7 @@ public class UI {
     Draw.color(Color.white);
     Lines.stroke(2f);
     Lines.rect(centerX - barWidth / 2f, centerY - barHeight / 2f, barWidth, barHeight);
-
-    float progress = assets.getProgress();
+    
     if (progress > 0.01f) {
       float maxFillWidth = barWidth - padding * 2;
       float currentFillWidth = maxFillWidth * progress;

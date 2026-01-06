@@ -118,6 +118,8 @@ public class WorldData {
       moveunits.clear();
     }
     unitGrid = null;
+    
+    bullets.clear();
 
     world = new World(newW, newH, false);
     world.floors = new Ar<>(newW * newH);
