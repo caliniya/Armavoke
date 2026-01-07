@@ -27,6 +27,11 @@ public class Fonts {
 
   // 不需要缩放的字体名称集合
   private static final ObjectSet<String> unscaled = new ObjectSet<>();
+  
+  public static void setup() {
+  	def.getData().markupEnabled = true;
+    outline.getData().markupEnabled = true;
+  }
 
   /** 初始化字体加载器。 应该在游戏启动早期（如 ClientLoad 阶段）调用。 */
   public static void loadSystem() {

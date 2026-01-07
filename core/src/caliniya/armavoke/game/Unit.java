@@ -34,7 +34,7 @@ public class Unit implements Poolable {
   public float speedX, speedY, angle; // 速度分量 (每帧移动的像素量), 速度方向
   public float rotationSpeed;
   public float rotation; // 渲染朝向 (度)
-  public float angleToTarget;
+  public float angleToTarget, distToTarget;
 
   public boolean shooting = false;
 
@@ -155,24 +155,29 @@ public class Unit implements Poolable {
     float oldX = this.x;
     float oldY = this.y;
     
-    if (path == null && Mathf.dst(x, y, targetX, targetY) < 2f) {
+    distToTarget = Mathf.dst(x, y, targetX, targetY);
+    
+    if (path == null && distToTarget < 2f) {
       x = targetX;
       y = targetY;
+      distToTarget = 0f; 
     } else {
       x += speedX * dt;
       y += speedY * dt;
     }
     
+    if (distToTarget > 1f) { 
+        angleToTarget = Angles.angle(x, y, targetX, targetY);
+    }
+    
     if (shooting) {
       // 射击模式下
-      if (mainFixedWeapon != null) {
-        
-        angleToTarget = Angles.angle(x, y, targetX, targetY);
+      if (mainFixedWeapon != null && distToTarget > 1f) {
         
         rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
 
       } else {
-        if (Mathf.len(speedX, speedY) > 0.01f) {
+        if (Mathf.len(speedX, speedY) > 0.01f && distToTarget > 1f) {
           rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
         }
       }

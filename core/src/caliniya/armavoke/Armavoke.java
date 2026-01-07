@@ -53,7 +53,8 @@ public class Armavoke extends ApplicationCore {
     graphics.clear(Color.black);
     
     // 资源加载完成后的初始化
-    if (assets.update() && !assinited) {         
+    if (assets.update() && !assinited) { 
+      Fonts.setup();   
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
       UI.initAll();
       Styles.load();

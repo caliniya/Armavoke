@@ -8,14 +8,14 @@ import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.geom.Point2;
-import arc.util.Align; // 新增引用
-import arc.util.Strings; // 新增引用
+import arc.util.Align;
+import arc.util.Strings;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
-import caliniya.armavoke.ui.Fonts; // 假设这是你的字体类，或者使用 arc.graphics.g2d.Fonts
+import caliniya.armavoke.ui.Fonts;
 
 public class UnitRender extends BasicSystem<UnitRender> {
 
@@ -77,12 +77,8 @@ public class UnitRender extends BasicSystem<UnitRender> {
 
     // 绘制武器
     for (Weapon weapon : u.weapons) {
-      WeaponType w = weapon.type;
-      TextureRegion reg = w.region;
-      float wx = u.x + Angles.trnsx(u.rotation, w.x, w.y);
-      float wy = u.y + Angles.trnsy(u.rotation, w.x, w.y);
       float wRot = u.rotation + weapon.rotation;
-      Draw.rect(reg, wx, wy, wRot);
+      Draw.rect(weapon.type.region, weapon.wx, weapon.wy, wRot);
     }
   }
 

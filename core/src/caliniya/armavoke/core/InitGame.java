@@ -32,11 +32,7 @@ public class InitGame {
     new UnitProces().init();
     
     Unit ttt = UnitTypes.test.create(500 , 500);
-    Unit ta = UnitTypes.test.create(1000,1000);
-    for(int i = 0; i < ta.weapons.size; ++i) {
-    	Weapon w = ta.weapons.get(i);
-      w.rotate = true;
-    }
+    Unit ta = UnitTypes.test2.create(1000,1000);
     ta.team = TeamTypes.Veto;
   }
 }
