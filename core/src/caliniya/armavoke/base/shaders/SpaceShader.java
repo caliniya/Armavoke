@@ -10,6 +10,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.gl.Shader;
 import arc.util.Disposable;
 import arc.util.Time;
+import caliniya.armavoke.core.Render;
 
 public class SpaceShader implements Disposable {
     
@@ -34,9 +35,7 @@ public class SpaceShader implements Disposable {
 
     public void render() {
         
-        float zoom = Core.camera.width / Core.graphics.getWidth();
-        
-        zoom *= baseScale;
+        float zoom = Render.currentZoom * baseScale;
 
         shader.bind();
         

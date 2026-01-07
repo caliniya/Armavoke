@@ -1,6 +1,5 @@
 package caliniya.armavoke.core;
 
-
 import arc.Core;
 import arc.Events;
 import arc.util.Log;
@@ -26,7 +25,7 @@ public class InitGame {
     Maps.load();
     WorldData.initWorld();
     RouteData.init();
-    Armavoke.addSystem(new MapRender().init(),new UnitRender().init(), new GameProcess().init());
+    Armavoke.addSystem(new MapRender().init(),new UnitRender().init(), new GameProcess().init() , new Render().init());
     new BulletSystem().init();
     new UnitMath().init();
     new UnitProces().init();

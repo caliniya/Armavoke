@@ -1,33 +1,32 @@
 package caliniya.armavoke;
 
+import static arc.Core.*;
+
+import arc.ApplicationCore;
+import arc.ApplicationListener;
+import arc.assets.Loadable;
 import arc.graphics.Camera;
-import arc.scene.Scene;
-import arc.util.viewport.ScreenViewport;
-import caliniya.armavoke.ui.Styles;
-import arc.graphics.g2d.SpriteBatch;
-import arc.input.InputMultiplexer;
-import arc.input.GestureDetector;
-import arc.util.Strings;
-import caliniya.armavoke.base.tool.Ar;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.SpriteBatch;
+import arc.graphics.g2d.TextureAtlas;
+import arc.input.*;
+import arc.scene.Scene;
+import arc.util.Log;
+import arc.util.viewport.ScreenViewport;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.game.type.UnitType;
-import caliniya.armavoke.system.BasicSystem;
-import caliniya.armavoke.system.render.MapRender;
+import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.input.*;
-import caliniya.armavoke.ui.fragment.*;
-import arc.ApplicationCore;
-import arc.ApplicationListener;
-import arc.assets.Loadable;
-import arc.graphics.Color;
-import arc.graphics.g2d.TextureAtlas;
-import arc.util.Log;
+import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
-import caliniya.armavoke.content.*;
 import caliniya.armavoke.ui.*;
-import static arc.Core.*;
+import caliniya.armavoke.ui.Styles;
+import caliniya.armavoke.ui.fragment.*;
 
 public class Armavoke extends ApplicationCore {
 

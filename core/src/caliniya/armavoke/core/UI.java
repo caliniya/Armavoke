@@ -1,12 +1,14 @@
 package caliniya.armavoke.core;
 
+import arc.graphics.Camera;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import caliniya.armavoke.ui.fragment.*;
 
-import static arc.Core.*;
+import static arc.Core.scene;
+import static arc.Core.graphics;
 
 public class UI {
   
@@ -16,7 +18,8 @@ public class UI {
   public static GameFragment game;
   //游戏菜单ui
   public static MenuFragment menu;
-  
+  //ui用的相机
+  public static Camera camera;
   
   private static boolean isDebugShown = false;
   
@@ -30,6 +33,7 @@ public class UI {
     if(menu == null) {
     	menu = new MenuFragment();
     }
+    camera = scene.getCamera();
   }
 
   public static void Menu() {

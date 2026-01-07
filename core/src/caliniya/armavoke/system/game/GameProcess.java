@@ -2,6 +2,7 @@ package caliniya.armavoke.system.game;
 
 import arc.util.Time;
 import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.core.Render;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
@@ -10,7 +11,7 @@ public class GameProcess extends BasicSystem<GameProcess> {
 
   @Override
   public GameProcess init() {
-    index = 1;
+    index = 2;
     return super.init(false);
   }
 
