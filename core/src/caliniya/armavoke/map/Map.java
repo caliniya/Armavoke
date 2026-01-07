@@ -20,8 +20,11 @@ public class Map implements Comparable<Map> {
 
   /** 地图尺寸 (从文件头读取) */
   public int width, height;
+  
+  /** 是否是太空地图 */
+  public final boolean space;
 
-  /** 预览图 (懒加载) */
+  /** 预览图 */
   public Texture texture;
 
   // 构造函数
@@ -31,9 +34,8 @@ public class Map implements Comparable<Map> {
     this.height = height;
     this.tags = tags;
     this.custom = custom;
+    this.space = tags.getBool("space");
   }
-
-  // --- 便捷访问方法 ---
 
   public String name() {
     return tags.get("name", file.nameWithoutExtension());
@@ -54,7 +56,7 @@ public class Map implements Comparable<Map> {
   /** 获取预览图，如果没有则返回默认错误图 */
   public Texture safeTexture() {
     if (texture == null) {
-      //return Core.assets.get("sprites/error.png", Texture.class); // 需确保资源存在
+      //return Core.assets.get("sprites/error.png", Texture.class);
       return null;
     }
     return texture;

@@ -114,13 +114,13 @@ public class MapRender extends BasicSystem<MapRender> {
     startY = Mathf.clamp(startY, 0, chunksH - 1);
     endX = Mathf.clamp(endX, 0, chunksW - 1);
     endY = Mathf.clamp(endY, 0, chunksH - 1);
-    
+
     if (world.space && spaceShader != null) {
-        spaceShader.render();
+      spaceShader.render();
     } else {
-        // 如果不是太空，或者 Shader 加载失败，清空屏幕为默认颜色
-        // (Arc 的 application listener 通常会自动 clear，但为了保险可以手动 Fill)
-        Core.graphics.clear(Color.black); 
+      // 如果不是太空，或者 Shader 加载失败，清空屏幕为默认颜色
+      // (Arc 的 application listener 通常会自动 clear，但为了保险可以手动 Fill)
+      Core.graphics.clear(Color.black);
     }
 
     // 只渲染视野内的区块
@@ -143,29 +143,36 @@ public class MapRender extends BasicSystem<MapRender> {
     boolean[] solidMap = RouteData.layers[0].baseSolidMap;
     int[] clearanceMap = RouteData.layers[0].clearanceMap;
 
-    if (solidMap == null) return;
+    int worldW = WorldData.world.W; // 缓存世界宽度
+
+    // 安全检查
+    if (solidMap == null || clearanceMap == null) return;
 
     for (int y = startY; y <= endY; y++) {
       for (int x = startX; x <= endX; x++) {
 
-        int index = WorldData.world.coordToIndex(x, y);
+        int index = y * worldW + x;
+
+        // 越界检查 (防止视野超出地图边缘导致崩溃)
+        if (index < 0 || index >= solidMap.length) continue;
 
         float drawX = x * TILE_SIZE + TILE_SIZE / 2f;
         float drawY = y * TILE_SIZE + TILE_SIZE / 2f;
 
-        if (index >= 0 && index < solidMap.length && solidMap[index]) {
+        // 绘制红色障碍块
+        if (solidMap[index]) {
           Draw.color(1f, 0f, 0f, 0.5f);
           Fill.rect(drawX, drawY, TILE_SIZE, TILE_SIZE);
         }
-        int clearance = clearanceMap[index];
 
+        // 绘制距离场数值
+        int clearance = clearanceMap[index];
         if (clearance == 0) Draw.color(Color.red);
         else if (clearance < 3) Draw.color(Color.yellow);
         else Draw.color(Color.green);
       }
     }
-
-    Draw.color();
+    Draw.color(); // 重置颜色
   }
 
   public void flagUpdate(int worldGridX, int worldGridY) {

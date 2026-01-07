@@ -28,88 +28,96 @@ public class GameIO {
 
   public static Map readMeta(Fi file) {
     try (DataInputStream stream = new DataInputStream(file.read())) {
-        Reads r = new Reads(stream);
-        String magic = new String(r.b(4));
-        if (!magic.equals(MAGIC)) return null;
-        int ver = r.i();
-        int w = r.i();
-        int h = r.i();
-        StringMap tags = new StringMap();
-        int tagCount = r.s();
-        for (int i = 0; i < tagCount; i++) tags.put(r.str(), r.str());
-        return new Map(file, w, h, tags, true);
-    } catch (IOException e) { return null; }
+      Reads r = new Reads(stream);
+      String magic = new String(r.b(4));
+      if (!magic.equals(MAGIC)) return null;
+      int ver = r.i();
+      int w = r.i();
+      int h = r.i();
+      StringMap tags = new StringMap();
+      int tagCount = r.s();
+      for (int i = 0; i < tagCount; i++) tags.put(r.str(), r.str());
+      return new Map(file, w, h, tags, true);
+    } catch (IOException e) {
+      return null;
+    }
   }
 
   public static void save(Fi file, @Nullable StringMap tags) {
     try (DataOutputStream stream = new DataOutputStream(file.write(false))) {
       Writes w = new Writes(stream);
 
-      // Magic & Header
+      // --- Header ---
       w.b(MAGIC.getBytes());
       w.i(SAVE_VERSION);
       w.i(WorldData.world.W);
       w.i(WorldData.world.H);
 
-      // Tags
+      // --- Tags ---
       if (tags == null) tags = new StringMap();
+      tags.put("space", String.valueOf(WorldData.world.space));
       w.s(tags.size);
       for (var entry : tags) {
         w.str(entry.key);
         w.str(entry.value);
       }
-      
+
+      // --- 准备调色板 (Palette) ---
       Ar<Floor> floorPalette = new Ar<>();
       ObjectIntMap<Floor> floorMap = new ObjectIntMap<>();
-      
       Ar<ENVBlock> blockPalette = new Ar<>();
       ObjectIntMap<ENVBlock> blockMap = new ObjectIntMap<>();
 
-      floorPalette.add((Floor)null); 
-      blockPalette.add((ENVBlock)null);
-      // floorMap.put(null, 0);
-      // blockMap.put(null, 0);
+      floorPalette.add((Floor) null);
+      blockPalette.add((ENVBlock) null);
+      // 注意：ObjectIntMap 默认值是 0，正好对应 null
 
-      int total = WorldData.world.W * WorldData.world.H;
+      int width = WorldData.world.W;
+      int height = WorldData.world.H;
 
       // 第一遍扫描：统计用到了哪些方块
-      for (int i = 0; i < total; i++) {
-        Floor floor = WorldData.world.floors.get(i);
-        ENVBlock block = WorldData.world.envblocks.get(i);
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          // 使用 API 获取，而不是访问数组
+          Floor floor = WorldData.world.getFloor(x, y);
+          ENVBlock block = WorldData.world.getENVBlock(x, y);
 
-        // 只处理非空对象
-        if (floor != null && !floorMap.containsKey(floor)) {
-          floorMap.put(floor, floorPalette.size);
-          floorPalette.add(floor);
-        }
-        
-        if (block != null && !blockMap.containsKey(block)) {
-          blockMap.put(block, blockPalette.size);
-          blockPalette.add(block);
+          if (floor != null && !floorMap.containsKey(floor)) {
+            floorMap.put(floor, floorPalette.size);
+            floorPalette.add(floor);
+          }
+
+          if (block != null && !blockMap.containsKey(block)) {
+            blockMap.put(block, blockPalette.size);
+            blockPalette.add(block);
+          }
         }
       }
-      
-      w.s(floorPalette.size); 
+
+      // 写入调色板
+      w.s(floorPalette.size);
       for (int i = 0; i < floorPalette.size; i++) {
-          Floor f = floorPalette.get(i);
-          w.str(f == null ? "null" : f.internalName);
+        Floor f = floorPalette.get(i);
+        w.str(f == null ? "null" : f.internalName);
       }
 
       w.s(blockPalette.size);
       for (int i = 0; i < blockPalette.size; i++) {
-          ENVBlock b = blockPalette.get(i);
-          w.str(b == null ? "null" : b.internalName);
+        ENVBlock b = blockPalette.get(i);
+        w.str(b == null ? "null" : b.internalName);
       }
 
-      for (int i = 0; i < total; i++) {
-        Floor floor = WorldData.world.floors.get(i);
-        ENVBlock block = WorldData.world.envblocks.get(i);
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          Floor floor = WorldData.world.getFloor(x, y);
+          ENVBlock block = WorldData.world.getENVBlock(x, y);
 
-        w.s(floor == null ? 0 : floorMap.get(floor)); 
-        w.s(block == null ? 0 : blockMap.get(block)); 
+          w.s(floor == null ? 0 : floorMap.get(floor, 0));
+          w.s(block == null ? 0 : blockMap.get(block, 0));
+        }
       }
 
-      // 6. Units
+      // --- Units ---
       w.i(WorldData.units.size);
       for (Unit u : WorldData.units) {
         w.str(u.type.internalName);
@@ -140,40 +148,48 @@ public class GameIO {
       int width = r.i();
       int height = r.i();
 
-      // Tags
+      // --- Tags 读取逻辑修改 ---
+      StringMap tags = new StringMap();
       int tagCount = r.s();
-      for (int i = 0; i < tagCount; i++) { r.str(); r.str(); }
+      for (int i = 0; i < tagCount; i++) {
+        String key = r.str();
+        String value = r.str();
+        tags.put(key, value);
+      }
 
-      WorldData.reBuildAll(width, height);
-      //这里会自动处理导航数据
-      
-      // 读取地板映射表
+      // 获取是否为太空地图 (默认为 false)
+      boolean isSpace = tags.getBool("space");
+
+      WorldData.reBuildAll(width, height, isSpace);
+
+      // 读取调色板
       int floorPaletteSize = r.s();
       Floor[] floorLookup = new Floor[floorPaletteSize];
-      for(int i=0; i<floorPaletteSize; i++){
-          String name = r.str();
-          floorLookup[i] = name.equals("null") ? null : ContentVar.get(name, Floor.class);
+      for (int i = 0; i < floorPaletteSize; i++) {
+        String name = r.str();
+        floorLookup[i] = name.equals("null") ? null : ContentVar.get(name, Floor.class);
       }
 
-      // 读取环境块映射表
       int blockPaletteSize = r.s();
       ENVBlock[] blockLookup = new ENVBlock[blockPaletteSize];
-      for(int i=0; i<blockPaletteSize; i++){
-          String name = r.str();
-          blockLookup[i] = name.equals("null") ? null : ContentVar.get(name, ENVBlock.class);
+      for (int i = 0; i < blockPaletteSize; i++) {
+        String name = r.str();
+        blockLookup[i] = name.equals("null") ? null : ContentVar.get(name, ENVBlock.class);
       }
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          short floorId = r.s();
+          short blockId = r.s();
 
-      int total = width * height;
-      for (int i = 0; i < total; i++) {
-        short floorId = r.s();
-        short blockId = r.s();
+          Floor floor =
+              (floorId >= 0 && floorId < floorLookup.length) ? floorLookup[floorId] : null;
+          ENVBlock block =
+              (blockId >= 0 && blockId < blockLookup.length) ? blockLookup[blockId] : null;
 
-        // 查表获取真实对象
-        Floor floor = (floorId >= 0 && floorId < floorLookup.length) ? floorLookup[floorId] : null;
-        ENVBlock block = (blockId >= 0 && blockId < blockLookup.length) ? blockLookup[blockId] : null;
-
-        WorldData.world.floors.add(floor);
-        WorldData.world.envblocks.add(block);
+          // 使用 API 设置数据
+          WorldData.world.setFloor(x, y, floor);
+          WorldData.world.setENVBlock(x, y, block);
+        }
       }
 
       // Units
@@ -186,8 +202,12 @@ public class GameIO {
           u.read(r);
         }
       }
+
+      // 初始化寻路
       RouteData.init();
-      
+
+      // 重建渲染
+      // caliniya.armavoke.Armavoke.mapRender.rebuildAll();
 
     } catch (IOException e) {
       Log.err("Load failed", e);

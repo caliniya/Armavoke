@@ -39,7 +39,7 @@ public class WorldData {
 
   @SuppressWarnings("unchecked")
   public static void initWorld() {
-    world = new World();
+    world = new World(100,100,true);
     world.test = true;
     world.init();
 
@@ -105,7 +105,7 @@ public class WorldData {
    * @param newW 新地图的宽
    * @param newH 新地图的高
    */
-  public static void reBuildAll(int newW, int newH) {
+  public static void reBuildAll(int newW, int newH , boolean space) {
 
     if (units != null) {
       units.each(
@@ -121,9 +121,7 @@ public class WorldData {
     
     bullets.clear();
 
-    world = new World(newW, newH, false);
-    world.floors = new Ar<>(newW * newH);
-    world.envblocks = new Ar<>(newW * newH);
+    world = new World(newW, newH, space);
 
     // 重置空间网格 (Spatial Grid)
     gridW = Mathf.ceil((float) newW / CHUNK_SIZE);

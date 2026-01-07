@@ -65,7 +65,7 @@ public class GameFragment {
     });
     
     RBtn = new Button("Reload", () -> {
-      WorldData.reBuildAll(100,100);
+      WorldData.reBuildAll(100,100 , true);
       WorldData.initWorld();
       RouteData.init();
     });

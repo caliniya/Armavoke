@@ -11,8 +11,10 @@ public class ContentType {
   public final CType type;
   
   public final String internalName; 
+  
+  // 范围 1 ~ 32767 (0 保留为空)
+  public short id; 
 
-  //用于UI显示的本地化名称
   public String localizedName;
   public @Nullable String description;
 
@@ -25,6 +27,7 @@ public class ContentType {
     this.localizedName = Core.bundle.get(internalName + ".name", name);
     this.description = Core.bundle.getOrNull(internalName + ".description");
 
+    // 注册时会自动分配 ID
     ContentVar.add(this);
   }
   
