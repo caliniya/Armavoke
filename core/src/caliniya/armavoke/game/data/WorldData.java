@@ -119,8 +119,10 @@ public class WorldData {
     }
     unitGrid = null;
     
-    bullets.clear();
-
+    if(bullets != null) {
+    	bullets.clear();
+    }
+    
     world = new World(newW, newH, space);
 
     // 重置空间网格 (Spatial Grid)
@@ -132,6 +134,7 @@ public class WorldData {
     for (int i = 0; i < totalChunks; i++) {
       unitGrid[i] = new Ar<>(16);
     }
+    initWorld();
     Teams.init();
     Events.fire(EventType.events.Mapinit);
     RouteData.init();

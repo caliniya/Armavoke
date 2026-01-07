@@ -20,7 +20,7 @@ public class Map implements Comparable<Map> {
 
   /** 地图尺寸 (从文件头读取) */
   public int width, height;
-  
+
   /** 是否是太空地图 */
   public final boolean space;
 
@@ -56,7 +56,7 @@ public class Map implements Comparable<Map> {
   /** 获取预览图，如果没有则返回默认错误图 */
   public Texture safeTexture() {
     if (texture == null) {
-      //return Core.assets.get("sprites/error.png", Texture.class);
+      // return Core.assets.get("sprites/error.png", Texture.class);
       return null;
     }
     return texture;

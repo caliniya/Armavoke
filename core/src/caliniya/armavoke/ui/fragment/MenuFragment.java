@@ -10,6 +10,7 @@ import caliniya.armavoke.core.InitGame;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
@@ -43,9 +44,8 @@ public class MenuFragment {
                   new Button(
                       "A1",
                       () -> {
-                        Log.info("aa");
-                        Log.info("aaa");
-                        Log.info("aaaaa");
+                        Maps.load();
+                        UI.Maps();
                       }));
               menu.row();
 

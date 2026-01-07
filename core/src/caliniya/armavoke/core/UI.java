@@ -18,6 +18,8 @@ public class UI {
   public static GameFragment game;
   //游戏菜单ui
   public static MenuFragment menu;
+  //地图列表
+  public static MapsFragment maps;
   //ui用的相机
   public static Camera camera;
   
@@ -32,6 +34,9 @@ public class UI {
     }
     if(menu == null) {
     	menu = new MenuFragment();
+    }
+    if(maps == null) {
+    	maps = new MapsFragment();
     }
     camera = scene.getCamera();
   }
@@ -76,6 +81,10 @@ public class UI {
     if (isDebugShown && debug != null) {
         debug.add();
     }
+  }
+  
+  public static void Maps() {
+  	maps.build(scene.root);
   }
 
   /**

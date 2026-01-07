@@ -13,12 +13,12 @@ public class Maps {
     public static void load() {
         maps.clear();
         
-        Fi mapDir = Core.files.local("saves/");
+        Fi mapDir = Core.settings.getDataDirectory().child("/saves");
         if (!mapDir.exists()) mapDir.mkdirs();
 
         // 遍历所有文件
         for (Fi file : mapDir.list()) {
-            if (file.extension().equals(".aes")) {
+            if (file.extension().equals("aes")) {
                 // 只读取元数据()
                 Map map = GameIO.readMeta(file);
                 if (map != null) {
