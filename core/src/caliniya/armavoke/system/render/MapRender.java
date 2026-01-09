@@ -118,8 +118,6 @@ public class MapRender extends BasicSystem<MapRender> {
     if (world.space && spaceShader != null) {
       spaceShader.render();
     } else {
-      // 如果不是太空，或者 Shader 加载失败，清空屏幕为默认颜色
-      // (Arc 的 application listener 通常会自动 clear，但为了保险可以手动 Fill)
       Core.graphics.clear(Color.black);
     }
 

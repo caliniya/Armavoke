@@ -1,50 +1,35 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/Block.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MapsFragment.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 29,
+          "index": 2533,
+          "line": 90
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 29,
+          "index": 2533,
+          "line": 90
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/ENVBlock.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 10,
+          "index": 2036,
+          "line": 83
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/Floor.java",
-      "selection": {
-        "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
-        },
-        "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 10,
+          "index": 2036,
+          "line": 83
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/Floor.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java"
 }

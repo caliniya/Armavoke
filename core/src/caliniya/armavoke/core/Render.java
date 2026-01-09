@@ -1,11 +1,13 @@
 package caliniya.armavoke.core;
 
 import arc.Core;
+import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
 import caliniya.armavoke.system.render.MapRender;
+import caliniya.armavoke.system.render.UnitRender;
 
 /**
  * 全局渲染处理
@@ -37,6 +39,9 @@ public class Render extends BasicSystem<Render> {
   
   /** UI相机的震动偏移向量 */
   private static final Vec2 uiShakeOffset = new Vec2();
+  
+  public static MapRender mapRender;
+  public static UnitRender unitRender;
 
   /**
    * 初始化
@@ -181,7 +186,23 @@ public class Render extends BasicSystem<Render> {
     Core.camera.position.x = Mathf.clamp(Core.camera.position.x, 0, mapW);
     Core.camera.position.y = Mathf.clamp(Core.camera.position.y, 0, mapH);
   }
-
+  
+  public static MapRender getMapRender() {
+  	return mapRender;
+  }
+  
+  public static UnitRender getUnitRender() {
+  	return unitRender;
+  }
+  
+  public static void updateAll(){
+    if(mapRender == null || unitRender == null)return;
+    mapRender.update();
+    unitRender.update();
+    Draw.flush();
+    //少用
+  }
+  
   /**
    * 销毁系统资源
    * 重置所有状态变量，释放占用的资源

@@ -2,126 +2,99 @@ package caliniya.armavoke.ui.fragment;
 
 import arc.Core;
 import arc.graphics.Color;
-import arc.scene.Group;
 import arc.scene.ui.Image;
 import arc.scene.ui.Label;
 import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
+import arc.util.Log;
 import caliniya.armavoke.core.InitGame;
 import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Map;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.Button;
 
-public class MapsFragment {
+// 继承自 OverFragment (即之前的 BaseOverlay)
+public class MapsFragment extends OverFragment {
 
-  /** 构建界面并添加到父节点 */
-  public void build(Group parent) {
-    // 根容器
-    Table root = new Table();
-    root.setFillParent(true);
+  // 重写父类的抽象方法，构建具体内容
+  @Override
+  protected void buildContent(Table window) {
+    // 确保地图列表是最新的 (在展示界面时加载)
+    Maps.load();
 
-    // 标题
-    root.add(new Label("地图选择")).pad(20f).row();
+    // --- 窗口标题 ---
+    window.add(new Label("地图选择")).pad(10f).growX().center().row();
+    window.image().color(Color.gray).growX().height(3f).padBottom(10f).row();
 
     // --- 地图列表容器 ---
     Table listTable = new Table();
-    listTable.top(); // 列表项从顶部开始排列
+    listTable.top();
 
-    // 检查是否有地图
     if (Maps.maps.isEmpty()) {
-      listTable.add(new Label("没有找到地图存档")).pad(20f).color(Color.gray);
+      listTable.add(new Label("没有找到地图存档")).pad(20f).color(Color.lightGray);
     } else {
-      // 遍历所有地图并生成列表项
       for (Map map : Maps.maps) {
-        addMapRow(listTable, map, root);
+        addMapRow(listTable, map);
       }
     }
 
-    // --- 滚动窗格 ---
     ScrollPane pane = new ScrollPane(listTable);
-    pane.setFadeScrollBars(false); // 常驻滚动条
-    pane.setScrollingDisabled(true, false); // 禁止横向滚动
+    pane.setFadeScrollBars(false);
+    pane.setScrollingDisabled(true, false);
 
-    // 将滚动窗格添加到根容器，占据剩余空间
-    root.add(pane).grow().pad(10f).row();
+    window.add(pane).grow().pad(10f).row();
 
     // --- 底部按钮 ---
-    // 添加一个关闭按钮来移除这个界面
-    Button closeBtn =
-        new Button(
-            "返回",
-            () -> {
-              root.remove();
-            });
-    root.add(closeBtn).size(200f, 60f).margin(10f).bottom();
-
-    // 添加到场景
-    parent.addChild(root);
+    // 调用基类的 close() 方法
+    Button closeBtn = new Button("返回", this::close);
+    window.add(closeBtn).size(200f, 60f).margin(10f).bottom();
   }
 
-  /** 辅助方法：添加单行地图信息 */
-  private void addMapRow(Table container, Map map, Table rootUI) {
+  private void addMapRow(Table container, Map map) {
     Table row = new Table();
-    // 给每一行加一个背景，区分明显的边界 (可选)
-    // row.background("button");
+    row.background(Core.atlas.drawable("white")).setColor(0.25f, 0.25f, 0.25f, 1f);
 
-    // 1. 预览图 (如果有)
+    // 预览图
     if (map.safeTexture() != null) {
       Image image = new Image(map.safeTexture());
       image.setScaling(Scaling.fit);
-      row.add(image).size(64f).padRight(10f);
+      row.add(image).size(64f).pad(10f);
     }
 
-    // 2. 文本信息 (名称、作者、尺寸)
+    // 文本信息
     Table info = new Table();
     info.left();
-    // 名称
     info.add(new Label(map.name()))
         .left()
         .growX()
         .color(map.custom ? Color.orange : Color.white)
         .row();
-    // 详细信息
+
     String detailText = map.width + "x" + map.height + " | " + map.author();
     if (map.space) detailText += " | [Space]";
+    info.add(new Label(detailText)).left().color(Color.lightGray).fontScale(0.9f);
 
-    info.add(new Label(detailText)).left().color(Color.gray);
-
-    // 让信息栏占据中间所有空间
     row.add(info).growX().padLeft(10f);
 
-    // 3. 加载/开始按钮
-    // 这里使用你的自定义 Button 类
+    // 加载按钮
     Button loadBtn =
         new Button(
             "加载",
             () -> {
               try {
-                // 调用之前的 GameIO 进行加载
-                // 注意：这里假设 GameIO.load 接受 Fi 对象
-                // 另外，加载地图通常意味着开始游戏，可能需要隐藏当前 UI
-
-                // 1. 加载地图
+                // 初始化游戏环境
                 InitGame.testinit();
-                caliniya.armavoke.io.GameIO.load(map.file);
-
-                // 2. 关闭地图选择窗口
-                rootUI.remove();
-
+                // 加载地图数据
+                GameIO.load(map.file);
+                // 关闭地图选择窗口
+                this.close();
               } catch (Exception e) {
-                // 简单的错误处理
-                arc.util.Log.err("加载地图失败", e);
+                Log.err("加载地图失败", e);
               }
             });
 
-    row.add(loadBtn).size(100f, 50f).padLeft(10f);
-
-    // 将这一行添加到列表容器中
-    container.add(row).growX().padBottom(10f).row();
-
-    // 添加分割线 (可选)
-    container.image().color(Color.darkGray).growX().height(2f).padBottom(10f).row();
+    row.add(loadBtn).size(100f, 50f).pad(10f);
+    container.add(row).growX().padBottom(5f).row();
   }
 }

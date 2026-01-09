@@ -24,7 +24,7 @@ public class SpaceShader implements Disposable {
 
     public SpaceShader() {
         shader = new Shader(
-            Core.files.internal("shaders/space.vert"),
+            Core.files.internal("shaders/default.vert"),
             Core.files.internal("shaders/space.frag")
         );
 

@@ -9,7 +9,7 @@ public class Blocks {
     ;
     
     public static void load(){
-        TestBlock = new Block();
+        TestBlock = new Block("test-building");
     }
 	
 }

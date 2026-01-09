@@ -14,11 +14,6 @@ public class Floor extends ContentType {
   }
 
   public void load() {
-
     region = Core.atlas.find(name);
-
-    if (!Core.atlas.isFound(region)) {
-      // region = Core.atlas.find("error");
-    }
   }
 }

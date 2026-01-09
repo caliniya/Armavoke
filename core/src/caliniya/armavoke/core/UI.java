@@ -61,15 +61,12 @@ public class UI {
     Draw.color(Color.white);
     Lines.stroke(2f);
     Lines.rect(centerX - barWidth / 2f, centerY - barHeight / 2f, barWidth, barHeight);
-    
-    if (progress > 0.01f) {
       float maxFillWidth = barWidth - padding * 2;
       float currentFillWidth = maxFillWidth * progress;
       float fillHeight = barHeight - padding * 2;
       float leftEdgeX = centerX - barWidth / 2f + padding;
       float drawCenterX = leftEdgeX + currentFillWidth / 2f;
       Fill.rect(drawCenterX, centerY, currentFillWidth, fillHeight);
-    }
     Draw.flush();
   }
 
@@ -84,7 +81,7 @@ public class UI {
   }
   
   public static void Maps() {
-  	maps.build(scene.root);
+    maps.build();
   }
 
   /**

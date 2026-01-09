@@ -69,7 +69,8 @@ public class Init {
     // 在这里阻塞加载让加载界面能用
     atlas = new TextureAtlas();
     atlas.addRegion("white", assets.get("sprites/white.png"), 1, 1, 1, 1);
-
+    
+    scene.resize(graphics.getWidth() , graphics.getHeight());
     UI.Loading(0f);
 
     Fonts.loadSystem();

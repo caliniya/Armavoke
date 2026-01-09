@@ -55,8 +55,8 @@ public class Armavoke extends ApplicationCore {
     if (assets.update() && !assinited) { 
       Fonts.setup();   
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
-      UI.initAll();
       Styles.load();
+      UI.initAll();
       UI.Menu();
       UI.Debug();
       UnitControl unitCtrl = new UnitControl().init();
