@@ -115,7 +115,7 @@ public class MapRender extends BasicSystem<MapRender> {
     endX = Mathf.clamp(endX, 0, chunksW - 1);
     endY = Mathf.clamp(endY, 0, chunksH - 1);
 
-    if (world.space && spaceShader != null) {
+    if (world.space) {
       spaceShader.render();
     } else {
       Core.graphics.clear(Color.black);

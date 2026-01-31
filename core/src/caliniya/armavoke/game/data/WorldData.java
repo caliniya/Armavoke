@@ -1,13 +1,13 @@
 package caliniya.armavoke.game.data;
 
 import arc.Events;
-import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.system.render.MapRender;
-import caliniya.armavoke.world.World;
-import arc.math.Mathf;
+import caliniya.armavoke.world.*;
+import arc.math.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 
@@ -18,6 +18,7 @@ public class WorldData {
   public static Ar<Unit> units;
   // 有移动目标的单位
   public static Ar<Unit> moveunits;
+  //子弹
   public static Ar<Bullet> bullets;
 
   // --- 空间划分网格相关 ---
@@ -32,7 +33,6 @@ public class WorldData {
   public static int gridW, gridH;
 
   // 存储分区的数组，每个元素是一个单位列表
-  // 使用数组而不是Ar<Ar<Unit>>是为了访问速度略微快一点
   public static Ar<Unit>[] unitGrid;
 
   private WorldData() {}
@@ -42,6 +42,7 @@ public class WorldData {
     world = new World(100,100,true);
     world.test = true;
     world.init();
+    Game.team = TeamTypes.Evoke;
 
     units = new Ar<>(100);
     // 有移动目标的单位

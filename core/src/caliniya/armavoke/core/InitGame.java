@@ -27,7 +27,7 @@ public class InitGame {
     RouteData.init();
     Render.mapRender = new MapRender().init();
     Render.unitRender = new UnitRender().init();
-    Armavoke.addSystem(new UnitRender().init(), new GameProcess().init() ,new Render().init());
+    Armavoke.addSystem(Render.unitRender , Render.mapRender, new GameProcess().init() ,new Render().init());
     new BulletSystem().init();
     new UnitMath().init();
     new UnitProces().init();

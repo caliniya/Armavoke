@@ -34,7 +34,7 @@ public class Fonts {
   }
 
   /** 初始化字体加载器。 应该在游戏启动早期（如 ClientLoad 阶段）调用。 */
-  public static void loadSystem() {
+  public static void initFont() {
     // 获取显卡支持的最大纹理尺寸
     int max = Gl.getInt(Gl.maxTextureSize);
 
@@ -73,7 +73,6 @@ public class Fonts {
             // 设置纹理过滤为线性，使字体缩放更平滑
             parameter.fontParameters.magFilter = TextureFilter.linear;
             parameter.fontParameters.minFilter = TextureFilter.linear;
-            // 关键：将字体生成的字形放入我们创建的 packer 中
             parameter.fontParameters.packer = packer;
 
             return super.loadSync(manager, fileName, file, parameter);

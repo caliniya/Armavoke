@@ -1,35 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MapsFragment.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java",
       "selection": {
         "end": {
-          "column": 29,
-          "index": 2533,
-          "line": 90
+          "column": 60,
+          "index": 1807,
+          "line": 57
         },
         "start": {
-          "column": 29,
-          "index": 2533,
-          "line": 90
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java",
-      "selection": {
-        "end": {
-          "column": 10,
-          "index": 2036,
-          "line": 83
-        },
-        "start": {
-          "column": 10,
-          "index": 2036,
-          "line": 83
+          "column": 60,
+          "index": 1807,
+          "line": 57
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java"
 }

@@ -8,6 +8,7 @@ import arc.input.InputProcessor;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.BasicSystem;
@@ -49,15 +50,18 @@ public class UnitControl implements InputProcessor, GestureListener {
     Unit target = findUnitAt(wx, wy);
 
     if (target != null) {
-      toggleUnitSelection(target);
-      return true;
-    } else {
-      // 点击空地：尝试移动
-      if (!selectedUnits.isEmpty()) {
-        issueMoveCommand(wx, wy);
+      if (target.team == Game.team) {
+        toggleUnitSelection(target);
         return true; 
       }
+    } 
+    
+    // 点击空地(或者点击了敌人且未被拦截)：尝试移动
+    if (!selectedUnits.isEmpty()) {
+      issueMoveCommand(wx, wy);
+      return true; 
     }
+    
 
     return false;
   }
@@ -74,7 +78,7 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   /** 下达移动指令 */
   private void issueMoveCommand(float tx, float ty) {
-    // 1. 严格边界检查
+    // 严格边界检查
     float mapWidth = WorldData.world.W * WorldData.TILE_SIZE;
     float mapHeight = WorldData.world.H * WorldData.TILE_SIZE;
 
@@ -84,7 +88,6 @@ public class UnitControl implements InputProcessor, GestureListener {
     }
 
     // 2. 障碍物检查
-    // 如果点击的是墙壁，直接无视
     if (isSolidAtWorldPos(tx, ty)) {
       return;
     }
@@ -95,7 +98,7 @@ public class UnitControl implements InputProcessor, GestureListener {
         Unit u = selectedUnits.get(i);
         
         if (u == null || u.health <= 0) continue;
-
+        
         u.targetX = tx;
         u.targetY = ty;
 
@@ -123,11 +126,11 @@ public class UnitControl implements InputProcessor, GestureListener {
     selectedUnits.clear();
   }
 
-  // --- 查找单位相关逻辑 ---
 
   private boolean isPointInUnit(Unit unit, float px, float py) {
     if (unit == null || unit.type == null) return false;
-        float halfW = unit.size / 2f;
+    // 使用你代码中提供的 size 字段
+    float halfW = unit.size / 2f;
     float halfH = unit.size / 2f;
     return Math.abs(unit.x - px) <= halfW && Math.abs(unit.y - py) <= halfH;
   }
@@ -170,6 +173,7 @@ public class UnitControl implements InputProcessor, GestureListener {
     return null;
   }
 
+  // InputProcessor 接口的空实现...
   @Override public boolean touchDown(int x, int y, int p, KeyCode b) { return false; }
   @Override public boolean pinch(Vec2 i1, Vec2 i2, Vec2 p1, Vec2 p2) { return false; }
   @Override public boolean longPress(float x, float y) { return false; }

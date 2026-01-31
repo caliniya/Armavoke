@@ -73,7 +73,7 @@ public class Init {
     scene.resize(graphics.getWidth() , graphics.getHeight());
     UI.Loading(0f);
 
-    Fonts.loadSystem();
+    Fonts.initFont();
     Fonts.loadFonts();
     assets.load("sprites/sprites.aatls", TextureAtlas.class);
     inited();

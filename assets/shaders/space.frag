@@ -1,4 +1,4 @@
-precision highp float;
+#define HIGHP
 
 uniform sampler2D u_texture; // 传入的宇宙背景图
 uniform vec2 u_resolution;   // 屏幕分辨率
