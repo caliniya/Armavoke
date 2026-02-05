@@ -4,14 +4,29 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java",
       "selection": {
         "end": {
-          "column": 60,
-          "index": 1807,
-          "line": 57
+          "column": 0,
+          "index": 1648,
+          "line": 66
         },
         "start": {
-          "column": 60,
-          "index": 1807,
-          "line": 57
+          "column": 0,
+          "index": 1648,
+          "line": 66
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/Button.java",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 450,
+          "line": 17
+        },
+        "start": {
+          "column": 0,
+          "index": 450,
+          "line": 17
         }
       }
     }
