@@ -11,7 +11,7 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.util.Align;
 import caliniya.armavoke.ui.Button;
 
-public abstract class WinFragment {
+public class WinFragment {
 
   public Table root; //定位节点
   public Table window; // 窗口节点
@@ -31,36 +31,27 @@ public abstract class WinFragment {
         new NinePatchDrawable((NinePatchDrawable) Core.atlas.getDrawable("Window")));
 
     window.touchable = Touchable.enabled;
+    window.cullable = true;
 
     Table titleTable = new Table();
     titleTable.add(new Label(title)).color(Color.white).expandX().left().padLeft(10f);
 
-    Button closeBtn = new Button("@close", () -> this.remove());
+    Button closeBtn = new Button("@close", () -> remove());
     
+    titleTable.add(closeBtn).align(Align.topLeft);
     window.add(titleTable).growX().align(Align.topRight);
-    titleTable.add(closeBtn).growX().align(Align.topLeft).scrollX(true);
     window.row();
 
     window.image().color(Color.valueOf("98BFF5FF")).fillX().height(2f);
     window.row();
 
     window.add(main).grow().pad(10f);
-
     root.add(window).size(w, h).center();
-
     Core.scene.root.addChild(root);
   }
 
   /** 销毁窗口 */
   public void remove() {
-    if (root != null) {
       root.remove();
-      root = null;
-    }
-  }
-
-  /** 动态修改标题 */
-  public void setTitle(String newTitle) {
-    this.title = newTitle;
   }
 }

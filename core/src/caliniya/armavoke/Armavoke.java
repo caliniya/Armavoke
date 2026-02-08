@@ -1,5 +1,6 @@
 package caliniya.armavoke;
 
+import arc.Core;
 import static arc.Core.*;
 
 import arc.ApplicationCore;
@@ -74,6 +75,8 @@ public class Armavoke extends ApplicationCore {
       UnitTypes.load();
       Floors.load();
       ENVBlocks.load();
+      UI.camera.resize(graphics.getWidth(),graphics.getHeight());
+      UI.camera.update();
       assinited = true;
     }
 

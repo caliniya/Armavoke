@@ -59,7 +59,9 @@ public class Init {
     bundle = I18NBundle.createBundle(files.internal("language/language"), locale);
     assets = new AssetManager();
     camera = new Camera();
-    scene = new Scene(new ScreenViewport(new Camera()));
+    UI.camera = new Camera();
+    UI.vport = new ScreenViewport(UI.camera);
+    scene = new Scene(UI.vport);
     batch = new SpriteBatch();
     input.addProcessor(scene);
     Log.info("inited basic system");

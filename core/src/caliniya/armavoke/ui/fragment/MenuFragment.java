@@ -42,14 +42,14 @@ public class MenuFragment {
 
               menu.add(
                   new Button(
-                      "A1",
+                      "@mapList",
                       () -> {
                         Maps.load();
                         UI.Maps();
                       }));
               menu.row();
 
-              menu.add(new Button("A2", () -> Log.info("A2")));
+              menu.add(new Button("test", () -> UI.Window("aaaa",Core.graphics.getWidth()/2,Core.graphics.getHeight()/2)));
               menu.row();
 
               menu.add(new Button("A3", () -> Log.info("A3")));

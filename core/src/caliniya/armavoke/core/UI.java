@@ -5,6 +5,8 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.scene.ui.layout.Table;
+import arc.util.viewport.Viewport;
 import caliniya.armavoke.ui.fragment.*;
 
 import static arc.Core.scene;
@@ -20,8 +22,9 @@ public class UI {
   public static MenuFragment menu;
   //地图列表
   public static MapsFragment maps;
-  //ui用的相机
+  //ui用的相机和视口
   public static Camera camera;
+  public static Viewport vport;
   
   private static boolean isDebugShown = false;
   
@@ -44,7 +47,7 @@ public class UI {
   public static void Menu() {
     scene.clear();
     menu.build();
-    if (isDebugShown) debug.add(); 
+    Debug();
   }
 
   // 加载界面渲染逻辑
@@ -73,34 +76,26 @@ public class UI {
   public static void Game() {
     scene.clear();
     game.build();
-    
-    // 如果之前开启了 debug，进入游戏时需要重新添加回 scene
-    if (isDebugShown && debug != null) {
-        debug.add();
-    }
+    Debug();
   }
   
   public static void Maps() {
     maps.build();
   }
+  
+  public static void Window(String Ttitle,int Tw,int Th) {
+  	WinFragment win = new WinFragment(){{
+      title = Ttitle;
+      w = Tw;
+      h = Th;
+    }};
+    win.build();
+  }
 
-  /**
-   * 切换调试信息的显示状态
-   */
+
   public static void Debug() {
-    // 懒加载初始化
-    if(debug == null) {
-        debug = new DebugFragment();
-    }
-
     if (isDebugShown) {
-        // 如果当前是显示的，则关闭
-        debug.remove();
-        isDebugShown = false;
-    } else {
-        // 如果当前是关闭的，则显示
         debug.add();
-        isDebugShown = true;
     }
   }
 }
