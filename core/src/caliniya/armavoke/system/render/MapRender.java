@@ -14,12 +14,12 @@ import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 import caliniya.armavoke.ui.Fonts;
 import caliniya.armavoke.world.World;
 import caliniya.armavoke.base.shaders.*;
 
-public class MapRender extends BasicSystem<MapRender> {
+public class MapRender extends caliniya.armavoke.system.System<MapRender> {
   public static final float TILE_SIZE = 32f;
   public static World world;
   public Camera camera = Core.camera;

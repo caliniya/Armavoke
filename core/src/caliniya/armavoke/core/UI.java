@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.util.viewport.Viewport;
 import caliniya.armavoke.ui.fragment.*;
@@ -13,6 +14,9 @@ import static arc.Core.scene;
 import static arc.Core.graphics;
 
 public class UI {
+  
+  // 缓存 Scl 值，避免重复计算
+  public static float scl;
   
   //调试显示器
   public static DebugFragment debug;
@@ -26,20 +30,23 @@ public class UI {
   public static Camera camera;
   public static Viewport vport;
   
-  private static boolean isDebugShown = false;
+  private static boolean isDebugShown = true;
   
   public static void initAll(){
+    // 初始化 Scl 缓存
+    scl = Scl.scl();
+    
     if(debug == null) {
-    	debug = new DebugFragment();
+      debug = new DebugFragment();
     }
     if(game == null) {
-    	game = new GameFragment();
+      game = new GameFragment();
     }
     if(menu == null) {
-    	menu = new MenuFragment();
+      menu = new MenuFragment();
     }
     if(maps == null) {
-    	maps = new MapsFragment();
+      maps = new MapsFragment();
     }
     camera = scene.getCamera();
   }
@@ -64,12 +71,12 @@ public class UI {
     Draw.color(Color.white);
     Lines.stroke(2f);
     Lines.rect(centerX - barWidth / 2f, centerY - barHeight / 2f, barWidth, barHeight);
-      float maxFillWidth = barWidth - padding * 2;
-      float currentFillWidth = maxFillWidth * progress;
-      float fillHeight = barHeight - padding * 2;
-      float leftEdgeX = centerX - barWidth / 2f + padding;
-      float drawCenterX = leftEdgeX + currentFillWidth / 2f;
-      Fill.rect(drawCenterX, centerY, currentFillWidth, fillHeight);
+    float maxFillWidth = barWidth - padding * 2;
+    float currentFillWidth = maxFillWidth * progress;
+    float fillHeight = barHeight - padding * 2;
+    float leftEdgeX = centerX - barWidth / 2f + padding;
+    float drawCenterX = leftEdgeX + currentFillWidth / 2f;
+    Fill.rect(drawCenterX, centerY, currentFillWidth, fillHeight);
     Draw.flush();
   }
 
@@ -83,19 +90,29 @@ public class UI {
     maps.build();
   }
   
-  public static void Window(String Ttitle,int Tw,int Th) {
-  	WinFragment win = new WinFragment(){{
+  /**
+   * 创建一个窗口
+   * @param title 窗口标题
+   * @param widthRatio 窗口宽度占屏幕宽度的比例 (0~1)
+   * @param heightRatio 窗口高度占屏幕高度的比例 (0~1)
+   */
+  public static void Window(String Ttitle, float widthRatio, float heightRatio) {
+    // 计算实际像素尺寸：屏幕尺寸 * 比例 / Scl缩放因子
+    // 除以 scl 是因为 Cell.size() 内部会乘以 scl
+    float actualW = graphics.getWidth() * widthRatio / scl;
+    float actualH = graphics.getHeight() * heightRatio / scl;
+    
+    WinFragment win = new WinFragment(){{
       title = Ttitle;
-      w = Tw;
-      h = Th;
+      w = actualW;
+      h = actualH;
     }};
     win.build();
   }
 
-
   public static void Debug() {
     if (isDebugShown) {
-        debug.add();
+      debug.add();
     }
   }
 }

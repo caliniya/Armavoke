@@ -10,17 +10,20 @@ import arc.math.Angles;
 import arc.math.geom.Point2;
 import arc.util.Align;
 import arc.util.Strings;
+import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 import caliniya.armavoke.ui.Fonts;
 
-public class UnitRender extends BasicSystem<UnitRender> {
+public class UnitRender extends caliniya.armavoke.system.System<UnitRender> {
 
   // 调试开关
   public static boolean debug = true;
+  
+  public static Ar<Bullet> temp = new Ar<Bullet>(false,1000);
 
   @Override
   public UnitRender init() {
@@ -38,12 +41,17 @@ public class UnitRender extends BasicSystem<UnitRender> {
         if (debug) drawDebug(u);
       }
     }
-
-    for (int i = 0; i < WorldData.bullets.size; i++) {
-      Bullet b = WorldData.bullets.get(i);
+    
+    temp.clear();
+    synchronized(WorldData.bullets){
+      temp.addAll(WorldData.bullets);
+    }
+    
+    for(int i = 0; i < temp.size; ++i) {
+      Bullet b = temp.get(i);
       if (shouldDraw(b.x, b.y, 64f)) {
         drawBullet(b);
-      }
+        }
     }
   }
 

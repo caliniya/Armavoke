@@ -5,15 +5,14 @@ import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
-import caliniya.armavoke.system.render.MapRender;
-import caliniya.armavoke.system.render.UnitRender;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.system.render.*;
 
 /**
  * 全局渲染处理
  * 负责管理游戏相机的缩放、震动效果和边界限制
  */
-public class Render extends BasicSystem<Render> {
+public class Render extends caliniya.armavoke.system.System<Render> {
 
   // --- 静态变量 ---
   
@@ -39,9 +38,6 @@ public class Render extends BasicSystem<Render> {
   
   /** UI相机的震动偏移向量 */
   private static final Vec2 uiShakeOffset = new Vec2();
-  
-  public static MapRender mapRender;
-  public static UnitRender unitRender;
 
   /**
    * 初始化
@@ -187,18 +183,10 @@ public class Render extends BasicSystem<Render> {
     Core.camera.position.y = Mathf.clamp(Core.camera.position.y, 0, mapH);
   }
   
-  public static MapRender getMapRender() {
-  	return mapRender;
-  }
-  
-  public static UnitRender getUnitRender() {
-  	return unitRender;
-  }
-  
   public static void updateAll(){
-    if(mapRender == null || unitRender == null)return;
-    mapRender.update();
-    unitRender.update();
+    if(Systems.MR == null || Systems.UR == null)return;
+    Systems.MR.update();
+    Systems.UR.update();
     Draw.flush();
     //少用
   }

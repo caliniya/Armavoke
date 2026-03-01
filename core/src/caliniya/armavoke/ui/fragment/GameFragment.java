@@ -28,10 +28,10 @@ public class GameFragment {
     Table leftTable = new Table();
     leftTable.bottom().left();
     
-    commandBtn = new Button("@command", () -> {
+    commandBtn = new Button(() -> {
         isCommandEnabled = !isCommandEnabled;
         Events.fire(new EventType.CommandChange(isCommandEnabled));
-    });
+    },"@command");
     leftTable.add(commandBtn).size(120f, 50f).margin(10f);
     
     // --- 右下角：存档测试按钮 ---

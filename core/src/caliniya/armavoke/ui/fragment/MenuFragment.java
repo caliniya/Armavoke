@@ -49,7 +49,7 @@ public class MenuFragment {
                       }));
               menu.row();
 
-              menu.add(new Button("test", () -> UI.Window("aaaa",Core.graphics.getWidth()/2,Core.graphics.getHeight()/2)));
+              menu.add(new Button("test", () -> UI.Window("aaaa",0.5f ,0.5f)));
               menu.row();
 
               menu.add(new Button("A3", () -> Log.info("A3")));

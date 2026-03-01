@@ -7,9 +7,9 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 
-public class UnitMath extends BasicSystem<UnitMath> {
+public class UnitMath extends caliniya.armavoke.system.System<UnitMath> {
 
   private Ar<Unit> processList = new Ar<>();
   // 判定到达节点的阈值，稍微宽容一点避免在节点附近抖动

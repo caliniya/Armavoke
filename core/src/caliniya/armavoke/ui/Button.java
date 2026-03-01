@@ -10,7 +10,14 @@ public class Button extends ImageButton {
   public Button(String text, Runnable action) {
     super();
     clicked(action);
-    add(text).growX().scrollX(true).center().get().setAlignment(Align.center,Align.center);
+    add(text).growX().scrollX(true).center().get().setAlignment(Align.center, Align.center);
     setStyle(Styles.ibuttondef);
+  }
+
+  public Button( Runnable action ,String text) {
+    super();
+    clicked(action);
+    add(text).growX().scrollX(true).center().get().setAlignment(Align.center, Align.center);
+    setStyle(Styles.ibuttonc);
   }
 }

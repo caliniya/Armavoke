@@ -5,6 +5,7 @@ import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.system.*;
 import caliniya.armavoke.type.type.BulletType;
 
 public class Bullet implements Poolable {
@@ -17,7 +18,7 @@ public class Bullet implements Poolable {
     public float rotation;
     public float time = 0f; // 已存活时间
     
-    // public Bullet next; 
+    //public Bullet next; 
 
     protected Bullet() {}
 
@@ -48,7 +49,7 @@ public class Bullet implements Poolable {
         this.velX = baseVx + (unitVx * inertia);
         this.velY = baseVy + (unitVy * inertia);
         
-        WorldData.bullets.add(this);
+        Systems.BP.addBullet(this);
     }
     
     @Override
@@ -63,7 +64,6 @@ public class Bullet implements Poolable {
 
     /** 移除子弹 (回收到池) */
     public void remove() {
-        WorldData.bullets.remove(this);
         Pools.free(this);
     }
 }

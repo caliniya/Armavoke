@@ -3,11 +3,11 @@ package caliniya.armavoke.system.world;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 
 // 单位处理(意图处理) TODO
 // 在后台运行
-public class UnitProces extends BasicSystem<UnitProces> {
+public class UnitProces extends caliniya.armavoke.system.System<UnitProces> {
   
   public static UnitProces i;
   

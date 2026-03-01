@@ -7,10 +7,10 @@ import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.core.Render;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 
 @SuppressWarnings("unused")
-public class CameraInput extends BasicSystem<CameraInput>
+public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
     implements GestureListener, InputProcessor {
 
   private boolean up, down, left, right;

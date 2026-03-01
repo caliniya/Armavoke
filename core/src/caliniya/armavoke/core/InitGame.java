@@ -2,6 +2,8 @@ package caliniya.armavoke.core;
 
 import arc.Core;
 import arc.Events;
+import arc.math.Mathf;
+import arc.math.Rand;
 import arc.util.Log;
 import caliniya.armavoke.Armavoke;
 import caliniya.armavoke.base.type.EventType;
@@ -14,6 +16,7 @@ import caliniya.armavoke.system.game.GameProcess;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.Weapon;
+import caliniya.armavoke.system.*;
 
 public class InitGame {
 
@@ -25,15 +28,16 @@ public class InitGame {
     Maps.load();
     WorldData.initWorld();
     RouteData.init();
-    Render.mapRender = new MapRender().init();
-    Render.unitRender = new UnitRender().init();
-    Armavoke.addSystem(Render.unitRender , Render.mapRender, new GameProcess().init() ,new Render().init());
-    new BulletSystem().init();
-    new UnitMath().init();
-    new UnitProces().init();
+    Systems.MR = new MapRender().init();
+    Systems.UR = new UnitRender().init();
+    Systems.GP = new GameProcess().init();
+    Armavoke.addSystem(Systems.MR , Systems.UR, Systems.GP ,new Render().init());
+    Systems.BP = new BulletProcess().init();
+    Systems.UM = new UnitMath().init();
+    Systems.UP = new UnitProces().init();
     
-    Unit ttt = UnitTypes.test.create(500 , 500);
-    Unit ta = UnitTypes.test2.create(1000,1000);
-    ta.team = TeamTypes.Veto;
+    for(int i = 0; i < 1000; ++i) {
+      UnitTypes.test.create(100,100);
+    }
   }
 }

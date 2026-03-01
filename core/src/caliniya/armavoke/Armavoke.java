@@ -3,30 +3,25 @@ package caliniya.armavoke;
 import arc.Core;
 import static arc.Core.*;
 
-import arc.ApplicationCore;
-import arc.ApplicationListener;
+import arc.*;
 import arc.assets.Loadable;
-import arc.graphics.Camera;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.SpriteBatch;
-import arc.graphics.g2d.TextureAtlas;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.Scene;
+import arc.scene.ui.layout.Scl;
 import arc.util.Log;
 import arc.util.viewport.ScreenViewport;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Unit;
-import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.game.type.UnitType;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.input.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.ui.*;
-import caliniya.armavoke.ui.Styles;
 import caliniya.armavoke.ui.fragment.*;
 
 public class Armavoke extends ApplicationCore {
@@ -34,7 +29,7 @@ public class Armavoke extends ApplicationCore {
   public boolean assinited = false;
   public CameraInput camInput;
 
-  public static Ar<BasicSystem> systems = new Ar<BasicSystem>(10);
+  public static Ar<caliniya.armavoke.system.System> systems = new Ar<caliniya.armavoke.system.System>(10);
 
   @Override
   public void setup() {
@@ -78,6 +73,10 @@ public class Armavoke extends ApplicationCore {
       UI.camera.resize(graphics.getWidth(),graphics.getHeight());
       UI.camera.update();
       assinited = true;
+      Log.info(scene.getWidth() + " " + scene.getHeight());
+      Log.info(graphics.getWidth() + " " + graphics.getHeight());
+      Scl.setProduct(1);
+      Log.info(graphics.getDensity());
     }
 
     // 加载界面
@@ -87,7 +86,7 @@ public class Armavoke extends ApplicationCore {
       Draw.proj(camera);
 
       for (int i = 0; i < systems.size; i++) {
-        BasicSystem sys = systems.get(i);
+        caliniya.armavoke.system.System sys = systems.get(i);
         if (sys == null) {
           continue;
         }
@@ -100,9 +99,9 @@ public class Armavoke extends ApplicationCore {
     scene.draw();
   }
 
-  public static void addSystem(BasicSystem<?>... newSystems) {
+  public static void addSystem(caliniya.armavoke.system.System<?>... newSystems) {
     boolean added = false;
-    for (BasicSystem<?> s : newSystems) {
+    for (caliniya.armavoke.system.System<?> s : newSystems) {
       if (s != null && !systems.contains(s)) {
         if (!s.inited) s.init();
         systems.add(s);

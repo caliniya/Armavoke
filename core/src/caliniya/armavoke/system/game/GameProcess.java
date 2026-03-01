@@ -5,9 +5,9 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.BasicSystem;
+import caliniya.armavoke.system.System;
 
-public class GameProcess extends BasicSystem<GameProcess> {
+public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override
   public GameProcess init() {
