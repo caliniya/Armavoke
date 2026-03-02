@@ -7,13 +7,13 @@ import caliniya.armavoke.base.type.EventType;
 
 /**
  * 抽象系统类，代表游戏或应用中的一个独立逻辑模块。
- * <p>
- * 支持两种运行模式：
+ *
+ * <p>支持两种运行模式：
+ *
  * <ul>
- *     <li>主线程运行：由外部手动调用 {@link #update()} 或 {@link #update(float)}。</li>
- *     <li>独立线程运行：在 {@link #init(boolean)} 中开启独立线程循环，自带帧率控制（默认 60 TPS）和 TPS 统计。</li>
+ *   <li>主线程运行：由外部手动调用 {@link #update()} 或 {@link #update(float)}。
+ *   <li>独立线程运行：在 {@link #init(boolean, boolean)} 中开启独立线程循环，自带帧率控制（默认 60 TPS）和 TPS 统计。
  * </ul>
- * </p>
  *
  * @param <T> 自引用泛型类型，允许子类方法返回自身类型以支持链式调用。
  */
@@ -28,12 +28,15 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
   /** 是否在独立线程中运行。 */
   protected boolean isThreaded = false;
 
+  /** 系统是否可以被暂停。如果为 false，系统将忽略游戏暂停事件持续运行。 */
+  protected boolean isPausable = true;
+
   /** 线程运行状态标志，使用 volatile 保证多线程可见性。 */
   private volatile boolean threadRunning = false;
-  
+
   /** 暂停状态标志，使用 volatile 保证多线程可见性。 */
   private volatile boolean paused = false;
-  
+
   /** 暂停锁对象，用于线程的等待/唤醒机制。 */
   private final Object pauseLock = new Object();
 
@@ -55,77 +58,83 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   /**
    * 使用默认配置初始化系统。
-   * <p>默认根据 {@link #isThreaded} 字段决定是否开启线程。</p>
    *
-   * @return 当前系统实例（用于链式调用）。
+   * <p>默认为线程模式取决于 {@link #isThreaded}，且默认可被暂停。
+   *
+   * @return 当前系统实例。
    */
   public T init() {
     return init(this.isThreaded);
   }
 
   /**
-   * 初始化系统。
-   * <p>
-   * 如果系统未初始化，将设置运行模式，注册游戏暂停事件监听器。
-   * 如果指定为线程模式，将启动独立线程。
-   * </p>
+   * 初始化系统，默认为可暂停模式。
    *
    * @param runInThread 是否在独立线程中运行。
    * @return 当前系统实例。
    */
   public T init(boolean runInThread) {
+    return init(runInThread, true);
+  }
+
+  /**
+   * 初始化系统。
+   *
+   * <p>如果系统未初始化，将设置运行模式和暂停策略。 如果指定为线程模式，将启动独立线程。
+   *
+   * @param runInThread 是否在独立线程中运行。
+   * @param pausable 是否响应游戏暂停事件。如果为 false，线程将在游戏暂停时继续运行。
+   * @return 当前系统实例。
+   */
+  public T init(boolean runInThread, boolean pausable) {
     if (inited) return (T) this;
 
     this.isThreaded = runInThread;
+    this.isPausable = pausable;
     this.inited = true;
 
     if (isThreaded) {
       startThread();
-      // 注册线程停止事件，当收到 ThreadedStop 事件时停止线程
       Events.run(EventType.events.ThreadedStop, () -> stopThread());
     }
-    // 注册游戏暂停事件，同步系统的暂停状态
-    Events.on(EventType.GamePause.class, event -> setPaused(event.pause));
+
+    // 只有可暂停的系统才注册暂停事件监听
+    if (this.isPausable) {
+      Events.on(EventType.GamePause.class, event -> setPaused(event.pause));
+    }
 
     return (T) this;
   }
 
   /**
    * 系统逻辑更新方法（带时间增量）。
-   * <p>子类应重写此方法实现具体逻辑。通常用于线程模式下的时间补偿计算。</p>
    *
-   * @param delta 以 60TPS 为基准的帧时间增量。
-   *              值为 1.0 表示理想的一帧（约16.6ms），最大限制为 4.0。
+   * @param delta 以 60TPS 为基准的帧时间增量（1.0 = 理想一帧，最大 4.0）。
    */
   public void update(float delta) {}
 
-  /**
-   * 系统逻辑更新方法（无参数）。
-   * <p>子类应重写此方法实现具体逻辑。通常用于非线程模式或固定步长逻辑。</p>
-   */
+  /** 系统逻辑更新方法（无参数）。 */
   public void update() {}
 
-  /**
-   * 销毁系统，释放资源。
-   * <p>会停止独立线程（如果正在运行）。</p>
-   */
+  /** 销毁系统，释放资源。 */
   public void dispose() {
     stopThread();
   }
 
   /**
    * 设置系统的暂停状态。
-   * <p>
-   * 如果从暂停恢复，会重置计时器并唤醒等待的线程，防止因暂停导致的时间跳跃。
-   * </p>
+   *
+   * <p>仅对标记为 {@code isPausable = true} 的系统生效。 如果从暂停恢复，会重置计时器并唤醒等待的线程。
    *
    * @param paused true 为暂停，false 为恢复。
    */
   public void setPaused(boolean paused) {
+    // 如果系统不可暂停，直接忽略设置请求
+    if (!isPausable) return;
+
     synchronized (pauseLock) {
       this.paused = paused;
       if (!paused) {
-        // 恢复时重置最后循环时间，避免计算出一极大的 delta 值
         lastLoopTime = java.lang.System.nanoTime();
         pauseLock.notifyAll();
       }
@@ -143,30 +152,16 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   // ========== 内部计时与统计变量 ==========
 
-  /** 上一次循环的时间戳（纳秒），用于计算帧间隔。 */
   private long lastLoopTime = 0;
-  
-  /** 计数器，用于统计每秒的 Tick 次数。 */
   private int tickCounter = 0;
-  
-  /** 上一次 TPS 更新的时间戳（纳秒）。 */
   private long lastTPSUpdate = 0;
-  
-  /** TPS 采样数组，用于计算平滑 TPS。 */
   private final float[] tpsSamples = new float[60];
-  
-  /** 当前采样写入索引。 */
   private int tpsIndex = 0;
-  
-  /** 已填充的采样数量。 */
   private int tpsFilled = 0;
 
   // =============================
 
-  /**
-   * 启动独立系统线程。
-   * <p>如果线程已在运行则不执行操作。</p>
-   */
+  /** 启动独立系统线程。 */
   private void startThread() {
     if (threadRunning) return;
 
@@ -176,7 +171,10 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
         Threads.daemon(
             "System-" + this.getClass().getSimpleName(),
             () -> {
-              Log.info("System thread started: @", this.getClass().getSimpleName());
+              Log.info(
+                  "System thread started: @ (Pausable: @)",
+                  this.getClass().getSimpleName(),
+                  isPausable);
 
               lastLoopTime = java.lang.System.nanoTime();
               lastTPSUpdate = lastLoopTime;
@@ -184,12 +182,15 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
               while (threadRunning) {
                 try {
                   // --- 暂停控制 ---
-                  synchronized (pauseLock) {
-                    // 如果处于暂停状态，线程进入等待，释放锁
-                    while (paused && threadRunning) {
-                      pauseLock.wait();
+                  // 仅当系统可暂停且处于暂停状态时，线程才会等待
+                  if (isPausable) {
+                    synchronized (pauseLock) {
+                      while (paused && threadRunning) {
+                        pauseLock.wait();
+                      }
                     }
                   }
+
                   if (!threadRunning) break;
 
                   // --- 帧时间计算 ---
@@ -197,16 +198,12 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                   long elapsedNs = now - lastLoopTime;
                   lastLoopTime = now;
 
-                  // 计算 delta（以目标帧时间 targetNs 为单位）
-                  // 限制最大 delta 为 4.0，防止长时间暂停后逻辑爆炸
                   float delta = (float) (elapsedNs / (double) targetNs);
                   if (delta > 4f) delta = 4f;
 
                   try {
-                    // --- 执行逻辑 ---
                     update(delta);
                     update();
-                    // 注意：通常子类只会实现其中一个 update 方法
                     tickCounter++;
                   } catch (Exception e) {
                     Log.err(
@@ -214,7 +211,6 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                   }
 
                   // --- TPS 统计 ---
-                  // 每隔 1 秒统计一次实时 TPS 并更新平滑 TPS
                   if (now - lastTPSUpdate >= 1_000_000_000L) {
                     tps = tickCounter;
                     tickCounter = 0;
@@ -224,19 +220,15 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
                   // --- 帧率控制 ---
                   long endTime = java.lang.System.nanoTime();
-                  // 计算剩余时间：目标时间 - 实际消耗时间
                   long sleepNs = targetNs - (endTime - now);
 
                   if (sleepNs > 0) {
-                    // 如果有余量，则休眠
                     Thread.sleep(sleepNs / 1_000_000, (int) (sleepNs % 1_000_000));
                   } else {
-                    // 如果超时，让出 CPU 时间片，避免占用过高
                     Thread.yield();
                   }
 
                 } catch (InterruptedException e) {
-                  // 捕获中断异常，正常退出循环
                   threadRunning = false;
                   Thread.currentThread().interrupt();
                   Log.err(e);
@@ -248,12 +240,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
             });
   }
 
-  /**
-   * 更新平滑 TPS 值。
-   * <p>使用循环数组存储最近 60 个采样值进行移动平均计算。</p>
-   *
-   * @param tps 当前的实时 TPS 值。
-   */
+  /** 更新平滑 TPS 值。 */
   private void updateSmoothedTPS(float tps) {
     tpsSamples[tpsIndex] = tps;
     tpsIndex = (tpsIndex + 1) % tpsSamples.length;
@@ -266,10 +253,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
     smoothedTps = sum / tpsFilled;
   }
 
-  /**
-   * 停止独立系统线程。
-   * <p>会中断线程并等待其结束（最多等待 100ms）。</p>
-   */
+  /** 停止独立系统线程。 */
   private void stopThread() {
     threadRunning = false;
     if (systemThread != null) {
@@ -282,13 +266,6 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
     }
   }
 
-  /**
-   * 比较两个系统的优先级。
-   * <p>基于 {@link #index} 进行比较，用于对系统列表进行排序。</p>
-   *
-   * @param other 要比较的另一个系统。
-   * @return 比较结果。
-   */
   @Override
   public int compareTo(System<?> other) {
     return Integer.compare(this.index, other.index);

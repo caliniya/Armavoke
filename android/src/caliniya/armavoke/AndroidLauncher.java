@@ -16,6 +16,9 @@ import arc.util.Log;
 import arc.util.Log.*;
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AndroidLauncher extends AndroidApplication {
   @Override
@@ -23,11 +26,11 @@ public class AndroidLauncher extends AndroidApplication {
     super.onCreate(savedInstanceState);
 
     CaocConfig.Builder.create().enabled(true).errorActivity(ErrorActivity.class).apply();
-    
+
     Window win = getWindow();
     win.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.BLACK));
     win.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    
+
     initialize(
         new Armavoke(),
         new AndroidApplicationConfiguration() {
@@ -46,34 +49,33 @@ public class AndroidLauncher extends AndroidApplication {
       LogHandler originalLogger = Log.logger;
       // 要过滤的标签列表(它们太多了而且一般没有用)
       String[] filteredTags = {"AndroidGraphics", "GL30"};
-      // 例外列表：这些消息不过滤
-      String[] exceptions = {"[pause]", "[resume]"};
-
+      
+      // 定义时间格式
+      SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+      
+      Log.level = Log.LogLevel.info;
+      
       Log.logger =
           (level, text) -> {
-            if (level == LogLevel.info && Log.level.ordinal() > LogLevel.debug.ordinal()) {
-              // 检查是否是例外
-              boolean isException = false;
-              for (String exception : exceptions) {
-                if (text.contains(exception)) {
-                  isException = true;
-                  break;
-                }
-              }
-
-              // 如果不是例外，才进行过滤
-              if (!isException) {
-                for (String tag : filteredTags) {
-                  if (text.matches("\\[" + tag + "\\].*")) {
-                    return;
-                  }
+            
+            if (Log.level != Log.LogLevel.debug) {
+              // 直接进行过滤检查
+              for (String tag : filteredTags) {
+                if (text.matches("\\[" + tag + "\\].*")) {
+                  return;
                 }
               }
             }
+            
             originalLogger.log(level, text);
             try {
+              // 获取当前时间
+              String timestamp = dateFormat.format(new Date());
+              
               writer.write(
                   "["
+                      + timestamp
+                      + "] ["
                       + Character.toUpperCase(level.name().charAt(0))
                       + "] "
                       + Log.removeColors(text)
@@ -87,8 +89,9 @@ public class AndroidLauncher extends AndroidApplication {
       // 只能这么做了
       Log.err(e);
     }
-    Log.level = Log.LogLevel.info;
-    Log.info("start-Android");
+    //Log.level = Log.LogLevel.info;
+    Log.info("Start-Android");
+    Log.info("Log Level :" + Log.level);
   }
 
   @Override

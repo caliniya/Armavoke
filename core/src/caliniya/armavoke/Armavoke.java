@@ -13,6 +13,7 @@ import arc.scene.ui.layout.Scl;
 import arc.util.Log;
 import arc.util.viewport.ScreenViewport;
 import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Unit;
@@ -29,10 +30,16 @@ public class Armavoke extends ApplicationCore {
   public boolean assinited = false;
   public CameraInput camInput;
 
-  public static Ar<caliniya.armavoke.system.System> systems = new Ar<caliniya.armavoke.system.System>(10);
+  // 用于记录开始时间
+  private long startTime;
+
+  public static Ar<caliniya.armavoke.system.System> systems =
+      new Ar<caliniya.armavoke.system.System>(10);
 
   @Override
   public void setup() {
+    // 记录应用启动时的纳秒时间
+    startTime = java.lang.System.nanoTime();
     graphics.clear(Color.black);
   }
 
@@ -46,10 +53,10 @@ public class Armavoke extends ApplicationCore {
   public void update() {
     super.update();
     graphics.clear(Color.black);
-    
+
     // 资源加载完成后的初始化
-    if (assets.update() && !assinited) { 
-      Fonts.setup();   
+    if (assets.update() && !assinited) {
+      Fonts.setup();
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
       Styles.load();
       UI.initAll();
@@ -57,7 +64,6 @@ public class Armavoke extends ApplicationCore {
       UI.Debug();
       UnitControl unitCtrl = new UnitControl().init();
       camInput = new CameraInput().init();
-      Log.info("loaded");
       InputMultiplexer multiplexer =
           new InputMultiplexer(
               scene,
@@ -70,13 +76,24 @@ public class Armavoke extends ApplicationCore {
       UnitTypes.load();
       Floors.load();
       ENVBlocks.load();
-      UI.camera.resize(graphics.getWidth(),graphics.getHeight());
+      UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();
       assinited = true;
-      Log.info(scene.getWidth() + " " + scene.getHeight());
-      Log.info(graphics.getWidth() + " " + graphics.getHeight());
       Scl.setProduct(1);
-      Log.info(graphics.getDensity());
+      
+      Log.info("Game Inited");
+
+      // 计算消耗时间
+      long durationNanos = java.lang.System.nanoTime() - startTime;
+
+      // 转换单位
+      long durationMillis = durationNanos / 100_000_0; // 毫秒 (带小数)
+      long durationMicros = durationNanos / 1000; // 微秒 (整数)
+
+
+      Log.info(
+          "Game inited - Using: "
+              + String.format("%d ms / %d µs", durationMillis, durationMicros));
     }
 
     // 加载界面
@@ -132,5 +149,19 @@ public class Armavoke extends ApplicationCore {
     super.resize(width, height);
     scene.resize(width, height);
     camera.resize(width, height);
+  }
+
+  @Override
+  public void pause() {
+    Events.fire(new EventType.GamePause(true));
+    Log.info("[Application] Game Pause");
+    super.pause();
+  }
+
+  @Override
+  public void resume() {
+    Events.fire(new EventType.GamePause(false));
+    Log.info("[Application] Game Resume");
+    super.resume();
   }
 }
