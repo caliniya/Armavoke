@@ -1,16 +1,17 @@
 package caliniya.armavoke.base.type;
 
-import caliniya.armavoke.base.game.ContentType;
-import caliniya.armavoke.game.type.UnitType;
-import caliniya.armavoke.world.Block;
-import caliniya.armavoke.world.Floor;
-import caliniya.armavoke.world.ENVBlock;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.game.type.*;
+import caliniya.armavoke.world.*;
+import caliniya.armavoke.type.type.*;
 
 public enum CType {
   Block(Block.class),
   Floor(Floor.class),
   ENVBlock(ENVBlock.class),
-  Unit(UnitType.class);
+  Unit(UnitType.class),
+  Item(ItemType.class);
+  
   
   public final Class<? extends ContentType> type;
 

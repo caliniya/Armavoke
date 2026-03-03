@@ -1,6 +1,7 @@
 package caliniya.armavoke.core;
 
 import arc.struct.ObjectMap;
+import arc.struct.StringMap;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
@@ -13,6 +14,8 @@ public class ContentVar {
   // 分类列表，用于通过 ID 查找对象
   // contentByTypes[CType.ordinal()].get(id - 1)
   private static final Ar<ContentType>[] contentByTypes;
+  
+  public static StringMap items;
 
   static {
     int typeCount = CType.values().length;

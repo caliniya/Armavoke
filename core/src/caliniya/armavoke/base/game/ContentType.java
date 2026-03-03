@@ -10,11 +10,13 @@ public class ContentType {
   public final String name;
   public final CType type;
   
+  //命名空间名称
   public final String internalName; 
   
   // 范围 1 ~ 32767 (0 保留为空)
   public short id; 
-
+  
+  //本地化名称
   public String localizedName;
   public @Nullable String description;
 
