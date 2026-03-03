@@ -1,21 +1,58 @@
-task buildTexturePacker(type: Jar) {
-    archiveBaseName = 'buildTexturePacker'
+task buildAll(type: Jar) {
+    archiveBaseName = 'caliniya-tools'
+    archiveVersion = version
+    
     from sourceSets.main.output
+    
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
     
     manifest {
-        attributes 'Main-Class': 'caliniya.tools.TexturePackerTool'
+        attributes(
+            'Main-Class': 'caliniya.tools.TexturePackerTool',
+            'TexturePacker-Main': 'caliniya.tools.TexturePackerTool',
+            'IconGen-Main': 'caliniya.tools.IconGen',
+            'Created-By': "Gradle ${gradle.gradleVersion}",
+            'Build-Date': new Date().format('yyyy-MM-dd HH:mm:ss')
+        )
     }
     
     duplicatesStrategy = 'exclude'
+    
+    dependsOn classes
 }
 
-task assetsTool(type: JavaExec) {
-    // 使用运行时类路径而不是仅JAR文件
+task helper {
+    dependsOn buildAll
+    doLast {
+        def jarFile = buildAll.archiveFile.get().asFile
+        println """
+=============================================
+Caliniya Tools JAR created: ${jarFile.name}
+=============================================
+Usage:
+
+1. Run TexturePacker (default):
+   java -jar ${jarFile.name}
+
+2. Run TexturePacker (specify main class):
+   java -cp ${jarFile.name} caliniya.tools.TexturePackerTool <args>
+
+3. Run IconGen:
+   java -cp ${jarFile.name} caliniya.tools.IconGen <args>
+
+4. View entry points in JAR:
+   jar -xf ${jarFile.name} META-INF/MANIFEST.MF && cat META-INF/MANIFEST.MF
+=============================================
+"""
+    }
+}
+
+task AssetsPack(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
+    description = 'Pack textures into atlas'
     
     mainClass = 'caliniya.tools.TexturePackerTool'
     
@@ -29,6 +66,23 @@ task assetsTool(type: JavaExec) {
     dependsOn classes
 }
 
+//这样就可以显示在前面了
+task AiconGen(type: JavaExec) {
+    description = 'Generates SVG icons from PNG sources using IconGen.'
+    
+    classpath = sourceSets.main.runtimeClasspath
+    
+    mainClass = 'caliniya.tools.IconGen'
+    
+    args = [
+        "${rootDir}/assets-origin/icon/origin", // 输入目录
+        "${rootDir}/assets-origin/icon/gen/icon",    // 输出目录
+        "${rootDir}/assets-origin/icon/temp"    // 额外资源目录
+    ]
+    
+    dependsOn classes
+}
+
 artifacts {
-    archives buildTexturePacker
+    archives buildAll
 }
