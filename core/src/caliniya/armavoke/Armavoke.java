@@ -24,6 +24,7 @@ import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.type.type.*;
 
 public class Armavoke extends ApplicationCore {
 

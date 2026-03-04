@@ -10,7 +10,7 @@ import caliniya.armavoke.game.type.UnitType;
 
 public class UnitTypes {
 
-  public static UnitType test , test2;
+  public static UnitType test, test2;
 
   public static void load() {
     test =
@@ -32,12 +32,11 @@ public class UnitTypes {
                     bullet = new BulletType();
                     rotate = true;
                   }
-                }
-                );
+                });
             this.load();
           }
         };
-      test2 =
+    test2 =
         new UnitType("testunit") {
           {
             this.addWeapons(

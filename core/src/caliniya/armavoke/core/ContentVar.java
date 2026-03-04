@@ -1,21 +1,26 @@
 package caliniya.armavoke.core;
 
 import arc.struct.ObjectMap;
-import arc.struct.StringMap;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
 
+/**
+ * 内容注册与管理器。
+ * <p>
+ * 负责游戏内容（如物品、单位等）的注册、存储和查询。内容通过名称映射和类型数组存储，
+ * 注册时分配运行时ID（从1开始）。
+ */
 public class ContentVar {
-  
-  // 全局映射表: "Unit.xxx" -> Object
+
+  /** 内容名称映射表，用于通过名称快速查找内容对象。 */
   private static final ObjectMap<String, ContentType> contentMap = new ObjectMap<>();
 
-  // 分类列表，用于通过 ID 查找对象
-  // contentByTypes[CType.ordinal()].get(id - 1)
+  /** 按类型分类的内容数组，索引对应 {@link CType#ordinal()}。 */
   private static final Ar<ContentType>[] contentByTypes;
-  
-  public static StringMap items;
+
+  /** 已注册的物品类型内容总数。 */
+  public static int totalItemCount = 0;
 
   static {
     int typeCount = CType.values().length;
@@ -24,29 +29,52 @@ public class ContentVar {
       contentByTypes[i] = new Ar<>();
     }
   }
-  
-  /** 注册内容并分配 ID */
+
+  /**
+   * 注册内容并分配运行时ID。
+   * <p>ID从1开始分配，每种类型的ID独立编号。
+   *
+   * @param content 要注册的内容对象
+   * @throws RuntimeException 当某类型的内容数量超过 {@link Short#MAX_VALUE} 时抛出
+   */
   public static void add(ContentType content) {
     if (content == null) return;
-    
-    // 存入名字映射
+
     contentMap.put(content.internalName, content);
-    
+
     Ar<ContentType> list = contentByTypes[content.type.ordinal()];
-    
+
     if (list.size >= Short.MAX_VALUE) {
-        throw new RuntimeException("Too many contents for type: " + content.type + ". Max is " + Short.MAX_VALUE);
+      throw new RuntimeException("Too many contents for type: " + content.type);
     }
-    
+
+    // ID 从 1 开始
     content.id = (short) (list.size + 1);
-    
     list.add(content);
+
+    if (content.type == CType.Item) {
+      totalItemCount++;
+    }
   }
 
+  /**
+   * 通过内部名称获取内容对象。
+   *
+   * @param internalName 内容的内部名称
+   * @return 对应的内容对象，不存在则返回null
+   */
   public static ContentType get(String internalName) {
     return contentMap.get(internalName);
   }
 
+  /**
+   * 通过内部名称获取指定类型的内容对象。
+   *
+   * @param <T> 期望的内容类型
+   * @param internalName 内容的内部名称
+   * @param type 期望的内容类型Class对象
+   * @return 类型匹配的内容对象，不匹配或不存在则返回null
+   */
   @SuppressWarnings("unchecked")
   public static <T extends ContentType> T get(String internalName, Class<T> type) {
     ContentType c = contentMap.get(internalName);
@@ -56,33 +84,45 @@ public class ContentVar {
     return null;
   }
 
+  /**
+   * 获取指定类型的所有内容对象。
+   *
+   * @param type 内容类型
+   * @return 包含该类型所有内容的数组
+   */
   public static Ar<ContentType> getByType(CType type) {
     return contentByTypes[type.ordinal()];
   }
-  
-  /** 
-   * 通过 ID 和 类型 获取对象 
-   * @param type 内容类型 (Floor, Unit, etc.)
-   * @param id 运行时 ID
-   * @return 对应的对象，如果 ID 为 0 或越界则返回 null
+
+  /**
+   * 通过类型和运行时ID获取内容对象。
+   * <p>时间复杂度为 O(1)。
+   *
+   * @param <T> 返回的内容类型
+   * @param type 内容类型
+   * @param id 运行时ID (有效范围 >= 1)
+   * @return 对应的内容对象，ID无效则返回null
    */
   @SuppressWarnings("unchecked")
   public static <T extends ContentType> T getByID(CType type, short id) {
-      if (id <= 0) return null; // 0 是保留空值
-      
-      Ar<ContentType> list = contentByTypes[type.ordinal()];
-      
-      int index = id - 1;
-      
-      if (index >= list.size) return null; // 防止越界
-      
-      return (T) list.get(index);
+    if (id <= 0) return null;
+
+    Ar<ContentType> list = contentByTypes[type.ordinal()];
+    int index = id - 1;
+
+    if (index >= list.size) return null;
+
+    return (T) list.get(index);
   }
 
+  /**
+   * 清空所有已注册的内容并重置计数器。
+   */
   public static void clear() {
     contentMap.clear();
     for (Ar<ContentType> list : contentByTypes) {
       list.clear();
     }
+    totalItemCount = 0;
   }
 }

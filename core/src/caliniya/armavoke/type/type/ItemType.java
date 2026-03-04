@@ -5,17 +5,16 @@ import arc.graphics.g2d.TextureRegion;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 
-//目前我还想不到该有什么其他东西(
 public class ItemType extends ContentType {
   
   public TextureRegion icon;
+  // 移除了 maxStack，具体容量由 ItemModule 决定
   
   public ItemType(String name) {
     super(name, CType.Item);
   }
   
   public void load() {
-  	icon = Core.atlas.find(name);
+    icon = Core.atlas.find(name);
   }
-  
 }
