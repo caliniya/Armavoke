@@ -2,6 +2,7 @@ package caliniya.armavoke.game.type;
 
 import arc.Core;
 import arc.graphics.g2d.TextureRegion;
+import arc.util.Log;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
@@ -34,7 +35,7 @@ public class UnitType extends ContentType {
     region = Core.atlas.find(name, "white");
     cell = Core.atlas.find(name + "-cell", "air");
     for (WeaponType weapon : weapons) {
-      weapon.load(this.name);
+      weapon.load(name);
     }
   }
 

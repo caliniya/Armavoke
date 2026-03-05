@@ -1,0 +1,35 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/content/UnitTypes.java",
+      "selection": {
+        "end": {
+          "column": 21,
+          "index": 1404,
+          "line": 52
+        },
+        "start": {
+          "column": 21,
+          "index": 1404,
+          "line": 52
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/type/UnitType.java",
+      "selection": {
+        "end": {
+          "column": 19,
+          "index": 815,
+          "line": 32
+        },
+        "start": {
+          "column": 19,
+          "index": 815,
+          "line": 32
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/content/UnitTypes.java"
+}

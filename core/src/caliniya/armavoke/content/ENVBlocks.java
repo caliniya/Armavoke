@@ -9,7 +9,6 @@ public class ENVBlocks {
 
   public static void load() {
     a = new ENVBlock("a"){{
-      this.load();
     }};
     
   }

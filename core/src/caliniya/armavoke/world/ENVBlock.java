@@ -11,6 +11,7 @@ public class ENVBlock extends ContentType {
 
     public ENVBlock(String name){
         super(name, CType.ENVBlock);
+        load();
     }
     
     public void load() {

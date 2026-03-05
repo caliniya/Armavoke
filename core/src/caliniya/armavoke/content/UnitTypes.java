@@ -33,7 +33,6 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
-            this.load();
           }
         };
     test2 =
@@ -48,8 +47,9 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
-            this.load();
           }
         };
+        test.load();
+        test2.load();
   }
 }

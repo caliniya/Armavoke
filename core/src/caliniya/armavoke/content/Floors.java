@@ -8,7 +8,6 @@ public class Floors {
 
   public static void load() {
     TestFloor = new Floor("test"){{
-      this.load();
     }};
     //space = new Floor("space");
   }

@@ -16,6 +16,7 @@ public class Block extends ContentType {
 
   public Block(String BlockName) {
     super(BlockName, CType.Block);
+    load();
   }
   
   public void load() {
