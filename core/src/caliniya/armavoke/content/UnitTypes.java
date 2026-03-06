@@ -16,7 +16,7 @@ public class UnitTypes {
     test =
         new UnitType("testunit") {
           {
-            this.addWeapons(
+            addWeapons(
                 new WeaponType("aa") {
                   {
                     mirror = true;
@@ -33,12 +33,14 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
+            this.load();
           }
         };
+
     test2 =
         new UnitType("testunit") {
           {
-            this.addWeapons(
+            addWeapons(
                 new WeaponType("aa") {
                   {
                     mirror = true;
@@ -47,9 +49,8 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
+            this.load();
           }
         };
-        test.load();
-        test2.load();
   }
 }

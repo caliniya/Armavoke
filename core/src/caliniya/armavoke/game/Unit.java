@@ -17,6 +17,7 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.game.type.UnitType;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.type.type.*;
 
 public class Unit implements Poolable {
@@ -25,6 +26,8 @@ public class Unit implements Poolable {
   public int id;
   public TeamTypes team;
   public TeamData teamData;
+  
+  public ItemModule item;
 
   public Ar<Weapon> weapons = new Ar<>();
   public Weapon mainFixedWeapon = null; // 缓存的主固定武器
@@ -60,6 +63,7 @@ public class Unit implements Poolable {
     u.team = team;
     u.x = x;
     u.y = y;
+    u.item = new ItemModule(100);
     u.init();
     return u;
   }
@@ -67,9 +71,9 @@ public class Unit implements Poolable {
   public static Unit create(UnitType type, float x, float y) {
     return create(TeamTypes.Evoke, type, x, y);
   }
-
+  
   public static Unit create(UnitType type) {
-    return create(type, 500, 500);
+    return create(type , 100 , 100);
   }
 
   public void init() {
@@ -237,6 +241,7 @@ public class Unit implements Poolable {
   }
 
   public void write(Writes w) {
+    item.write(w);
     w.f(x);
     w.f(y);
     w.f(rotation);
@@ -247,6 +252,7 @@ public class Unit implements Poolable {
   }
 
   public void read(Reads r) {
+    item.read(r);
     this.x = r.f();
     this.y = r.f();
     this.rotation = r.f();

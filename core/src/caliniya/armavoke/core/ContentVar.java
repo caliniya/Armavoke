@@ -4,6 +4,11 @@ import arc.struct.ObjectMap;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.content.Blocks;
+import caliniya.armavoke.content.ENVBlocks;
+import caliniya.armavoke.content.Floors;
+import caliniya.armavoke.content.Items;
+import caliniya.armavoke.content.UnitTypes;
 
 /**
  * 内容注册与管理器。
@@ -28,6 +33,17 @@ public class ContentVar {
     for (int i = 0; i < typeCount; i++) {
       contentByTypes[i] = new Ar<>();
     }
+    }
+  
+  /**
+  *初始化内容
+  **/
+  public static void load() {
+    Items.load();
+    Blocks.load();
+    Floors.load();
+    ENVBlocks.load();
+    UnitTypes.load();
   }
 
   /**

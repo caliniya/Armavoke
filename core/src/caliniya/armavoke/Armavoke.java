@@ -15,6 +15,7 @@ import arc.util.viewport.ScreenViewport;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.*;
+import caliniya.armavoke.core.ContentVar;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
@@ -74,9 +75,7 @@ public class Armavoke extends ApplicationCore {
               camInput);
       input.addProcessor(multiplexer);
       addSystem(camInput);
-      UnitTypes.load();
-      Floors.load();
-      ENVBlocks.load();
+      ContentVar.load();
       UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();
       assinited = true;

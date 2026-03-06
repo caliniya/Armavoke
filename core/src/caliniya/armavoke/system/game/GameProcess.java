@@ -2,6 +2,7 @@ package caliniya.armavoke.system.game;
 
 import arc.util.Time;
 import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.content.Items;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
@@ -26,6 +27,7 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
       u.update(Time.delta);
       u.updateWeapons(Time.delta);
+      u.item.addItem(Items.Ge,10);
     }
   }
 }

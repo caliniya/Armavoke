@@ -198,7 +198,7 @@ public class GameIO {
         String typeName = r.str();
         UnitType type = ContentVar.get(typeName, UnitType.class);
         if (type != null) {
-          Unit u = Unit.create(type);
+          Unit u = type.create();
           u.read(r);
         }
       }
