@@ -5,6 +5,7 @@ import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.Building; // 导入 Building
 import caliniya.armavoke.system.render.MapRender;
 import caliniya.armavoke.world.*;
 import arc.math.*;
@@ -16,9 +17,12 @@ public class WorldData {
 
   // 全局单位列表 (用于逻辑更新)
   public static Ar<Unit> units;
+  // 全局建筑列表 (用于渲染和逻辑更新)
+  public static Ar<Building> buildings; // 新增
+
   // 有移动目标的单位
   public static Ar<Unit> moveunits;
-  //子弹
+  // 子弹
   public static Ar<Bullet> bullets;
 
   // --- 空间划分网格相关 ---
@@ -39,15 +43,16 @@ public class WorldData {
 
   @SuppressWarnings("unchecked")
   public static void initWorld() {
-    world = new World(20,20,true);
-    world.test = true;
-    world.init();
     Game.team = TeamTypes.Evoke;
 
     units = new Ar<>(100);
+    buildings = new Ar<>(100);
     // 有移动目标的单位
     moveunits = new Ar<>(5);
     bullets = new Ar<>(false, 1000);
+    world = new World(100, 100, false);
+    world.test = true;
+    world.init();
 
     // 1. 初始化网格尺寸
     // 即使地图大小不能整除32，也要向上取整多算一个格子，防止越界
@@ -63,13 +68,19 @@ public class WorldData {
     Teams.init();
   }
 
-  public static void clearunits() {
+  public static void clear() {
     if (units != null) {
       units.each(
           unit -> {
             unit.reset();
           });
       units.clear();
+    }
+
+    // 清理建筑
+    if (buildings != null) {
+      buildings.each(b -> b.remove()); // 使用 remove 归还对象池
+      buildings.clear();
     }
 
     // 清理网格中的残留引用
@@ -105,8 +116,9 @@ public class WorldData {
    *
    * @param newW 新地图的宽
    * @param newH 新地图的高
+   * @param space 是否为太空地图
    */
-  public static void reBuildAll(int newW, int newH , boolean space) {
+  public static void reBuildAll(int newW, int newH, boolean space) {
 
     if (units != null) {
       units.each(
@@ -115,15 +127,23 @@ public class WorldData {
           });
       units.clear();
     }
+
+    // 清理建筑
+    if (buildings != null) {
+      buildings.each(b -> b.remove());
+      buildings.clear();
+    }
+
     if (moveunits != null) {
       moveunits.clear();
     }
-    unitGrid = null;
-    
-    if(bullets != null) {
-    	bullets.clear();
+
+    if (bullets != null) {
+      bullets.clear();
     }
-    
+
+    unitGrid = null;
+
     world = new World(newW, newH, space);
 
     // 重置空间网格 (Spatial Grid)
@@ -135,9 +155,28 @@ public class WorldData {
     for (int i = 0; i < totalChunks; i++) {
       unitGrid[i] = new Ar<>(16);
     }
-    initWorld();
+
+    // 注意：这里调用 initWorld 会重新创建 world 并重置所有列表
+    // 但我们已经创建了新的 world 和网格，为避免重复初始化，可以只调用必要的部分
+    world.test = true;
+    world.init();
+    Game.team = TeamTypes.Evoke;
+
+    // 重新创建列表（如果 initWorld 中创建了新的，这里可以省略，但为了清晰保留）
+    units = new Ar<>(100);
+    buildings = new Ar<>(100);
+    moveunits = new Ar<>(5);
+    bullets = new Ar<>(false, 1000);
+
     Teams.init();
     Events.fire(EventType.events.Mapinit);
     RouteData.init();
+  }
+
+  /** 简化的重建方法，使用当前世界参数 */
+  public static void reBuildAll() {
+    if (world != null) {
+      reBuildAll(world.W, world.H, world.space);
+    }
   }
 }

@@ -36,6 +36,7 @@ public class MapChunk implements Disposable {
 
   public void bake() {
     if (!dirty) return;
+    Draw.color();
 
     // 设置烘焙摄像机
     // 我们希望摄像机正好对准 FBO 的中心，视野大小完全覆盖 PIXEL_SIZE

@@ -151,14 +151,14 @@ public class Armavoke extends ApplicationCore {
   @Override
   public void pause() {
     Events.fire(new EventType.GamePause(true));
-    Log.info("[Application] Game Pause");
+    Log.info("Game Pause");
     super.pause();
   }
 
   @Override
   public void resume() {
     Events.fire(new EventType.GamePause(false));
-    Log.info("[Application] Game Resume");
+    Log.info("Game Resume");
     super.resume();
   }
 }
