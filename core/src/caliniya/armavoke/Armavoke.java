@@ -80,7 +80,7 @@ public class Armavoke extends ApplicationCore {
       UI.camera.update();
       assinited = true;
       Scl.setProduct(1);
-      
+
       Log.info("Game Inited");
 
       // 计算消耗时间
@@ -90,10 +90,8 @@ public class Armavoke extends ApplicationCore {
       long durationMillis = durationNanos / 100_000_0; // 毫秒 (带小数)
       long durationMicros = durationNanos / 1000; // 微秒 (整数)
 
-
       Log.info(
-          "Game inited - Using: "
-              + String.format("%d ms / %d µs", durationMillis, durationMicros));
+          "Game inited - Using: " + String.format("%d ms / %d µs", durationMillis, durationMicros));
     }
 
     // 加载界面
@@ -102,8 +100,7 @@ public class Armavoke extends ApplicationCore {
     } else {
       Draw.proj(camera);
 
-      for (int i = 0; i < systems.size; i++) {
-        caliniya.armavoke.system.System sys = systems.get(i);
+      for (caliniya.armavoke.system.System sys : systems) {
         if (sys == null) {
           continue;
         }

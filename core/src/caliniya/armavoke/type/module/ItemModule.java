@@ -25,7 +25,7 @@ public class ItemModule extends Module {
    * 值 = 当前数量<br>
    * 大小 = 最大ID + 1 (因为 ID 从 1 开始，0 索引废弃)
    */
-  protected int[] items;
+  public int[] items;
 
   /**
    * 过滤数组。
@@ -34,7 +34,7 @@ public class ItemModule extends Module {
    * 值 = true (允许存储), false (不允许)<br>
    * 如果为 null，则允许所有物品。
    */
-  protected boolean[] filter;
+  public boolean[] filter;
 
   /**
    * 构造一个具有指定容量的物品模块。

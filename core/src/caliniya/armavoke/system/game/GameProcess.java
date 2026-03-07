@@ -1,5 +1,6 @@
 package caliniya.armavoke.system.game;
 
+import arc.util.Log;
 import arc.util.Time;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.content.Items;
@@ -18,16 +19,14 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override
   public void update() {
-
-    Ar<Unit> units = WorldData.units;
-    for (int i = 0; i < units.size; i++) {
-      Unit u = units.get(i);
+    for (Unit u : WorldData.units) {
       
       if (u == null || u.health <= 0) continue;
 
       u.update(Time.delta);
       u.updateWeapons(Time.delta);
       u.item.addItem(Items.Ge,10);
+      
     }
   }
 }

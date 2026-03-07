@@ -5,16 +5,12 @@ import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
 
-// 单位处理(意图处理) TODO
-// 在后台运行
 public class UnitProces extends caliniya.armavoke.system.System<UnitProces> {
-  
-  public static UnitProces i;
+
   
   @Override
   public UnitProces init() {
-    i = super.init(true);
-    return i;
+    return super.init(true);
   }
 
   @Override
@@ -31,15 +27,6 @@ public class UnitProces extends caliniya.armavoke.system.System<UnitProces> {
       
       // 暂时强制所有单位开火 (测试用)
       u.shooting = true;
-      
-      // TODO: 未来在这里实现:
-      // 1. 索敌 (Find Target)
-      // 2. 避障力计算 (Separation)
-      // 3. 状态机切换 (Idle -> Moving -> Attacking)
     }
-  }
-  
-  public static UnitProces getThis() {
-  	return i;
   }
 }

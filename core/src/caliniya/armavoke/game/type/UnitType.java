@@ -1,6 +1,9 @@
 package caliniya.armavoke.game.type;
 
 import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Log;
 import caliniya.armavoke.base.game.ContentType;
@@ -47,6 +50,25 @@ public class UnitType extends ContentType {
   // 带坐标
   public Unit create(float x, float y) {
     return Unit.create(this, x, y);
+  }
+
+  public void draw(Unit u) {
+    // 默认的绘制逻辑
+    if (u.isSelected) {
+      Draw.color(Color.green);
+      Lines.stroke(2f);
+      Lines.circle(u.x, u.y, u.size + 4);
+      Draw.color();
+    }
+
+    Draw.rect(u.region, u.x, u.y, u.rotation);
+    Draw.rect(u.cell, u.x, u.y, u.rotation);
+
+    // 绘制武器
+    for (Weapon weapon : u.weapons) {
+      float wRot = u.rotation + weapon.rotation;
+      Draw.rect(weapon.type.region, weapon.wx, weapon.wy, wRot);
+    }
   }
 
   public void addWeapons(WeaponType... newWeapons) {

@@ -21,7 +21,7 @@ import caliniya.armavoke.system.*;
 public class InitGame {
 
   static {
-   Events.on(EventType.GameInit.class, evevt -> testinit());
+    Events.on(EventType.GameInit.class, evevt -> testinit());
   }
 
   public static void testinit() {
@@ -30,14 +30,13 @@ public class InitGame {
     RouteData.init();
     Systems.MR = new MapRender().init();
     Systems.UR = new UnitRender().init();
+    Systems.BR = new BlockRender().init();
     Systems.GP = new GameProcess().init();
-    Armavoke.addSystem(Systems.MR , Systems.UR, Systems.GP ,new Render().init());
+    Armavoke.addSystem(Systems.MR, Systems.UR, Systems.GP , Systems.BR, new Render().init());
     Systems.BP = new BulletProcess().init();
     Systems.UM = new UnitMath().init();
     Systems.UP = new UnitProces().init();
-    
-    for(int i = 0; i < 1000; ++i) {
-      UnitTypes.test.create(100,100);
-    }
+
+    UnitTypes.test.create(100, 100);
   }
 }

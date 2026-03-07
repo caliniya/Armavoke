@@ -39,7 +39,7 @@ public class WorldData {
 
   @SuppressWarnings("unchecked")
   public static void initWorld() {
-    world = new World(100,100,true);
+    world = new World(20,20,true);
     world.test = true;
     world.init();
     Game.team = TeamTypes.Evoke;

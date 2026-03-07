@@ -197,6 +197,10 @@ public class Unit implements Poolable {
       updateChunkPosition();
     }
   }
+  
+  public void draw(){
+    type.draw(this);
+  }
 
   /**
    * 武器逻辑更新
