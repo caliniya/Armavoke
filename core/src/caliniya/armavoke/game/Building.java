@@ -4,6 +4,7 @@ import arc.func.Intc2;
 import arc.util.pooling.Pools;
 import arc.util.pooling.Pool.Poolable;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.world.Block;
 
 public class Building implements Poolable {
@@ -16,7 +17,7 @@ public class Building implements Poolable {
   // --- 运行时状态数据 ---
   public float maxHealth;
   public float health;
-  public boolean solid;
+  public ItemModule item;
 
   // --- 形状数据 (独立副本，已旋转) ---
   // 这里的 shapeOffsets 是经过 angle 变换后的世界相对坐标
@@ -33,16 +34,17 @@ public class Building implements Poolable {
     this.ty = ty;
     this.angle = angle % 4; // 确保角度在 0-3 之间
 
-    // 计算像素坐标 (用于渲染)
+    // 计算像素坐标
     this.x = tx * WorldData.TILE_SIZE;
     this.y = ty * WorldData.TILE_SIZE;
 
-    // 1. 复制基础属性
     this.maxHealth = block.health;
     this.health = block.health;
-    this.solid = block.solid;
+    
+    this.item = new ItemModule(block.capacity);
+    item.setFilter(block.allowItem);
 
-    // 2. 计算旋转后的形状数据
+    // 计算旋转后的形状数据
     if (block.shapeOffsets != null) {
       this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
     } else {
@@ -62,17 +64,17 @@ public class Building implements Poolable {
     y = ty * WorldData.TILE_SIZE;
   }
 
-  /** 核心逻辑：计算该建筑占据的所有世界坐标 */
+  /** 计算该建筑占据的所有世界坐标 */
   public void getOccupiedCoords(Intc2 consumer) {
     // 情况 1: 异形建筑 (有自定义形状数据)
     if (shapeOffsets != null) {
       for (int i = 0; i < shapeOffsets.length; i += 2) {
         consumer.get(tx + shapeOffsets[i], ty + shapeOffsets[i + 1]);
       }
-    } 
+    }
     // 情况 2: 标准矩形建筑 (无自定义形状数据，依据 size 判定)
     else if (block != null) {
-      int s = (int)block.size;
+      int s = (int) block.size;
       // 遍历 size x size 的区域
       // 例如 size=2 时，遍历 (0,0), (0,1), (1,0), (1,1)
       for (int dx = 0; dx < s; dx++) {
@@ -83,7 +85,7 @@ public class Building implements Poolable {
     }
   }
 
-  /** 交互逻辑：判断是否占据指定坐标 */
+  /** 交互逻辑：判断是否占据指定坐标，参数为格坐标 */
   public boolean occupies(int worldX, int worldY) {
     // 情况 1: 异形判断
     if (shapeOffsets != null) {
@@ -95,15 +97,14 @@ public class Building implements Poolable {
       }
       return false;
     }
-    
+
     // 情况 2: 矩形判断
     if (block != null) {
-      int s = (int)block.size;
+      int s = (int) block.size;
       // 检查是否在 [tx, tx+s) 和 [ty, ty+s) 范围内
-      return worldX >= tx && worldX < tx + s && 
-             worldY >= ty && worldY < ty + s;
+      return worldX >= tx && worldX < tx + s && worldY >= ty && worldY < ty + s;
     }
-    
+
     return false;
   }
 
@@ -138,6 +139,5 @@ public class Building implements Poolable {
     angle = 0;
     health = 0;
     maxHealth = 0;
-    solid = false;
   }
 }

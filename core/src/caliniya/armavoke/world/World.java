@@ -184,9 +184,9 @@ public class World {
       return true;
     }
 
-    // 建筑碰撞检测：直接询问建筑实体的 solid 状态
+    // 建筑碰撞检测：直接询问建筑类型的 solid
     Building b = getBuilding(x, y);
-    if (b != null && b.solid) { // 注意：这里读取的是 Building 的状态，而非 Block
+    if (b != null && b.block.solid) {
       return true;
     }
 
@@ -255,7 +255,7 @@ public class World {
     return x >= 0 && x < W && y >= 0 && y < H;
   }
 
-  // --- 索引相关的便捷方法 (第一段代码中的) ---
+  // --- 索引相关的便捷方法 ---
 
   public void setENVBlock(int index, ENVBlock block) {
     setENVBlock(index % W, index / W, block);

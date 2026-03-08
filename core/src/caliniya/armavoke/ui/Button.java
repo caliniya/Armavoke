@@ -14,7 +14,7 @@ public class Button extends ImageButton {
     setStyle(Styles.ibuttondef);
   }
 
-  public Button( Runnable action ,String text) {
+  public Button(Runnable action, String text) {
     super();
     clicked(action);
     add(text).growX().scrollX(true).center().get().setAlignment(Align.center, Align.center);

@@ -9,6 +9,7 @@ import caliniya.armavoke.content.ENVBlocks;
 import caliniya.armavoke.content.Floors;
 import caliniya.armavoke.content.Items;
 import caliniya.armavoke.content.UnitTypes;
+import caliniya.armavoke.type.type.ItemType;
 
 /**
  * 内容注册与管理器。
@@ -23,6 +24,8 @@ public class ContentVar {
 
   /** 按类型分类的内容数组，索引对应 {@link CType#ordinal()}。 */
   private static final Ar<ContentType>[] contentByTypes;
+  
+  public static ItemType[] items;//所有已注册物品
 
   /** 已注册的物品类型内容总数。 */
   public static int totalItemCount = 0;
@@ -40,10 +43,13 @@ public class ContentVar {
   **/
   public static void load() {
     Items.load();
-    Blocks.load();
     Floors.load();
     ENVBlocks.load();
+    items = getByType(CType.Item).toArray(ItemType.class);
+    Blocks.load();
     UnitTypes.load();
+    //items = new ItemType[totalItemCount];
+    //items = (ItemType[]) getByType(CType.Item).items;
   }
 
   /**

@@ -70,6 +70,10 @@ public class UnitType extends ContentType {
       Draw.rect(weapon.type.region, weapon.wx, weapon.wy, wRot);
     }
   }
+  
+  public void update(Unit u){
+    // TODO: 以后再说
+  }
 
   public void addWeapons(WeaponType... newWeapons) {
     for (WeaponType weapon : newWeapons) {

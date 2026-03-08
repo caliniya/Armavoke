@@ -190,6 +190,7 @@ public class Unit implements Poolable {
       if (Mathf.len(speedX, speedY) > 0.01f) {
         rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
       }
+      type.update(this);
     }
 
     // 空间网格更新

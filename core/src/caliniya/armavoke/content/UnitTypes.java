@@ -36,7 +36,7 @@ public class UnitTypes {
             this.load();
           }
         };
-
+    /*
     test2 =
         new UnitType("testunit") {
           {
@@ -52,5 +52,6 @@ public class UnitTypes {
             this.load();
           }
         };
+        */
   }
 }

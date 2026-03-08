@@ -7,19 +7,23 @@ import arc.graphics.g2d.TextureRegion;
 import arc.util.Log;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.core.ContentVar;
 import caliniya.armavoke.game.Building;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.type.type.ItemType;
 
 public class Block extends ContentType {
 
   // --- 基础属性 ---
-  public float psize;
-  public int size;
-  public boolean buildable = true;
-  public boolean solid = true;
-  public float health = 100;
+  public float psize; // 大小，像素级
+  public int size; // 大小，单位格
+  public boolean buildable = true; // 可以造
+  public boolean solid = true; // 可以阻挡通行
+  public float health = 100; // 顾名思义
+  public int capacity = 100; // 物品容量，为0就是不能存
+  public ItemType[] allowItem = ContentVar.items; // 能存的,默认啥都能存一百(不能在这里调用，会空指针)(不对不对，可以的)
 
-  public TextureRegion region;
+  public TextureRegion region; // 主贴图allow
 
   // --- 形状定义 ---
   // 相对于锚点(0,0)的偏移量数组：[dx1, dy1, dx2, dy2, ...]
@@ -39,10 +43,14 @@ public class Block extends ContentType {
     region = Core.atlas.find(name);
   }
 
-  /** 绘制方法 实现核心逻辑： 1. 以建筑中心为旋转中心。 2. 根据角度顺时针旋转。 */
   public void draw(Building b) {
     float rotation = b.angle * 90f;
     Draw.rect(region, b.x + psize / 2, b.y + psize / 2, rotation);
+  }
+  
+  //允许全部
+  public void allowAllItem(ItemType... types){
+    allowItem = types;
   }
 
   /**

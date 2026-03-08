@@ -13,7 +13,7 @@ public class WorldChunk {
   public short[] floorIds;
   // 数据层 2: 环境方块 (墙壁等)
   public short[] envblockIds;
-  // 数据层 3: 建筑实例 (新增)
+  // 数据层 3: 建筑实例
   public Building[] buildings;
   
   public boolean empty = true;
@@ -42,7 +42,7 @@ public class WorldChunk {
     empty = false;
   }
 
-  // --- Building (新增) ---
+  // --- Building ---
   public Building getBuilding(int localX, int localY) {
     return buildings[(localY << SHIFT) | localX];
   }
