@@ -73,7 +73,7 @@ public class World {
         }
       }
     }
-    int buildingCount = 2; // 生成数量
+    int buildingCount = 0; // 生成数量
     for (int i = 0; i < buildingCount; i++) {
       // 在安全区域内随机生成
       int padding = 5;
@@ -123,6 +123,11 @@ public class World {
     return chunk.getBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK);
   }
 
+  /** 检查坐标上是否存在建筑 */
+  public boolean hasBuilding(int x, int y) {
+    return getBuilding(x, y) != null;
+  }
+
   /** 放置建筑 会自动处理多格建筑的引用填充 */
   // World.java 中的关键方法修改
 
@@ -131,7 +136,7 @@ public class World {
     if (!isValidCoord(x, y) || block == null) return null;
 
     // 1. 创建实例 (Building 内部会自动复制数据)
-    Building newBuild = block.create(x,y);
+    Building newBuild = block.create(x, y);
     WorldData.buildings.add(newBuild);
 
     // 2. 询问 Building 它占据了哪些坐标，并在世界中填充引用
@@ -156,7 +161,7 @@ public class World {
   public void removeBuilding(int x, int y) {
     Building build = getBuilding(x, y);
     if (build == null) return;
-    
+
     WorldData.buildings.remove(build);
     // 1. 询问 Building 它占据了哪些坐标，并清理引用
     build.getOccupiedCoords(

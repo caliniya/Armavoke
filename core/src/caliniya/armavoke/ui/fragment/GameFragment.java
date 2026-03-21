@@ -16,7 +16,7 @@ public class GameFragment {
 
   private boolean isCommandEnabled = false;
   private Button commandBtn;
-  private Button saveBtn, loadBtn , RBtn;
+  private Button saveBtn, loadBtn, RBtn;
 
   public void build() {
     // 主容器，填满屏幕
@@ -27,13 +27,16 @@ public class GameFragment {
     // --- 左下角：指挥按钮 ---
     Table leftTable = new Table();
     leftTable.bottom().left();
-    
-    commandBtn = new Button(() -> {
-        isCommandEnabled = !isCommandEnabled;
-        Events.fire(new EventType.CommandChange(isCommandEnabled));
-    },"@command");
+
+    commandBtn =
+        new Button(
+            () -> {
+              isCommandEnabled = !isCommandEnabled;
+              Events.fire(new EventType.CommandChange(isCommandEnabled));
+            },
+            "@command");
     leftTable.add(commandBtn).size(120f, 50f).margin(10f);
-    
+
     // --- 右下角：存档测试按钮 ---
     Table rightTable = new Table();
     rightTable.bottom().right();
@@ -41,41 +44,47 @@ public class GameFragment {
     // 定义存档文件路径
     Fi saveFile = Core.settings.getDataDirectory().child("save.aes");
 
-    saveBtn = new Button("Save", () -> {
-        try {
-            // 确保目录存在
-            saveFile.parent().mkdirs();
-            GameIO.save(saveFile , null);
-        } catch (Exception e) {
-            Log.err("Save failed", e);
-        }
-    });
+    saveBtn =
+        new Button(
+            "Save",
+            () -> {
+              try {
+                // 确保目录存在
+                saveFile.parent().mkdirs();
+                GameIO.save(saveFile, null);
+              } catch (Exception e) {
+                Log.err("Save failed", e);
+              }
+            });
 
-    loadBtn = new Button("Load", () -> {
-        if (!saveFile.exists()) {
-            Log.warn("No save file found at @", saveFile);
-            return;
-        }
-        try {
-            GameIO.load(saveFile);
-        } catch (Exception e) {
-            Log.err("Load failed", e);
-        }
-        
-    });
-    
-    RBtn = new Button("Reload", () -> {
-      WorldData.reBuildAll(100,100 , true);
-      WorldData.initWorld();
-      RouteData.init();
-    });
+    loadBtn =
+        new Button(
+            "Load",
+            () -> {
+              if (!saveFile.exists()) {
+                Log.warn("No save file found at @", saveFile);
+                return;
+              }
+              try {
+                GameIO.load(saveFile);
+              } catch (Exception e) {
+                Log.err("Load failed", e);
+              }
+            });
+
+    RBtn =
+        new Button(
+            "Reload",
+            () -> {
+              WorldData.reBuildAll(100, 100, false);
+            });
 
     // 添加按钮到右侧表格，并设置间距
     rightTable.add(saveBtn).size(80f, 50f).margin(5f);
     rightTable.row(); // 换行，或者并在同一行
     rightTable.add(loadBtn).size(80f, 50f).margin(5f);
     rightTable.row();
-    rightTable.add(RBtn).size(80,50).margin(5);
+    rightTable.add(RBtn).size(80, 50).margin(5);
 
     // 将左右两个子表格添加到根表格中
     // 使用 expand() 和 bottom() 来正确定位
