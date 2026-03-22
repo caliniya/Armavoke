@@ -1,20 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/base/game/Entity.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java",
       "selection": {
         "end": {
-          "column": 1,
-          "index": 65,
-          "line": 3
+          "column": 0,
+          "index": 0,
+          "line": 0
         },
         "start": {
-          "column": 1,
-          "index": 65,
-          "line": 3
+          "column": 0,
+          "index": 0,
+          "line": 0
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/base/game/Entity.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java"
 }
