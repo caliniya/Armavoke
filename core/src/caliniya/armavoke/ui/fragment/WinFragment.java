@@ -32,7 +32,8 @@ public class WinFragment {
 
     window = new Table();
     main = new Table();
-
+    main(main);
+    
     window.setBackground(
         new NinePatchDrawable((NinePatchDrawable) Core.atlas.getDrawable("Window")));
 
@@ -52,9 +53,8 @@ public class WinFragment {
     window.row();
 
     window.add(main).grow().pad(10f);
-    
-    
-    root.add(window).size(w,h).center();
+
+    root.add(window).size(w, h).center();
     Core.scene.root.addChild(root);
   }
 
@@ -62,4 +62,7 @@ public class WinFragment {
   public void remove() {
     root.remove();
   }
+    
+    public void main(Table t){}
+    
 }

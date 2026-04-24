@@ -11,13 +11,13 @@ public class Button extends ImageButton {
     super();
     clicked(action);
     add(text).growX().scrollX(true).center().get().setAlignment(Align.center, Align.center);
-    setStyle(Styles.ibuttondef);
+    setStyle(Styles.buttondef);
   }
 
   public Button(Runnable action, String text) {
     super();
     clicked(action);
     add(text).growX().scrollX(true).center().get().setAlignment(Align.center, Align.center);
-    setStyle(Styles.ibuttonc);
+    setStyle(Styles.buttonc);
   }
 }

@@ -1,17 +1,32 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MenuFragment.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MapsFragment.java",
       "selection": {
         "end": {
-          "column": 79,
-          "index": 1396,
-          "line": 51
+          "column": 35,
+          "index": 497,
+          "line": 16
         },
         "start": {
-          "column": 79,
-          "index": 1396,
-          "line": 51
+          "column": 35,
+          "index": 497,
+          "line": 16
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/Styles.java",
+      "selection": {
+        "end": {
+          "column": 33,
+          "index": 1986,
+          "line": 59
+        },
+        "start": {
+          "column": 33,
+          "index": 1986,
+          "line": 59
         }
       }
     },
@@ -19,32 +34,17 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java",
       "selection": {
         "end": {
-          "column": 40,
-          "index": 1286,
-          "line": 60
+          "column": 4,
+          "index": 2230,
+          "line": 91
         },
         "start": {
-          "column": 40,
-          "index": 1286,
-          "line": 60
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java",
-      "selection": {
-        "end": {
-          "column": 38,
-          "index": 835,
-          "line": 30
-        },
-        "start": {
-          "column": 38,
-          "index": 835,
-          "line": 30
+          "column": 4,
+          "index": 2230,
+          "line": 91
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java"
 }

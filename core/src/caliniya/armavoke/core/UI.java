@@ -86,7 +86,10 @@ public class UI {
   }
   
   public static void Maps() {
+    maps.h = (float)((graphics.getHeight() * 0.7) / scl);
+    maps.w = (float)((graphics.getWidth() * 0.7) / scl);
     maps.build();
+    
   }
   
   /**
