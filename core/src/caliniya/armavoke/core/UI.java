@@ -48,7 +48,6 @@ public class UI {
     if(maps == null) {
       maps = new MapsFragment();
     }
-    camera = scene.getCamera();
   }
 
   public static void Menu() {

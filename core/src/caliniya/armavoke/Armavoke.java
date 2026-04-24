@@ -15,9 +15,8 @@ import arc.util.viewport.ScreenViewport;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.*;
-import caliniya.armavoke.core.ContentVar;
 import caliniya.armavoke.core.UI;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.input.*;
@@ -80,8 +79,6 @@ public class Armavoke extends ApplicationCore {
       UI.camera.update();
       assinited = true;
       Scl.setProduct(1);
-
-      Log.info("Game Inited");
 
       // 计算消耗时间
       long durationNanos = java.lang.System.nanoTime() - startTime;

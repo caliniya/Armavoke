@@ -3,7 +3,7 @@ package caliniya.armavoke.type;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.core.ContentVar;
+import caliniya.armavoke.game.ContentVar;
 import caliniya.armavoke.type.type.ItemType;
 
 public class Item {

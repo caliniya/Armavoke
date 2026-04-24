@@ -4,6 +4,7 @@ import arc.Core;
 import arc.util.Nullable;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
+import caliniya.armavoke.game.*;
 
 public class ContentType {
 

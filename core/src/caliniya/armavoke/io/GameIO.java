@@ -8,7 +8,7 @@ import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.core.ContentVar;
+import caliniya.armavoke.game.ContentVar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;

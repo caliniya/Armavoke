@@ -2,7 +2,7 @@ package caliniya.armavoke.type.module;
 
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import caliniya.armavoke.core.ContentVar;
+import caliniya.armavoke.game.ContentVar;
 import caliniya.armavoke.type.Item;
 import caliniya.armavoke.type.type.ItemType;
 

@@ -5,7 +5,7 @@ import arc.func.Intc2;
 import caliniya.armavoke.content.Blocks;
 import caliniya.armavoke.content.ENVBlocks;
 import caliniya.armavoke.content.Floors;
-import caliniya.armavoke.core.ContentVar;
+import caliniya.armavoke.game.ContentVar;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.game.Building;
@@ -73,7 +73,7 @@ public class World {
         }
       }
     }
-    int buildingCount = 0; // 生成数量
+    int buildingCount = 3; // 生成数量
     for (int i = 0; i < buildingCount; i++) {
       // 在安全区域内随机生成
       int padding = 5;
@@ -255,7 +255,8 @@ public class World {
     if (id == 0) return null;
     return ContentVar.getByID(CType.Floor, id);
   }
-
+  
+  //越界检测
   public boolean isValidCoord(int x, int y) {
     return x >= 0 && x < W && y >= 0 && y < H;
   }

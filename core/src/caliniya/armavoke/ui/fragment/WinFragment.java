@@ -25,9 +25,10 @@ public class WinFragment {
   public String title = "Window"; // 标题
 
   public void build() {
+    if (root != null) root.remove();
     root = new Table();
     root.setFillParent(true);
-    root.touchable = Touchable.childrenOnly;
+    root.touchable = Touchable.enabled;
 
     window = new Table();
     main = new Table();

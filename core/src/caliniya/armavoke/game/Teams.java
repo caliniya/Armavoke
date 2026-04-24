@@ -1,4 +1,4 @@
-package caliniya.armavoke.core;
+package caliniya.armavoke.game;
 
 import arc.util.Log;
 import caliniya.armavoke.base.type.TeamTypes;

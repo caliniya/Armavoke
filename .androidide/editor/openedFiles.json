@@ -1,20 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MenuFragment.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 79,
+          "index": 1396,
+          "line": 51
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 79,
+          "index": 1396,
+          "line": 51
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java",
+      "selection": {
+        "end": {
+          "column": 40,
+          "index": 1286,
+          "line": 60
+        },
+        "start": {
+          "column": 40,
+          "index": 1286,
+          "line": 60
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java",
+      "selection": {
+        "end": {
+          "column": 38,
+          "index": 835,
+          "line": 30
+        },
+        "start": {
+          "column": 38,
+          "index": 835,
+          "line": 30
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UnitRender.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/WinFragment.java"
 }

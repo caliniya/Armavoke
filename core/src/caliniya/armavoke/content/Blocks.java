@@ -10,7 +10,7 @@ public class Blocks {
     TestBlock =
         new Block("test-building") {
           {
-            size = 3;
+            this.size = 3;
           }
         };
   }

@@ -1,7 +1,6 @@
 package caliniya.armavoke.system.input;
 
-import arc.Core;
-import arc.Events;
+import arc.*;
 import arc.input.GestureDetector.GestureListener;
 import arc.input.KeyCode;
 import arc.input.InputProcessor;
@@ -9,7 +8,7 @@ import arc.math.geom.Vec2;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.*;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.*;
 

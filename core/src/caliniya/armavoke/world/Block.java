@@ -7,9 +7,9 @@ import arc.graphics.g2d.TextureRegion;
 import arc.util.Log;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.core.ContentVar;
-import caliniya.armavoke.game.Building;
-import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.game.*;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.type.ItemType;
 
 public class Block extends ContentType {
@@ -41,6 +41,10 @@ public class Block extends ContentType {
 
   public void load() {
     region = Core.atlas.find(name);
+  }
+  
+  public void uptate(Building building ,float dt){
+    
   }
 
   public void draw(Building b) {

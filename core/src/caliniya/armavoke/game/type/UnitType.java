@@ -71,7 +71,7 @@ public class UnitType extends ContentType {
     }
   }
   
-  public void update(Unit u){
+  public void update(Unit u , float dt){
     // TODO: 以后再说
   }
 

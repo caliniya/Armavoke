@@ -1,12 +1,11 @@
 package caliniya.armavoke.game.data;
 
-import arc.Events;
+import arc.*;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.game.Unit;
-import caliniya.armavoke.game.Building; // 导入 Building
-import caliniya.armavoke.system.render.MapRender;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.game.*;
+import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.world.*;
 import arc.math.*;
 import caliniya.armavoke.type.*;
@@ -143,6 +142,7 @@ public class WorldData {
     }
 
     unitGrid = null;
+    Entities.clearIDs();
 
     world = new World(newW, newH, space);
 
