@@ -15,4 +15,5 @@ public class Systems {
   public static Render R;
   public static BlockRender BR;
   public static GameProcess GP;
+  public static DebugRender DE;
 }

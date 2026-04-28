@@ -12,7 +12,7 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
 import caliniya.armavoke.ui.Button;
 
-public class GameFragment {
+public class HUDFragment {
 
   private boolean isCommandEnabled = false;
   private Button commandBtn;

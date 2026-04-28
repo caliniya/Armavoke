@@ -44,7 +44,6 @@ public class MenuFragment {
                   new Button(
                       "@mapList",
                       () -> {
-                        Maps.load();
                         UI.Maps();
                       }));
               menu.row();

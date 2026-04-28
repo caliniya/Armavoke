@@ -8,24 +8,25 @@ import arc.graphics.g2d.Lines;
 import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.util.viewport.Viewport;
+import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.ui.windows.*;
 
 import static arc.Core.scene;
 import static arc.Core.graphics;
 
 public class UI {
   
-  // 缓存 Scl 值，避免重复计算
   public static float scl;
   
   //调试显示器
   public static DebugFragment debug;
   //主游戏ui
-  public static GameFragment game;
+  public static HUDFragment hud;
   //游戏菜单ui
   public static MenuFragment menu;
   //地图列表
-  public static MapsFragment maps;
+  public static MapsWindow maps;
   //ui用的相机和视口
   public static Camera camera;
   public static Viewport vport;
@@ -33,20 +34,19 @@ public class UI {
   private static boolean isDebugShown = true;
   
   public static void initAll(){
-    // 初始化 Scl 缓存
     scl = Scl.scl();
     
     if(debug == null) {
       debug = new DebugFragment();
     }
-    if(game == null) {
-      game = new GameFragment();
+    if(hud == null) {
+      hud = new HUDFragment();
     }
     if(menu == null) {
       menu = new MenuFragment();
     }
     if(maps == null) {
-      maps = new MapsFragment();
+      maps = new MapsWindow();
     }
   }
 
@@ -81,11 +81,12 @@ public class UI {
 
   public static void Game() {
     scene.clear();
-    game.build();
+    hud.build();
     Debug();
   }
   
   public static void Maps() {
+    Maps.load();
     maps.h = (float)((graphics.getHeight() * 0.7) / scl);
     maps.w = (float)((graphics.getWidth() * 0.7) / scl);
     maps.build();
@@ -99,13 +100,9 @@ public class UI {
    * @param heightRatio 窗口高度占屏幕高度的比例 (0~1)
    */
   public static void Window(String Ttitle, float widthRatio, float heightRatio) {
-    // 计算实际像素尺寸：屏幕尺寸 * 比例 / Scl缩放因子
-    // 除以 scl 是因为 Cell.size() 内部会乘以 scl
     float actualW = graphics.getWidth() * widthRatio / scl;
     float actualH = graphics.getHeight() * heightRatio / scl;
-    
-    WinFragment win = new WinFragment(){{
-      title = Ttitle;
+    Window win = new Window(){{
       w = actualW;
       h = actualH;
     }};

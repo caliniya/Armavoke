@@ -13,6 +13,7 @@ import arc.scene.ui.TextField;
 import arc.scene.ui.TextField.TextFieldStyle;
 import arc.scene.ui.TextButton.TextButtonStyle;
 import arc.scene.ui.Button.ButtonStyle;
+import arc.scene.ui.Dialog.DialogStyle;
 import caliniya.armavoke.ui.Fonts;
 
 public class Styles {
@@ -23,6 +24,7 @@ public class Styles {
   public static TextFieldStyle textField;
   public static TextButtonStyle textButton;
   public static ButtonStyle bu;
+  public static DialogStyle window;
 
   public static void load() {
 
@@ -66,7 +68,13 @@ public class Styles {
     textField.background = buttondef.up;
     textField.cursor = buttondef.down;  // 光标样式，使用已有资源
     textField.selection = buttondef.down;  // 选择高亮背景
-    
     Core.scene.addStyle(TextFieldStyle.class, textField);
+    
+    window = new DialogStyle();
+    window.background = Core.atlas.getDrawable("Window");
+    window.titleFont = textButton.font;
+    window.titleFontColor = Color.white;
+    Core.scene.addStyle(DialogStyle.class , window);
+    
   }
 }

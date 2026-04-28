@@ -6,9 +6,9 @@ import arc.util.Threads;
 import caliniya.armavoke.base.type.EventType;
 
 /**
- * 抽象系统类，代表游戏或应用中的一个独立逻辑模块。
+ * 代表游戏或应用中的一个独立逻辑模块。
  *
- * <p>支持两种运行模式：
+ * <p>两种运行模式：
  *
  * <ul>
  *   <li>主线程运行：由外部手动调用 {@link #update()} 或 {@link #update(float)}。

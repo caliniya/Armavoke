@@ -35,7 +35,7 @@ public class Armavoke extends ApplicationCore {
   private long startTime;
 
   public static Ar<caliniya.armavoke.system.System> systems =
-      new Ar<caliniya.armavoke.system.System>(10);
+      new Ar<caliniya.armavoke.system.System>(15);
 
   @Override
   public void setup() {
@@ -54,7 +54,6 @@ public class Armavoke extends ApplicationCore {
   public void update() {
     super.update();
     graphics.clear(Color.black);
-
     // 资源加载完成后的初始化
     if (assets.update() && !assinited) {
       Fonts.setup();
@@ -89,6 +88,7 @@ public class Armavoke extends ApplicationCore {
 
       Log.info(
           "Game inited - Using: " + String.format("%d ms / %d µs", durationMillis, durationMicros));
+      // Systems.DE = new DebugRender().init();
     }
 
     // 加载界面
@@ -104,10 +104,17 @@ public class Armavoke extends ApplicationCore {
         sys.update();
       }
       camera.update();
-      Draw.flush();
     }
     scene.act();
     scene.draw();
+    Draw.flush();
+
+    if (Systems.DE != null) {
+      Draw.proj(UI.camera);
+      Systems.DE.update();
+    }
+
+    Draw.flush();
   }
 
   public static void addSystem(caliniya.armavoke.system.System<?>... newSystems) {
