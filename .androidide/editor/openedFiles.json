@@ -1,20 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Armavoke.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UnitControl.java",
       "selection": {
         "end": {
-          "column": 37,
-          "index": 778,
-          "line": 25
+          "column": 1,
+          "index": 6045,
+          "line": 190
         },
         "start": {
-          "column": 37,
-          "index": 778,
-          "line": 25
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/CommandData.java",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 2916,
+          "line": 116
+        },
+        "start": {
+          "column": 0,
+          "index": 2916,
+          "line": 116
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java",
+      "selection": {
+        "end": {
+          "column": 7,
+          "index": 828,
+          "line": 33
+        },
+        "start": {
+          "column": 7,
+          "index": 828,
+          "line": 33
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Armavoke.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java"
 }

@@ -91,7 +91,7 @@ public class Unit extends Entity {
       this.type = UnitTypes.test;
       Log.err(this.toString() + "@ No unitTpye used test");
     }
-    this.size = this.type.size;
+    
     this.speed = this.type.speedt;
     this.rotationSpeed = this.type.rotationSpeend;
     this.region = this.type.region;
@@ -103,8 +103,12 @@ public class Unit extends Entity {
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {
       hitboxData = new float[type.hitbox.length];
+      // 自动计算外接圆直径
+      calculateBoundingSize();
     } else {
       hitboxData = new float[3];
+      // 没有自定义体积时，使用类型定义的默认尺寸
+      this.size = this.type.size;
     }
 
     this.team = TeamTypes.Evoke;
@@ -131,8 +135,40 @@ public class Unit extends Entity {
     WorldData.units.add(this);
     updateChunkPosition();
 
-    // 初始计算一次碰撞体
     updateHitbox();
+  }
+  
+  /**
+   * 根据自定义碰撞体积计算最小外接圆直径
+   * 并赋值给 size
+   */
+  private void calculateBoundingSize() {
+      if (type.hitbox == null) return;
+      
+      float maxRadiusSq = 0f;
+      
+      // 遍历所有碰撞方块，找到离原点最远的角点距离
+      for (int i = 0; i < type.hitbox.length; i += 3) {
+          float cx = type.hitbox[i];
+          float cy = type.hitbox[i + 1];
+          float s = type.hitbox[i + 2];
+          
+          // 正方形角点到中心的距离 (勾股定理的一半)
+          float cornerDist = s / 2f * Mathf.sqrt2;
+          
+          // 中心点到原点的距离
+          float centerDist = Mathf.len(cx, cy);
+          
+          // 最远点距离 = 中心距 + 角距
+          float totalDist = centerDist + cornerDist;
+          
+          if (totalDist * totalDist > maxRadiusSq) {
+              maxRadiusSq = totalDist * totalDist;
+          }
+      }
+      
+      // size 表示直径
+      this.size = Mathf.sqrt(maxRadiusSq) * 2f;
   }
 
   @Override
@@ -150,7 +186,7 @@ public class Unit extends Entity {
     this.currentChunkIndex = -1;
     this.isSelected = false;
     this.moving = false;
-    this.hitboxData = null; // 清空引用
+    this.hitboxData = null;
 
     this.pathFindCooldown = 0;
     if (path != null) path.clear();
@@ -181,11 +217,10 @@ public class Unit extends Entity {
   public void update(float dt) {
     float oldX = this.x;
     float oldY = this.y;
-    float oldRot = this.rotation; // 记录旧角度用于判断是否旋转
+    float oldRot = this.rotation;
 
     distToTarget = Mathf.dst(x, y, targetX, targetY);
 
-    // 到达目标点判定
     if (path == null && distToTarget < 2f) {
       x = targetX;
       y = targetY;
@@ -201,7 +236,6 @@ public class Unit extends Entity {
       angleToTarget = Angles.angle(x, y, targetX, targetY);
     }
 
-    // --- 旋转逻辑 ---
     if (shooting) {
       if (mainFixedWeapon != null && distToTarget > 1f) {
         rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
@@ -217,30 +251,21 @@ public class Unit extends Entity {
       type.update(this, dt);
     }
 
-    // --- 状态判断与碰撞更新优化 ---
-    // 1. 判断是否移动 (位置发生变化)
     moving = (x != oldX || y != oldY);
-
-    // 2. 判断是否旋转
     boolean rotated = !Mathf.equal(rotation, oldRot);
 
-    // 3. 只有在移动或旋转时才重新计算碰撞体积
-    // 注意：如果单位静止不动，碰撞体积数据保持不变，节省计算开销
     if (moving || rotated) {
       updateHitbox();
     }
 
-    // 空间网格更新 (仅在移动时更新)
     if (moving) {
       updateChunkPosition();
     }
   }
 
-  /** 根据当前位置和角度更新碰撞盒数据 */
   private void updateHitbox() {
     if (hitboxData == null) return;
 
-    // 情况 1: 使用自定义碰撞体
     if (type.hitbox != null) {
       float[] src = type.hitbox;
       float[] dst = hitboxData;
@@ -250,23 +275,19 @@ public class Unit extends Entity {
         float localY = src[i + 1];
         float boxSize = src[i + 2];
 
-        // 使用 Tmp.v1 计算旋转后的偏移量
         Vec2 rotated = Tmp.v1.trns(rotation, localX, localY);
 
         dst[i] = x + rotated.x;
         dst[i + 1] = y + rotated.y;
         dst[i + 2] = boxSize;
       }
-    }
-    // 情况 2: 默认正方形
-    else {
+    } else {
       hitboxData[0] = x;
       hitboxData[1] = y;
       hitboxData[2] = size;
     }
   }
 
-  /** 判断某个点是否在单位内部 */
   public boolean contains(float px, float py) {
     if (hitboxData == null) return false;
 
@@ -277,10 +298,7 @@ public class Unit extends Entity {
 
       float halfSize = s / 2f;
 
-      if (px >= cx - halfSize
-          && px <= cx + halfSize
-          && py >= cy - halfSize
-          && py <= cy + halfSize) {
+      if (px >= cx - halfSize && px <= cx + halfSize && py >= cy - halfSize && py <= cy + halfSize) {
         return true;
       }
     }
@@ -293,20 +311,24 @@ public class Unit extends Entity {
   }
 
   public void drawDebug() {
-    // 1. 绘制碰撞体积 (黄色)
-    // 新的碰撞系统支持多方块，直接遍历 hitboxData 绘制即可
     Draw.color(Color.yellow);
-    Lines.stroke(2f); // 稍微细一点的线条，适合多方块
+    Lines.stroke(2f);
 
     if (hitboxData != null) {
       for (int i = 0; i < hitboxData.length; i += 3) {
         float cx = hitboxData[i];
         float cy = hitboxData[i + 1];
         float s = hitboxData[i + 2];
-        // 绘制以 为中心，边长为 s 的正方形
         Lines.rect(cx - s / 2f, cy - s / 2f, s, s);
       }
     }
+    
+    // 绘制计算出的外接圆 (新增，用于验证 size 计算是否正确)
+    Draw.color(Color.sky);
+    float radius = size / 2f;
+    Lines.circle(x, y, radius);
+    Draw.color(Color.yellow); // 还原颜色
+
     if (Math.abs(speedX) > 0.001f || Math.abs(speedY) > 0.001f) {
       Draw.color(Color.magenta);
       float scale = 20f;
@@ -314,7 +336,6 @@ public class Unit extends Entity {
       Fonts.def.draw(Strings.format(speedX + " " + speedY), x, y + size + 8f, Align.center);
     }
 
-    // 3. 绘制目标点连接线 (橙色)
     if (targetX != 0 || targetY != 0) {
       Draw.color(Color.orange);
       Lines.line(x, y, targetX, targetY);
@@ -340,7 +361,7 @@ public class Unit extends Entity {
       }
     }
 
-    Draw.color(); // 重置颜色
+    Draw.color();
   }
 
   public void updateWeapons(float dt) {
