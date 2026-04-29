@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 buildscript {
     ext {
-        arcVersion =  'c10d68b7a1'  // https://github.com/Anuken/Arc
+        arcVersion =  'v157.1'  // https://github.com/Anuken/Arc
     }
     
     repositories {

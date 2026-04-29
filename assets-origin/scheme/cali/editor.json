@@ -1,0 +1,31 @@
+{
+  "bg": "@surface",
+  "line.current": "@surfaceVariant",
+  "line.divider": "@surface",
+  "line.num": "@onSurfaceVariant",
+  "line.num.current": "@primary",
+  "line.num.bg": "@surface",
+  "line.num.panel": "@surfaceVariant",
+  "line.num.panel.text": "@onSurfaceVariant",
+  "text.normal": "@onSurface",
+  "text.cursor": "@primary",
+  "text.selection.handle": "#42a5f5",
+  "text.matched.bg": "#ffb74d",
+  "text.selected.bg": "#1565c0",
+  "snippet.bg.editing": "#555555",
+  "snippet.bg.related": "#555555",
+  "snippet.bg.inactive": "#66aaaaaa",
+
+  "scrollbar.thumb": "@surfaceVariant",
+  "scrollbar.thumb.pressed": "@primary",
+  "scrollbar.track": "#2a2a2a",
+
+  "code.block.line": "@surfaceVariant",
+  "code.block.line.current": "@primary",
+  "code.block.line.side": "@outline",
+  "highlighted.delimiters.underline": "@outline",
+  "highlighted.delimiters.bg": "@surfaceVariant",
+  "highlighted.delimiters.fg": "@onSurface",
+
+  "non_printable_char": "@onSurfaceVariant"
+}

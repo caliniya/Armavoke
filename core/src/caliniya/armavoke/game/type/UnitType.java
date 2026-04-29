@@ -21,6 +21,9 @@ public class UnitType extends ContentType {
       speedt, // 像素每帧
       rotationSpeend = 1f // 旋转速度(单位帧每度？)
   ;
+  
+  //物理数据
+  public float[] hitbox = null;
   public float size = 100f;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();

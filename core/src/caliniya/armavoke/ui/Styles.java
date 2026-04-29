@@ -29,14 +29,16 @@ public class Styles {
   public static void load() {
 
     buttondef = new ImageButtonStyle();
-    buttondef.up = Core.atlas.drawable("button"); // 默认状态
-    buttondef.down = Core.atlas.drawable("button-1"); // 按下状态
+    buttondef.up = Core.atlas.drawable("button-up"); // 默认状态
+    buttondef.down = Core.atlas.drawable("button-down"); // 按下状态
     buttondef.checked = buttondef.up;
+    buttondef.disabled = Core.atlas.drawable("button-dis");
 
     buttonc = new ImageButtonStyle();
-    buttonc.up = Core.atlas.drawable("button"); // 默认状态
-    buttonc.down = Core.atlas.drawable("button-1"); // 按下状态
+    buttonc.up = buttondef.up;
+    buttonc.down = buttondef.down;
     buttonc.checked = buttondef.down;
+    buttonc.disabled = buttondef.disabled;
 
     Core.scene.addStyle(ImageButtonStyle.class, buttondef);
 
@@ -49,7 +51,7 @@ public class Styles {
     textButton = new TextButtonStyle();
     textButton.checked = buttondef.checked;
     textButton.font = Fonts.def;
-    textButton.up = buttondef.up;  // 修正了原来的错误
+    textButton.up = buttondef.up;
     textButton.down = buttondef.down;
     Core.scene.addStyle(TextButtonStyle.class, textButton);
 
@@ -58,8 +60,7 @@ public class Styles {
     bu.down = buttondef.down;
     bu.up = buttondef.up;
     Core.scene.addStyle(ButtonStyle.class, bu);
-
-    // 补全 TextFieldStyle - 最小必需配置
+    
     textField = new TextFieldStyle();
     textField.font = Fonts.def;
     textField.fontColor = Color.white;  // 必需：文本颜色
@@ -69,12 +70,6 @@ public class Styles {
     textField.cursor = buttondef.down;  // 光标样式，使用已有资源
     textField.selection = buttondef.down;  // 选择高亮背景
     Core.scene.addStyle(TextFieldStyle.class, textField);
-    
-    window = new DialogStyle();
-    window.background = Core.atlas.getDrawable("Window");
-    window.titleFont = textButton.font;
-    window.titleFontColor = Color.white;
-    Core.scene.addStyle(DialogStyle.class , window);
     
   }
 }

@@ -1,6 +1,5 @@
 package caliniya.armavoke;
 
-import arc.Core;
 import static arc.Core.*;
 
 import arc.*;

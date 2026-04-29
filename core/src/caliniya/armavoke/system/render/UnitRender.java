@@ -3,22 +3,15 @@ package caliniya.armavoke.system.render;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Angles;
-import arc.math.geom.Point2;
-import arc.util.Align;
-import arc.util.Strings;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
-import caliniya.armavoke.ui.Fonts;
 
-public class UnitRender extends caliniya.armavoke.system.System<UnitRender> {
+public class UnitRender extends System<UnitRender> {
 
   // 调试开关
   public static boolean debug = true;
@@ -38,10 +31,14 @@ public class UnitRender extends caliniya.armavoke.system.System<UnitRender> {
       Unit u = WorldData.units.get(i);
       if (shouldDraw(u.x, u.y, u.size * 2)) {
         u.draw();
-        if (debug) drawDebug(u);
+        // 调用单位内部的调试绘制方法
+        if (debug) {
+          u.drawDebug();
+        }
       }
     }
 
+    // 绘制子弹
     temp.clear();
     synchronized (WorldData.bullets) {
       temp.addAll(WorldData.bullets);
@@ -71,59 +68,5 @@ public class UnitRender extends caliniya.armavoke.system.System<UnitRender> {
     b.type.draw(b);
   }
 
-  /** 绘制调试信息 */
-  private void drawDebug(Unit u) {
-    // 1. 绘制碰撞体积 (黄色)
-    Draw.color(Color.yellow);
-    Lines.stroke(3f);
-    Lines.rect(u.x - u.size / 2f, u.y - u.size / 2f, u.size, u.size);
-
-    // 2. 绘制速度向量 (洋红色)
-    // 只有当速度大于微小阈值时才绘制，避免视觉干扰
-    if (Math.abs(u.speedX) > 0.001f || Math.abs(u.speedY) > 0.001f) {
-      Draw.color(Color.magenta);
-      // 放大倍数，因为每帧移动的像素很少，放大后才能看清方向
-      float scale = 20f;
-      Lines.line(u.x, u.y, u.x + u.speedX * scale, u.y + u.speedY * scale);
-
-      // 绘制具体数值文本
-      // 使用 arc.graphics.g2d.Fonts.def 或者你自己定义的 Fonts
-      // 注意：字体绘制比较消耗性能，仅在Debug模式使用
-      Fonts.def.draw(
-          Strings.format(u.speedX + " " + u.speedY),
-          u.x,
-          u.y + u.size + 8f, // 显示在单位上方
-          Align.center);
-    }
-
-    // 3. 绘制目标点连接线 (橙色)
-    if (u.targetX != 0 || u.targetY != 0) {
-      Draw.color(Color.orange);
-      Lines.line(u.x, u.y, u.targetX, u.targetY);
-      float s = 8f;
-      Lines.line(u.targetX - s, u.targetY - s, u.targetX + s, u.targetY + s);
-      Lines.line(u.targetX - s, u.targetY + s, u.targetX + s, u.targetY - s);
-    }
-
-    // 4. 绘制寻路路径 (青色)
-    if (u.path != null && !u.path.isEmpty()) {
-      Draw.color(Color.cyan);
-
-      float lastX = u.x;
-      float lastY = u.y;
-
-      for (int i = u.pathIndex; i < u.path.size; i++) {
-        Point2 p = u.path.get(i);
-        float wx = p.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-        float wy = p.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-
-        Lines.line(lastX, lastY, wx, wy);
-        Fill.square(wx, wy, 3f);
-        lastX = wx;
-        lastY = wy;
-      }
-    }
-
-    Draw.color(); // 重置颜色
-  }
+  // 移除了旧的 drawDebug(Unit u) 方法
 }

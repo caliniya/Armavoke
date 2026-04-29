@@ -103,7 +103,7 @@ public class WorldData {
     return cy * gridW + cx;
   }
 
-  /** 获取指定像素位置所在的单位列表 */
+  /** 获取指定像素位置所在网格的单位列表 */
   public static Ar<Unit> getUnitsAtChunk(float x, float y) {
     if (unitGrid == null) return null;
     int index = getChunkIndex(x, y);

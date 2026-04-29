@@ -97,7 +97,7 @@ public class Window {
     window.add(titleTable).growX(); 
     window.row();
     
-    window.image().color(Color.valueOf("98BFF5FF")).fillX().height(1f);
+    window.image().color(Color.valueOf("03ECEDFF")).fillX().height(1f);
     window.row();
 
     window.add(top).growX().top(); 
