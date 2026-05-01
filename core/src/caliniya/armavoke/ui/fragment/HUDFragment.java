@@ -2,42 +2,38 @@ package caliniya.armavoke.ui.fragment;
 
 import arc.Core;
 import arc.Events;
+import arc.math.Interp;
+import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.game.data.CommandData; // 引入 CommandData
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
 import caliniya.armavoke.ui.Button;
+import caliniya.armavoke.ui.Styles;
 import arc.files.Fi;
 
 public class HUDFragment {
 
-  private boolean isCommandEnabled = false;
+  // 移除了本地状态变量 isCommandEnabled
   
-  // 右侧容器，用于切换内容
   private Table rightContainer;
-  
-  // 两个面板引用
   private Table buildingPanel;
   private Table commandPanel;
 
   public void build() {
-    // 主容器
     Table root = new Table();
     root.setFillParent(true);
-    // 设置为只允许子元素响应点击，避免遮挡游戏视野
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
-
-    // === 1. 左下角：指挥模式开关 ===
     Table leftTable = new Table();
     leftTable.bottom().left();
 
     Button commandBtn = new Button(
         () -> {
-          isCommandEnabled = !isCommandEnabled;
-          Events.fire(new EventType.CommandChange(isCommandEnabled));
+          CommandData.commanding = !CommandData.commanding;
           updateRightPanel();
         },
         "@command");
@@ -48,21 +44,18 @@ public class HUDFragment {
     rightContainer = new Table();
     rightContainer.bottom().right();
 
-    // 初始化两个面板
     setupBuildingPanel();
     setupCommandPanel();
 
-    // 默认显示建筑面板
     updateRightPanel();
 
-    // === 布局组合 ===
     root.add(leftTable).expand().bottom().left();
     root.add(rightContainer).expand().bottom().right();
   }
 
-  /** 初始化建筑面板 (默认显示) */
   private void setupBuildingPanel() {
     buildingPanel = new Table();
+    buildingPanel.background(Styles.background);
     
     buildingPanel.add("[lightgray]建筑菜单[]").row();
     buildingPanel.add().height(10f).row();
@@ -77,14 +70,13 @@ public class HUDFragment {
     buildingPanel.add(btnRow);
   }
 
-  /** 初始化单位指挥面板 (指挥模式开启时显示) */
   private void setupCommandPanel() {
     commandPanel = new Table();
+    commandPanel.background(Styles.background);
     
     commandPanel.add("[accent]单位指挥[]").row();
     commandPanel.add().height(10f).row();
 
-    // --- 第一行：基础指令 ---
     Table basicRow = new Table();
     basicRow.defaults().size(70f, 50f).pad(5f);
     basicRow.button("攻击", () -> Log.info("攻击指令"));
@@ -92,7 +84,6 @@ public class HUDFragment {
     basicRow.button("防守", () -> Log.info("防守指令"));
     commandPanel.add(basicRow).row();
 
-    // --- 第二行：高级指令 (占位) ---
     Table advRow = new Table();
     advRow.defaults().size(70f, 50f).pad(5f);
     advRow.button("巡逻", () -> Log.info("巡逻指令"));
@@ -100,18 +91,24 @@ public class HUDFragment {
     advRow.button("编队", () -> Log.info("编队管理"));
     commandPanel.add(advRow).row();
     
-    // --- 第三行：状态显示 (占位) ---
     commandPanel.add("[gray]选中单位状态信息区域[]").padTop(10f);
   }
 
-  /** 更新右侧面板显示内容 */
   private void updateRightPanel() {
     rightContainer.clearChildren();
     
-    if (isCommandEnabled) {
-      rightContainer.add(commandPanel);
-    } else {
-      rightContainer.add(buildingPanel);
-    }
+    // 直接读取全局状态决定显示哪个面板
+    Table currentPanel = CommandData.commanding ? commandPanel : buildingPanel;
+    
+    currentPanel.clearActions();
+    
+    rightContainer.add(currentPanel);
+
+    // --- 动画逻辑 ---
+    currentPanel.pack();
+    float height = currentPanel.getPrefHeight();
+
+    currentPanel.setTranslation(0, -height);
+    currentPanel.addAction(Actions.translateBy(0, height, 0.3f, Interp.fade));
   }
 }

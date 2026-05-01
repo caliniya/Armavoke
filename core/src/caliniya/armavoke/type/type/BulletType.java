@@ -30,8 +30,8 @@ public class BulletType {
   }
 
   /** 子弹更新逻辑 (每帧调用) */
+  //基础的子弹运动目前在子弹处理中进行，未来整合进这里
   public void update(Bullet b) {
-    // TODO: 具体实现
   }
 
   /** 子弹绘制逻辑 */

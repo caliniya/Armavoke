@@ -1,24 +1,23 @@
 package caliniya.armavoke.system.world;
 
+import arc.util.Time;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
 
-public class UnitProces extends caliniya.armavoke.system.System<UnitProces> {
+public class EntityProces extends caliniya.armavoke.system.System<EntityProces> {
 
   
   @Override
-  public UnitProces init() {
+  public EntityProces init() {
     return super.init(true);
   }
 
   @Override
-  public void update() {
-    Ar<Unit> list = WorldData.units;
-
-    for (int i = 0; i < list.size; i++) {
-      Unit u = list.get(i);
+  public void update(float dt) {
+    for (int i = 0; i < WorldData.units.size; i++) {
+      Unit u = WorldData.units.get(i);
       if (u == null) continue;
       if (u.health <= 0) {
           u.remove(); 

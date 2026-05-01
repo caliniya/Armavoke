@@ -200,35 +200,36 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
                         }
                     }
                 }
-
-                // 4. 处理碰撞结果
-                if (hitTarget != null) {
-                    b.x = nextX;
-                    b.y = nextY;
-                    b.type.hit(b, hitTarget);
-
-                    // 命中后移除子弹
-                    activeItems[i] = activeItems[--activeBullets.size];
-                    activeItems[activeBullets.size] = null;
-                    i--;
-                } else {
-                    // 未命中，更新位置并存入渲染缓冲
-                    b.x = nextX;
-                    b.y = nextY;
-                    b.type.update(b);
-
-                    renderBuffer.add(b);
-                }
             }
+            
+            // --- 修正点：将碰撞处理移出空间遍历循环 ---
 
-            // 5. 交换渲染缓冲区
-            synchronized (WorldData.bullets) {
-                Ar<Bullet> temp = WorldData.bullets;
+            // 4. 处理碰撞结果
+            if (hitTarget != null) {
+                b.x = nextX;
+                b.y = nextY;
+                b.type.hit(b, hitTarget);
 
-                WorldData.bullets = renderBuffer;
+                // 命中后移除子弹
+                activeItems[i] = activeItems[--activeBullets.size];
+                activeItems[activeBullets.size] = null;
+                i--;
+            } else {
+                // 未命中，更新位置并存入渲染缓冲
+                b.x = nextX;
+                b.y = nextY;
+                b.type.update(b);
 
-                renderBuffer = temp;
+                renderBuffer.add(b);
             }
+        } // --- 修正点：子弹遍历循环在此结束 ---
+
+        // 5. 交换渲染缓冲区
+        // --- 修正点：将交换逻辑移出子弹遍历循环，每帧只交换一次 ---
+        synchronized (WorldData.bullets) {
+            Ar<Bullet> temp = WorldData.bullets;
+            WorldData.bullets = renderBuffer;
+            renderBuffer = temp;
         }
     }
 

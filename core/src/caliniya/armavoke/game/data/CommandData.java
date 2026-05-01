@@ -1,5 +1,6 @@
 package caliniya.armavoke.game.data;
 
+import arc.func.Boolf;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Unit;
@@ -9,57 +10,37 @@ public class CommandData {
 
   // 当前选中的单位
   public static Ar<Unit> checkedUnits = new Ar<Unit>();
+    public static boolean commanding;
 
   // 初始化，也包括重置数据
   public void init() {
     checkedUnits.clear();
   }
 
-  /**
-   * 根据像素坐标查找该位置上的单位（点检测）
-   *
-   * @param x 世界坐标 X
-   * @param y 世界坐标 Y
-   * @return 该位置上的单位，如果没有则返回 null
-   */
+  /** 根据像素坐标查找该位置上的单位（不过滤） */
   public Unit findUnitAt(float x, float y) {
-    return findUnitAt(x, y, null, false);
+    return findUnitAt(x, y, (Boolf<Unit>) null);
   }
 
-  /**
-   * 根据像素坐标查找该位置上的单位（点检测）
-   *
-   * @param x 世界坐标 X
-   * @param y 世界坐标 Y
-   * @param targetTeam 指定阵营（只检测该阵营），为 null 时检测所有阵营
-   * @return 该位置上的单位，如果没有则返回 null
-   */
+  /** 根据像素坐标查找该位置上的单位（指定阵营） */
   public Unit findUnitAt(float x, float y, TeamTypes targetTeam) {
-    return findUnitAt(x, y, targetTeam, true);
+    return findUnitAt(x, y, u -> u.team == targetTeam);
   }
 
-  /**
-   * 根据像素坐标查找该位置上的单位（点检测）
-   *
-   * @param x 世界坐标 X
-   * @param y 世界坐标 Y
-   * @param excludeTeam 需要排除的阵营（不检测该阵营），为 null 时不排除任何阵营
-   * @return 该位置上的单位，如果没有则返回 null
-   */
+  /** 根据像素坐标查找该位置上的单位（排除阵营） */
   public Unit findUnitAtExclude(float x, float y, TeamTypes excludeTeam) {
-    return findUnitAt(x, y, excludeTeam, false);
+    return findUnitAt(x, y, u -> u.team != excludeTeam);
   }
 
   /**
-   * 内部实现：根据像素坐标查找单位
+   * 核心查找方法：根据像素坐标和自定义过滤器查找单位
    *
    * @param x 世界坐标 X
    * @param y 世界坐标 Y
-   * @param teamFilter 阵营过滤器（null 表示不过滤）
-   * @param matchTarget 为 true 时只检测 teamFilter 指定的阵营，为 false 时排除 teamFilter 指定的阵营
+   * @param filter 过滤器接口，返回 true 表示符合条件，返回 false 表示跳过。传 null 表示不过滤。
    * @return 该位置上的单位，如果没有则返回 null
    */
-  private Unit findUnitAt(float x, float y, TeamTypes teamFilter, boolean matchTarget) {
+  public Unit findUnitAt(float x, float y, Boolf<Unit> filter) {
     int gridW = WorldData.gridW;
     int gridH = WorldData.gridH;
     Ar<Unit>[] grid = WorldData.unitGrid;
@@ -73,7 +54,7 @@ public class CommandData {
       return null;
     }
 
-    // 检测当前所在的区块及其周围 3x3 范围（考虑到单位可能跨区块）
+    // 检测当前所在的区块及其周围 3x3 范围
     for (int dy = -1; dy <= 1; dy++) {
       int ncy = cy + dy;
       if (ncy < 0 || ncy >= gridH) continue;
@@ -93,18 +74,22 @@ public class CommandData {
           Unit u = (Unit) uItems[j];
           if (u == null || u.health <= 0) continue;
 
-          // 阵营过滤
-          if (teamFilter != null) {
-            boolean sameTeam = u.team == teamFilter;
-            if (matchTarget ? !sameTeam : sameTeam) continue;
+          // 1. 自定义过滤器校验
+          if (filter != null && !filter.get(u)) continue;
+
+          // 2. 粗略检测：外接圆判定
+          // 如果点不在外接圆内，则一定不在单位内部
+          float halfSize = u.size / 2f;
+          float diffX = x - u.x;
+          float diffY = y - u.y;
+
+          if (diffX * diffX + diffY * diffY > halfSize * halfSize) {
+            continue;
           }
 
-          // 点碰撞检测：检查给定坐标是否在单位的 AABB 范围内
-          float halfSize = u.size / 2f;
-          if (x >= u.x - halfSize
-              && x <= u.x + halfSize
-              && y >= u.y - halfSize
-              && y <= u.y + halfSize) {
+          // 3. 精确检测：使用单位自身的形状判定
+          // 调用 Unit.contains 处理旋转、多方块等复杂逻辑
+          if (u.contains(x, y)) {
             return u;
           }
         }

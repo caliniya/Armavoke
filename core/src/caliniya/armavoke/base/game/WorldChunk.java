@@ -15,6 +15,7 @@ public class WorldChunk {
   public short[] envblockIds;
   // 数据层 3: 建筑实例
   public Building[] buildings;
+    //不存储单位
   
   public boolean empty = true;
 

@@ -32,7 +32,6 @@ import caliniya.armavoke.ui.Fonts;
 public class Unit extends Entity {
 
   public UnitType type;
-  public TeamTypes team;
   public TeamData teamData;
 
   public Ar<Weapon> weapons = new Ar<>();
@@ -112,6 +111,7 @@ public class Unit extends Entity {
     }
 
     this.team = TeamTypes.Evoke;
+    teamData = team.data();
     shooting = false;
 
     weapons.clear();

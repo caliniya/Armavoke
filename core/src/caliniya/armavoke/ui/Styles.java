@@ -3,6 +3,7 @@ package caliniya.armavoke.ui;
 import arc.Core;
 import arc.graphics.Color;
 import arc.scene.style.Drawable;
+import arc.scene.style.NinePatchDrawable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.ImageButton.ImageButtonStyle;
@@ -25,6 +26,8 @@ public class Styles {
   public static TextButtonStyle textButton;
   public static ButtonStyle bu;
   public static DialogStyle window;
+    
+    public static Drawable background;
 
   public static void load() {
 
@@ -71,5 +74,6 @@ public class Styles {
     textField.selection = buttondef.down;  // 选择高亮背景
     Core.scene.addStyle(TextFieldStyle.class, textField);
     
+    background = (NinePatchDrawable)Core.atlas.drawable("Window-2");
   }
 }

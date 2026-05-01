@@ -3,6 +3,7 @@ package caliniya.armavoke.game;
 import arc.func.Intc2;
 import arc.util.io.*;
 import arc.util.pooling.Pools;
+import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.module.*;
 import caliniya.armavoke.world.*;
@@ -13,6 +14,10 @@ public class Building extends Entity {
   // --- 锚点坐标 (左下角起始点) ---
   // 0:上, 1:右, 2:下, 3:左
   public int tx, ty, angle;
+
+  public float rotation; // 实际渲染旋转角度 (精确到度，用于炮塔转动)
+  public Unit target; // 当前攻击目标
+  public float reload; // 武器装填进度
 
   // --- 形状数据 (独立副本，已旋转) ---
   public int[] shapeOffsets;
@@ -39,7 +44,7 @@ public class Building extends Entity {
     // 初始化物品
     this.item = new ItemModule(block.capacity);
     this.item.setFilter(block.allowItem);
-    
+
     this.id = Entities.assignID();
 
     // 计算旋转后的形状数据
@@ -52,19 +57,19 @@ public class Building extends Entity {
 
   @Override
   public void update(float dt) {
-    block.uptate(this,dt);
+    block.update(this, dt);
   }
 
   /** 计算该建筑占据的所有世界坐标 */
-  //参数是对每个坐标进行的操作
-  //瓦片坐标
+  // 参数是对每个坐标进行的操作
+  // 瓦片坐标
   public void getOccupiedCoords(Intc2 consumer) {
     if (shapeOffsets != null) {
       for (int i = 0; i < shapeOffsets.length; i += 2) {
         consumer.get(tx + shapeOffsets[i], ty + shapeOffsets[i + 1]);
       }
     } else if (block != null) {
-      int s = (int) block.size;
+      int s = block.size;
       for (int dx = 0; dx < s; dx++) {
         for (int dy = 0; dy < s; dy++) {
           consumer.get(tx + dx, ty + dy);
@@ -74,7 +79,7 @@ public class Building extends Entity {
   }
 
   /** 交互逻辑：判断是否占据指定坐标 */
-  //参数是瓦片坐标
+  // 参数是瓦片坐标
   public boolean occupies(int worldX, int worldY) {
     if (shapeOffsets != null) {
       for (int i = 0; i < shapeOffsets.length; i += 2) {
@@ -85,7 +90,7 @@ public class Building extends Entity {
       return false;
     }
     if (block != null) {
-      int s = (int) block.size;
+      int s = block.size;
       return worldX >= tx && worldX < tx + s && worldY >= ty && worldY < ty + s;
     }
     return false;
@@ -95,13 +100,12 @@ public class Building extends Entity {
   public void draw() {
     block.draw(this);
   }
-  
+
   @Override
   public void kill() {
     // TODO: Implement this method
     remove();
   }
-  
 
   @Override
   public void remove() {
@@ -122,17 +126,16 @@ public class Building extends Entity {
     angle = 0;
     id = Entities.freeID(this.id);
   }
-  
+
   @Override
   public void write(Writes w) {
     // TODO: Implement this method
   }
-  
+
   @Override
   public void read(Reads r) {
     // TODO: Implement this method
   }
-  
 
   // --- 静态工厂方法 ---
   public static Building create(Block block, int tx, int ty, int angle) {

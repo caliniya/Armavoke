@@ -2,6 +2,7 @@ package caliniya.armavoke.base.game;
 
 import arc.util.pooling.Pool.Poolable;
 import caliniya.armavoke.type.module.ItemModule;
+import caliniya.armavoke.base.type.TeamTypes; // 导入
 import arc.util.io.*;
 
 public abstract class Entity implements Poolable {
@@ -11,8 +12,9 @@ public abstract class Entity implements Poolable {
 
   // --- 公共状态 ---
   public float health;
-  public float maxHealth; // 建筑需要，单位也可以通过类型初始化此值
+  public float maxHealth;
   public int id;
+  public TeamTypes team;
 
   // --- 公共组件 ---
   public ItemModule item;
@@ -25,10 +27,8 @@ public abstract class Entity implements Poolable {
   /** 渲染逻辑 */
   public abstract void draw();
   
-  /** 从世界移除 没有回调的*/
   public abstract void remove();
   
-  //带回调的
   public abstract void kill();
   
   public abstract void write(Writes w);
@@ -41,6 +41,7 @@ public abstract class Entity implements Poolable {
     y = 0;
     health = 0;
     maxHealth = 0;
+    team = null; // 重置阵营
     item = null;
   }
 }

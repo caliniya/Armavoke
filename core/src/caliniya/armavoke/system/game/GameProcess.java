@@ -28,5 +28,6 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
       u.item.addItem(Items.Ge,10);
       
     }
+    WorldData.buildings.each(b -> b.update(Time.delta));
   }
 }

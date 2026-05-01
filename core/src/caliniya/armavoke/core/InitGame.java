@@ -37,8 +37,10 @@ public class InitGame {
         Systems.MR, Systems.UR, Systems.GP, Systems.BR, new Render().init());
     Systems.BP = new BulletProcess().init();
     Systems.UM = new UnitMath().init();
-    Systems.UP = new UnitProces().init();
+    Systems.EP = new EntityProces().init();
 
-    UnitTypes.test.create(100, 100);
+    Unit U = UnitTypes.test.create(100, 100);
+    Log.info(U.team);
+    Log.info(U.teamData);
   }
 }

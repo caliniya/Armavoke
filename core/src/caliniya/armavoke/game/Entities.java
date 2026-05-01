@@ -48,7 +48,7 @@ public class Entities {
 
       TeamData data = Teams.get(otherTeam);
       if (data == null) continue;
-
+      
       data.find(x, y, radius, consumer);
     }
   }

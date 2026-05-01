@@ -1,5 +1,6 @@
 package caliniya.armavoke.content;
 
+import arc.util.Log;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
@@ -18,7 +19,7 @@ public class UnitTypes {
           {
             // --- 新增：体积数据测试 ---
             // 设置基础尺寸(用于剔除判定参考)
-            this.size = 40f; 
+            //this.size = 40f; 
             
             // 定义碰撞体积：一个横向的长条形 (2x1 格)
             // 假设单格大小为 20f。
@@ -28,9 +29,9 @@ public class UnitTypes {
             this.hitbox = new float[] {
                 //-10f, 0f, 20f, // 左边方块
                  //10f, 0f, 20f  // 右边方块
-                 0f, 100f, 100f, // 竖直部分
-                 0f,  0f, 100f,
-                100f,  0f, 100f  // 横向突出部分
+                 0f, 60f, 60f, // 竖直部分
+                 0f,  0f, 60f,
+                60f,  0f, 60f  // 横向突出部分
             };
 
             addWeapons(

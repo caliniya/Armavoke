@@ -3,33 +3,30 @@ package caliniya.armavoke.type;
 import arc.util.pooling.Pool.Poolable;
 import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.game.Unit;
-import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.*;
+import caliniya.armavoke.base.game.Entity; // 导入 Entity
+import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.type.type.BulletType;
 
 public class Bullet implements Poolable {
     public BulletType type;
-    public Unit owner;      // 发射者 (防止自伤)
-    public TeamTypes team;  // 所属团队 (用于敌我识别)
+    public Entity owner;
+    public TeamTypes team;    // 所属团队
     
     public float x, y;
     public float velX, velY;
     public float rotation;
-    public float time = 0f; // 已存活时间
+    public float time = 0f;
     
-    //public Bullet next; 
-
     protected Bullet() {}
 
-    /** 工厂方法：创建并初始化子弹 */
-    public static Bullet create(BulletType type, Unit owner, float x, float y, float angle, float unitVx, float unitVy) {
+    /** 工厂方法 */
+    public static Bullet create(BulletType type, Entity owner, float x, float y, float angle, float velocityX, float velocityY) {
         Bullet b = Pools.obtain(Bullet.class, Bullet::new);
-        b.init(type, owner, x, y, angle, unitVx, unitVy);
+        b.init(type, owner, x, y, angle, velocityX, velocityY);
         return b;
     }
 
-    public void init(BulletType type, Unit owner, float x, float y, float angle, float unitVx, float unitVy) {
+    public void init(BulletType type, Entity owner, float x, float y, float angle, float velocityX, float velocityY) {
         this.type = type;
         this.owner = owner;
         this.team = (owner != null) ? owner.team : TeamTypes.Abort;
@@ -39,16 +36,15 @@ public class Bullet implements Poolable {
         this.rotation = angle;
         this.time = 0f;
         
-        //  计算子弹自身的推进速度
+        // 计算速度：子弹自身速度 + 发射者惯性
         float bulletSpeed = type.speed;
-        float baseVx = arc.math.Mathf.cosDeg(angle) * bulletSpeed;
-        float baseVy = arc.math.Mathf.sinDeg(angle) * bulletSpeed;
+        float baseVx = (float)Math.cos(Math.toRadians(angle)) * bulletSpeed;
+        float baseVy = (float)Math.sin(Math.toRadians(angle)) * bulletSpeed;
         
-        float inertia = 1.0f; 
+        this.velX = baseVx + velocityX;
+        this.velY = baseVy + velocityY;
         
-        this.velX = baseVx + (unitVx * inertia);
-        this.velY = baseVy + (unitVy * inertia);
-        
+        // 自动添加到处理系统
         Systems.BP.addBullet(this);
     }
     
@@ -62,7 +58,6 @@ public class Bullet implements Poolable {
         time = 0;
     }
 
-    /** 移除子弹 (回收到池) */
     public void remove() {
         Pools.free(this);
     }

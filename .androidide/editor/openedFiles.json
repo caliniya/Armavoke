@@ -1,50 +1,35 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UnitControl.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/InitGame.java",
       "selection": {
         "end": {
-          "column": 1,
-          "index": 6045,
-          "line": 190
+          "column": 25,
+          "index": 1364,
+          "line": 43
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 25,
+          "index": 1364,
+          "line": 43
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/CommandData.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Unit.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 2916,
-          "line": 116
+          "column": 27,
+          "index": 3024,
+          "line": 113
         },
         "start": {
-          "column": 0,
-          "index": 2916,
-          "line": 116
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java",
-      "selection": {
-        "end": {
-          "column": 7,
-          "index": 828,
-          "line": 33
-        },
-        "start": {
-          "column": 7,
-          "index": 828,
-          "line": 33
+          "column": 27,
+          "index": 3024,
+          "line": 113
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/InitGame.java"
 }

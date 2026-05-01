@@ -23,7 +23,7 @@ public class Block extends ContentType {
   public int capacity = 100; // 物品容量，为0就是不能存
   public ItemType[] allowItem = ContentVar.items; // 能存的,默认啥都能存一百(不能在这里调用，会空指针)(不对不对，可以的)
 
-  public TextureRegion region; // 主贴图allow
+  public TextureRegion region; // 主贴图
 
   // --- 形状定义 ---
   // 相对于锚点(0,0)的偏移量数组：[dx1, dy1, dx2, dy2, ...]
@@ -31,7 +31,7 @@ public class Block extends ContentType {
 
   public Block(String name) {
     super(name, CType.Block);
-    load();
+    //load();
   }
 
   public Building create(int tx, int ty) {
@@ -43,7 +43,8 @@ public class Block extends ContentType {
     region = Core.atlas.find(name);
   }
   
-  public void uptate(Building building ,float dt){
+  
+  public void update(Building building ,float dt){
     
   }
 
