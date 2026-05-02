@@ -90,7 +90,7 @@ public class Unit extends Entity {
       this.type = UnitTypes.test;
       Log.err(this.toString() + "@ No unitTpye used test");
     }
-    
+
     this.speed = this.type.speedt;
     this.rotationSpeed = this.type.rotationSpeend;
     this.region = this.type.region;
@@ -110,8 +110,8 @@ public class Unit extends Entity {
       this.size = this.type.size;
     }
 
-    this.team = TeamTypes.Evoke;
     teamData = team.data();
+    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
     shooting = false;
 
     weapons.clear();
@@ -137,38 +137,35 @@ public class Unit extends Entity {
 
     updateHitbox();
   }
-  
-  /**
-   * 根据自定义碰撞体积计算最小外接圆直径
-   * 并赋值给 size
-   */
+
+  /** 根据自定义碰撞体积计算最小外接圆直径 并赋值给 size */
   private void calculateBoundingSize() {
-      if (type.hitbox == null) return;
-      
-      float maxRadiusSq = 0f;
-      
-      // 遍历所有碰撞方块，找到离原点最远的角点距离
-      for (int i = 0; i < type.hitbox.length; i += 3) {
-          float cx = type.hitbox[i];
-          float cy = type.hitbox[i + 1];
-          float s = type.hitbox[i + 2];
-          
-          // 正方形角点到中心的距离 (勾股定理的一半)
-          float cornerDist = s / 2f * Mathf.sqrt2;
-          
-          // 中心点到原点的距离
-          float centerDist = Mathf.len(cx, cy);
-          
-          // 最远点距离 = 中心距 + 角距
-          float totalDist = centerDist + cornerDist;
-          
-          if (totalDist * totalDist > maxRadiusSq) {
-              maxRadiusSq = totalDist * totalDist;
-          }
+    if (type.hitbox == null) return;
+
+    float maxRadiusSq = 0f;
+
+    // 遍历所有碰撞方块，找到离原点最远的角点距离
+    for (int i = 0; i < type.hitbox.length; i += 3) {
+      float cx = type.hitbox[i];
+      float cy = type.hitbox[i + 1];
+      float s = type.hitbox[i + 2];
+
+      // 正方形角点到中心的距离 (勾股定理的一半)
+      float cornerDist = s / 2f * Mathf.sqrt2;
+
+      // 中心点到原点的距离
+      float centerDist = Mathf.len(cx, cy);
+
+      // 最远点距离 = 中心距 + 角距
+      float totalDist = centerDist + cornerDist;
+
+      if (totalDist * totalDist > maxRadiusSq) {
+        maxRadiusSq = totalDist * totalDist;
       }
-      
-      // size 表示直径
-      this.size = Mathf.sqrt(maxRadiusSq) * 2f;
+    }
+
+    // size 表示直径
+    this.size = Mathf.sqrt(maxRadiusSq) * 2f;
   }
 
   @Override
@@ -227,9 +224,11 @@ public class Unit extends Entity {
       distToTarget = 0f;
       speedX = 0;
       speedY = 0;
+      moving = false;
     } else {
       x += speedX * dt;
       y += speedY * dt;
+      moving = true;
     }
 
     if (distToTarget > 1f) {
@@ -298,7 +297,10 @@ public class Unit extends Entity {
 
       float halfSize = s / 2f;
 
-      if (px >= cx - halfSize && px <= cx + halfSize && py >= cy - halfSize && py <= cy + halfSize) {
+      if (px >= cx - halfSize
+          && px <= cx + halfSize
+          && py >= cy - halfSize
+          && py <= cy + halfSize) {
         return true;
       }
     }
@@ -322,7 +324,7 @@ public class Unit extends Entity {
         Lines.rect(cx - s / 2f, cy - s / 2f, s, s);
       }
     }
-    
+
     // 绘制计算出的外接圆 (新增，用于验证 size 计算是否正确)
     Draw.color(Color.sky);
     float radius = size / 2f;

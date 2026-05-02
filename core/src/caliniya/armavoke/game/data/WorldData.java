@@ -53,8 +53,6 @@ public class WorldData {
     world = new World(100, 100, false);
     world.test = true;
     world.init();
-        
-    Log.info(buildings.toString());
 
     // 1. 初始化网格尺寸
     // 即使地图大小不能整除32，也要向上取整多算一个格子，防止越界

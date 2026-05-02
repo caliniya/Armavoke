@@ -9,6 +9,7 @@ import caliniya.armavoke.Armavoke;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.content.UnitTypes;
+import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.map.Maps;
@@ -40,7 +41,5 @@ public class InitGame {
     Systems.EP = new EntityProces().init();
 
     Unit U = UnitTypes.test.create(100, 100);
-    Log.info(U.team);
-    Log.info(U.teamData);
   }
 }

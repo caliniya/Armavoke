@@ -1,35 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/InitGame.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Building.java",
       "selection": {
         "end": {
-          "column": 25,
-          "index": 1364,
-          "line": 43
+          "column": 0,
+          "index": 0,
+          "line": 0
         },
         "start": {
-          "column": 25,
-          "index": 1364,
-          "line": 43
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Unit.java",
-      "selection": {
-        "end": {
-          "column": 27,
-          "index": 3024,
-          "line": 113
-        },
-        "start": {
-          "column": 27,
-          "index": 3024,
-          "line": 113
+          "column": 0,
+          "index": 0,
+          "line": 0
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/InitGame.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Building.java"
 }

@@ -5,6 +5,8 @@ import arc.func.Intc2;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Log;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.core.*;
@@ -31,7 +33,7 @@ public class Block extends ContentType {
 
   public Block(String name) {
     super(name, CType.Block);
-    //load();
+    // load();
   }
 
   public Building create(int tx, int ty) {
@@ -42,19 +44,20 @@ public class Block extends ContentType {
   public void load() {
     region = Core.atlas.find(name);
   }
-  
-  
-  public void update(Building building ,float dt){
-    
-  }
+
+  public void update(Building building, float dt) {}
 
   public void draw(Building b) {
     float rotation = b.angle * 90f;
     Draw.rect(region, b.x + psize / 2, b.y + psize / 2, rotation);
   }
-  
-  //允许全部
-  public void allowAllItem(ItemType... types){
+
+  public void write(Building b, Writes w) {}
+
+  public void read(Building b, Reads r) {}
+
+  // 允许全部
+  public void allowAllItem(ItemType... types) {
     allowItem = types;
   }
 

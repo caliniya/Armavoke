@@ -19,15 +19,18 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override
   public void update() {
-    for (Unit u : WorldData.units) {
-      
-      if (u == null || u.health <= 0) continue;
-
-      u.update(Time.delta);
-      u.updateWeapons(Time.delta);
-      u.item.addItem(Items.Ge,10);
-      
-    }
-    WorldData.buildings.each(b -> b.update(Time.delta));
+    WorldData.units.each(
+        u -> {
+          if (u != null || u.health <= 0) {
+            u.update(Time.delta);
+            u.updateWeapons(Time.delta);
+          }
+        });
+    WorldData.buildings.each(
+        b -> {
+          if (b != null || b.health <= 0) {
+            b.update(Time.delta);
+          }
+        });
   }
 }
