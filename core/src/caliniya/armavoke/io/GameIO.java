@@ -29,7 +29,23 @@ public class GameIO {
   private static final String MAGIC = "AEVS";
   private static final int SAVE_VERSION = 1;
 
-  // ... (readMeta 保持不变) ...
+  public static Map readMeta(Fi file) {
+    try (DataInputStream stream = new DataInputStream(file.read())) {
+      Reads r = new Reads(stream);
+      String magic = new String(r.b(4));
+      if (!magic.equals(MAGIC)) return null;
+      int ver = r.i();
+      int w = r.i();
+      int h = r.i();
+      StringMap tags = new StringMap();
+      int tagCount = r.s();
+      for (int i = 0; i < tagCount; i++) tags.put(r.str(), r.str());
+      return new Map(file, w, h, tags, true);
+    } catch (IOException e) {
+      return null;
+    }
+  }
+    
 
   public static void save(Fi file, @Nullable StringMap tags) {
     try (DataOutputStream stream = new DataOutputStream(file.write(false))) {

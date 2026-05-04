@@ -156,18 +156,16 @@ public class Building extends Entity {
   /** 读取存档数据 注意：调用此方法前，对象通常是通过 Pools.obtain 获得的空对象 */
   @Override
   public void read(Reads r) {
-    // 2. 读取基础位置信息
     this.tx = r.i();
     this.ty = r.i();
     this.angle = r.b();
-
-    // 3. 读取实体状态
+    
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];
-
+    
     block.read(this, r);
-
+    
     if (this.item == null && block != null) {
       this.item = new ItemModule(block.capacity);
       this.item.setFilter(block.allowItem);

@@ -5,6 +5,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.Core;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.game.Unit;
 
@@ -50,7 +51,7 @@ public class BulletType {
   }
 
   /** 命中单位时的回调 */
-  public void hit(Bullet b, Unit target) {
+  public void hit(Bullet b, Entity target) {
     if (target != null) {
       target.health -= this.damage;
       // TODO: 播放命中特效
