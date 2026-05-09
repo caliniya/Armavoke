@@ -3,7 +3,7 @@ package caliniya.armavoke.type;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.game.ContentVar;
+import caliniya.armavoke.game.Contents;
 import caliniya.armavoke.type.type.ItemType;
 
 public class Item {
@@ -25,7 +25,7 @@ public class Item {
 
   public void read(Reads read) {
     short id = read.s();
-    this.type = ContentVar.getByID(CType.Item, id);
+    this.type = Contents.getByID(CType.Item, id);
     this.amount = read.i();
   }
   

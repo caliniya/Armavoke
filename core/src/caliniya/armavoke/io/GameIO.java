@@ -9,7 +9,7 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Building;
-import caliniya.armavoke.game.ContentVar;
+import caliniya.armavoke.game.Contents;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
@@ -171,14 +171,14 @@ public class GameIO {
       Floor[] floorLookup = new Floor[floorPaletteSize];
       for (int i = 0; i < floorPaletteSize; i++) {
         String name = r.str();
-        floorLookup[i] = name.equals("null") ? null : ContentVar.get(name, Floor.class);
+        floorLookup[i] = name.equals("null") ? null : Contents.get(name, Floor.class);
       }
 
       int blockPaletteSize = r.s();
       ENVBlock[] blockLookup = new ENVBlock[blockPaletteSize];
       for (int i = 0; i < blockPaletteSize; i++) {
         String name = r.str();
-        blockLookup[i] = name.equals("null") ? null : ContentVar.get(name, ENVBlock.class);
+        blockLookup[i] = name.equals("null") ? null : Contents.get(name, ENVBlock.class);
       }
 
       // 读取地图数据
@@ -199,7 +199,7 @@ public class GameIO {
       int unitCount = r.i();
       for (int i = 0; i < unitCount; i++) {
         String typeName = r.str();
-        UnitType type = ContentVar.get(typeName, UnitType.class);
+        UnitType type = Contents.get(typeName, UnitType.class);
         if (type != null) {
           Unit u = type.create();
           u.read(r);
@@ -211,7 +211,7 @@ public class GameIO {
       for (int i = 0; i < buildingCount; i++) {
         // 1. 先读取类型名称
         String typeName = r.str();
-        Block type = ContentVar.get(typeName, Block.class);
+        Block type = Contents.get(typeName, Block.class);
 
         if (type != null) {
           // 2. 创建空对象

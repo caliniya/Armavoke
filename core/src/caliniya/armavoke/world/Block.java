@@ -18,12 +18,12 @@ public class Block extends ContentType {
 
   // --- 基础属性 ---
   public float psize; // 大小，像素级
-  public int size; // 大小，单位格
+  public int size = 2; // 大小，单位格
   public boolean buildable = true; // 可以造
   public boolean solid = true; // 可以阻挡通行
   public float health = 100; // 顾名思义
   public int capacity = 100; // 物品容量，为0就是不能存
-  public ItemType[] allowItem = ContentVar.items; // 能存的,默认啥都能存一百(不能在这里调用，会空指针)(不对不对，可以的)
+  public ItemType[] allowItem = Contents.items; // 能存的,默认啥都能存一百(不能在这里调用，会空指针)(不对不对，可以的)
 
   public TextureRegion region; // 主贴图
 

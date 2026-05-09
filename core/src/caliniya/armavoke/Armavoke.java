@@ -15,6 +15,7 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.UI;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
@@ -58,6 +59,7 @@ public class Armavoke extends ApplicationCore {
       Fonts.setup();
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
       Styles.load();
+      Pal.load();
       UI.initAll();
       UI.Menu();
       UI.Debug();
@@ -72,7 +74,7 @@ public class Armavoke extends ApplicationCore {
               camInput);
       input.addProcessor(multiplexer);
       addSystem(camInput);
-      ContentVar.load();
+      Contents.load();
       UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();
       assinited = true;

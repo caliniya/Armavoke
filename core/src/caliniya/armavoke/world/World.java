@@ -200,7 +200,7 @@ public class World {
   public ENVBlock getENVBlock(int x, int y) {
     short id = getENVBlockId(x, y);
     if (id == 0) return null;
-    return ContentVar.getByID(CType.ENVBlock, id);
+    return Contents.getByID(CType.ENVBlock, id);
   }
 
   public void setFloor(int x, int y, Floor floor) {
@@ -226,7 +226,7 @@ public class World {
   public Floor getFloor(int x, int y) {
     short id = getFloorId(x, y);
     if (id == 0) return null;
-    return ContentVar.getByID(CType.Floor, id);
+    return Contents.getByID(CType.Floor, id);
   }
 
   public boolean isValidCoord(int x, int y) {

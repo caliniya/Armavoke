@@ -1,20 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java",
       "selection": {
         "end": {
-          "column": 22,
-          "index": 3460,
-          "line": 149
+          "column": 36,
+          "index": 36,
+          "line": 0
         },
         "start": {
-          "column": 22,
-          "index": 3460,
-          "line": 149
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatData.java",
+      "selection": {
+        "end": {
+          "column": 36,
+          "index": 36,
+          "line": 0
+        },
+        "start": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 64,
+          "line": 4
+        },
+        "start": {
+          "column": 1,
+          "index": 64,
+          "line": 4
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/BulletProcess.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java"
 }

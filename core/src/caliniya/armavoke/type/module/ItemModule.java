@@ -2,15 +2,13 @@ package caliniya.armavoke.type.module;
 
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import caliniya.armavoke.game.ContentVar;
+import caliniya.armavoke.game.Contents;
 import caliniya.armavoke.type.Item;
 import caliniya.armavoke.type.type.ItemType;
 
 /**
  * 物品存储模块，管理物品存储、容量及过滤规则。
  * 
- * @author caliniya
- * @version 1.0
  */
 public class ItemModule extends Module {
 
@@ -30,7 +28,7 @@ public class ItemModule extends Module {
      */
     public ItemModule(int capacity) {
         this.capacity = capacity;
-        int size = Math.max(ContentVar.totalItemCount + 1, 10);
+        int size = Math.max(Contents.totalItemCount + 1, 10);
         this.items = new int[size];
     }
 

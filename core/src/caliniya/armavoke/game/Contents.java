@@ -5,32 +5,27 @@ import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.IntAr;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.content.Blocks;
-import caliniya.armavoke.content.ENVBlocks;
-import caliniya.armavoke.content.Floors;
-import caliniya.armavoke.content.Items;
-import caliniya.armavoke.content.UnitTypes;
+import caliniya.armavoke.content.*;
 import caliniya.armavoke.type.type.ItemType;
 
 /**
  * 内容注册与管理器。
- * <p>
- * 负责游戏内容（如物品、单位等）的注册、存储和查询。内容通过名称映射和类型数组存储，
- * 注册时分配运行时ID（从1开始）。
+ *
+ * <p>负责游戏内容（如物品、单位等）的注册、存储和查询。内容通过名称映射和类型数组存储， 注册时分配运行时ID（从1开始）。
  */
-public class ContentVar {
+public class Contents {
 
   /** 内容名称映射表，用于通过名称快速查找内容对象。 */
   private static final ObjectMap<String, ContentType> contentMap = new ObjectMap<>();
 
   /** 按类型分类的内容数组，索引对应 {@link CType#ordinal()}。 */
   private static final Ar<ContentType>[] contentByTypes;
-  
-  public static ItemType[] items;//所有已注册物品
-  
-  //public static IntAr EntitysID;
-  
-  //public static Ar<boolean> EntitysID;
+
+  public static ItemType[] items; // 所有已注册物品
+
+  // public static IntAr EntitysID;
+
+  // public static Ar<boolean> EntitysID;
 
   /** 已注册的物品类型内容总数。 */
   public static int totalItemCount = 0;
@@ -41,11 +36,9 @@ public class ContentVar {
     for (int i = 0; i < typeCount; i++) {
       contentByTypes[i] = new Ar<>();
     }
-    }
-  
-  /**
-  *初始化内容
-  **/
+  }
+
+  /** 初始化内容 */
   public static void load() {
     Items.load();
     Floors.load();
@@ -53,13 +46,17 @@ public class ContentVar {
     items = getByType(CType.Item).toArray(ItemType.class);
     Blocks.load();
     UnitTypes.load();
-    //EntitysID = new IntAr(100);
-    //items = new ItemType[totalItemCount];
-    //items = (ItemType[]) getByType(CType.Item).items;
+    for (Ar<ContentType> types : contentByTypes) {
+      types.each(t -> t.load());
+    }
+    // EntitysID = new IntAr(100);
+    // items = new ItemType[totalItemCount];
+    // items = (ItemType[]) getByType(CType.Item).items;
   }
 
   /**
    * 注册内容并分配运行时ID。
+   *
    * <p>ID从1开始分配，每种类型的ID独立编号。
    *
    * @param content 要注册的内容对象
@@ -124,7 +121,8 @@ public class ContentVar {
 
   /**
    * 通过类型和运行时ID获取内容对象。
-   * <p>时间复杂度为 O(1)。
+   *
+   * <p>时间复杂度为 O(1)。(大喜)
    *
    * @param <T> 返回的内容类型
    * @param type 内容类型
@@ -145,6 +143,8 @@ public class ContentVar {
 
   /**
    * 清空所有已注册的内容并重置计数器。
+   *
+   * <p>别用
    */
   public static void clear() {
     contentMap.clear();

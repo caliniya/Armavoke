@@ -149,9 +149,8 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       float nextX = b.x + b.velX * detla;
       float nextY = b.y + b.velY * detla;
 
-      // --- 碰撞检测 ---
+      // --- 碰撞检测 --
 
-      // 优先检测建筑碰撞 (墙壁阻挡)
       Building buildTarget = null;
       int tileX = (int) (nextX / WorldData.TILE_SIZE);
       int tileY = (int) (nextY / WorldData.TILE_SIZE);

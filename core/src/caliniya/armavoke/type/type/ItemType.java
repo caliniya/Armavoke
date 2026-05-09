@@ -11,7 +11,6 @@ public class ItemType extends ContentType {
   
   public ItemType(String name) {
     super(name, CType.Item);
-    load();
   }
   
   public void load() {

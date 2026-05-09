@@ -16,8 +16,6 @@ import caliniya.armavoke.ui.Styles;
 import arc.files.Fi;
 
 public class HUDFragment {
-
-  // 移除了本地状态变量 isCommandEnabled
   
   private Table rightContainer;
   private Table buildingPanel;
@@ -74,7 +72,7 @@ public class HUDFragment {
     commandPanel = new Table();
     commandPanel.background(Styles.background);
     
-    commandPanel.add("[accent]单位指挥[]").row();
+    commandPanel.add("[light]单位指挥[]").row();
     commandPanel.add().height(10f).row();
 
     Table basicRow = new Table();
@@ -97,7 +95,6 @@ public class HUDFragment {
   private void updateRightPanel() {
     rightContainer.clearChildren();
     
-    // 直接读取全局状态决定显示哪个面板
     Table currentPanel = CommandData.commanding ? commandPanel : buildingPanel;
     
     currentPanel.clearActions();

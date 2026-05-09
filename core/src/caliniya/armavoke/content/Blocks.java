@@ -14,18 +14,17 @@ public class Blocks {
         new Block("test-building") {
           {
             this.size = 3;
-            this.load();
           }
         };
     testTurret =
         new Turret("testturret") {
           {
+            this.size = 3;
             this.bulletType =
                 new BulletType() {
                   {
                   }
                 };
-            this.load();
           }
         };
   }

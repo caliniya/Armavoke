@@ -31,7 +31,11 @@ public class ContentType {
     this.description = Core.bundle.getOrNull(internalName + ".description");
 
     // 注册时会自动分配 ID
-    ContentVar.add(this);
+    Contents.add(this);
+  }
+  
+  public void load(){
+    
   }
   
   public String getIdentity() {

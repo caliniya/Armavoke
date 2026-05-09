@@ -11,7 +11,6 @@ public class Floor extends ContentType {
 
   public Floor(String name) {
     super(name, CType.Floor);
-    load();
   }
 
   public void load() {
