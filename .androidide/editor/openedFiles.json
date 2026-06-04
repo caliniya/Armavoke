@@ -1,47 +1,17 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java",
-      "selection": {
-        "end": {
-          "column": 26,
-          "index": 117,
-          "line": 6
-        },
-        "start": {
-          "column": 26,
-          "index": 117,
-          "line": 6
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatData.java",
-      "selection": {
-        "end": {
-          "column": 30,
-          "index": 30,
-          "line": 0
-        },
-        "start": {
-          "column": 30,
-          "index": 30,
-          "line": 0
-        }
-      }
-    },
-    {
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java",
       "selection": {
         "end": {
-          "column": 1,
-          "index": 80,
-          "line": 4
+          "column": 36,
+          "index": 449,
+          "line": 13
         },
         "start": {
-          "column": 1,
-          "index": 80,
-          "line": 4
+          "column": 36,
+          "index": 449,
+          "line": 13
         }
       }
     }
