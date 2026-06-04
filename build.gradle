@@ -25,7 +25,6 @@ allprojects {
     version = '1.0'
     ext {
         appName = "Armavoke"
-        gdxVersion = '1.12.1'
         versionCode = 1
         version = '1.0'
     }
