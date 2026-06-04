@@ -4,14 +4,14 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 121,
-          "line": 9
+          "column": 26,
+          "index": 117,
+          "line": 6
         },
         "start": {
-          "column": 0,
-          "index": 121,
-          "line": 9
+          "column": 26,
+          "index": 117,
+          "line": 6
         }
       }
     },
@@ -19,14 +19,14 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatData.java",
       "selection": {
         "end": {
-          "column": 17,
-          "index": 102,
-          "line": 6
+          "column": 30,
+          "index": 30,
+          "line": 0
         },
         "start": {
-          "column": 17,
-          "index": 102,
-          "line": 6
+          "column": 30,
+          "index": 30,
+          "line": 0
         }
       }
     },
@@ -34,17 +34,17 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java",
       "selection": {
         "end": {
-          "column": 12,
-          "index": 73,
-          "line": 3
+          "column": 1,
+          "index": 80,
+          "line": 4
         },
         "start": {
-          "column": 12,
-          "index": 73,
-          "line": 3
+          "column": 1,
+          "index": 80,
+          "line": 4
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java"
 }

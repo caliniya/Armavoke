@@ -1,4 +1,4 @@
-package caliniya.armavoke.world;
+package caliniya.armavoke.base.game;
 
 import caliniya.armavoke.game.Building;
 

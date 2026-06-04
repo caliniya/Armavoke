@@ -15,10 +15,10 @@ import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.game.type.UnitType;
 import caliniya.armavoke.map.Map;
-import caliniya.armavoke.world.Block; // 导入 Block
+import caliniya.armavoke.world.Block;
 import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.world.Floor;
-import caliniya.armavoke.world.WorldChunk;
+import caliniya.armavoke.base.game.WorldChunk;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

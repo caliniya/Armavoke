@@ -1,4 +1,4 @@
-package caliniya.armavoke.meta.stat;
+package caliniya.armavoke.core.meta.stat;
 
 public class StatData {
   /**
