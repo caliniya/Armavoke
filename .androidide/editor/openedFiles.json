@@ -44,7 +44,22 @@
           "line": 4
         }
       }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/game/GameProcess.java",
+      "selection": {
+        "end": {
+          "column": 25,
+          "index": 558,
+          "line": 21
+        },
+        "start": {
+          "column": 25,
+          "index": 558,
+          "line": 21
+        }
+      }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatUnit.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/game/GameProcess.java"
 }
