@@ -1,3 +1,60 @@
 这个文件夹内的内容是给AI阅读项目辅助使用的，当然你可以看来了解项目结构。
 首先，项目还处于十分早期的阶段，有很多类似于test字样的变量或者占位的方法，类等。我不会在开发阶段为了追求规范性去改它们，AI在修改代码和阅读项目时也不要去随便修改以及指出这些，认为是错误。
+
 以下是正文
+
+## 项目概览
+
+一款基于 Arc 框架（Mindustry 底层引擎）的 RTS + 自动化多平台游戏。
+
+- 作者：caliniya
+- 引擎：Arc (https://github.com/Anuken/Arc)(具体版本去看构建脚本)
+- 语言：Java
+- 构建：Gradle 多模块
+
+## 模块结构
+
+| 模块 | 路径 | 说明 |
+|------|------|------|
+| core | core/ | 主逻辑，全平台共享 |
+| desktop | desktop/ | 桌面启动器 |
+| android | android/ | Android 入口 |
+| android-old | android-old/ | sdk14的老安卓兼容版本，通常不用管他 |
+| tools | tools/ | 构建工具(一般AI用不上) |
+
+## 核心包结构 (core/src/caliniya/armavoke/)
+
+Armavoke.java —— ApplicationCore 入口，事件总线、场景切换
+Init.java —— 初始化引导
+
+base/ —— 基础层
+game/ —— 运行时游戏状态 (Game, Contents, Entities, Teams, Unit, Building)
+core/ —— 非游戏内容的运行时关键数据，例如渲染
+type/ —— 游戏对象类型 (Weapon, Bullet, Item 及其模板)
+world/ —— 世界结构 (World, Block, Floor 等)
+map/ —— 地图/存档 (Map, Maps)
+io/ —— IO相关
+system/ —— ECS 系统框架 (System 基类 + 各子系统)
+ui/ —— UI 组件 (Fonts, Styles, fragment, windows)
+content/ —— 内容声明 (Blocks, Items, UnitTypes 等静态注册)
+
+## 关键系统
+
+ECS 系统框架：System 抽象基类，支持主线程/独立线程、优先级排序、TPS 统计。通过 Systems 类持有所有系统静态引用。
+
+阵营：Evoke（玩家默认）, Veto, Abort, Mutex，共 4 个。(未来可能会修改)
+
+内容注册：Contents.java 管理全局名称映射和 ID 分配。
+
+## 资源
+
+assets/ —— 字体(normal.ttf)、本地化(language_zh_CN.properties)、着色器、精灵图集
+assets-origin/ —— 原始素材(icon, sprites 子目录)(scheme不要去管那是我的IDE的配色文件)
+
+## 给 AI 的注意事项
+
+1. 项目极早期，大量 test/占位符，不要动它们。
+2. base/tool/Ar.java 是我从 Seq 克隆改名的，用这个我觉得名字好听(不要管什么规范)。
+3. 新增内容类型要在 Contents.java 和对应 content/ 目录注册。
+4. 本地化键格式：statUnit.xxx，翻译在 language_zh_CN.properties。
+6. 更多架构细节见项目根目录 .architecture.md。
