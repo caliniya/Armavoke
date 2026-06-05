@@ -16,17 +16,14 @@ public class StatType implements Comparable<StatType> {
       general = new StatType("general"), //通用
       function = new StatType("function"); // 功能/支持
 
-  public final String name;
+  public final String name , localizedName;
   public final int id;
 
   public StatType(String name) {
     this.name = name;
+    localizedName = Core.bundle.get("statType." + name);
     id = all.size;
     all.add(this);
-  }
-
-  public String localized() {
-    return Core.bundle.get("statType." + name);
   }
 
   @Override

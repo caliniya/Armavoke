@@ -28,10 +28,12 @@ public class StatUnit {
   public final String name;
   public final boolean space;
   public @Nullable String icon;
+  public final String localizedName;
 
   public StatUnit(String name, boolean space) {
     this.name = name;
     this.space = space;
+    this.localizedName = Core.bundle.get("statUnit." + name.toLowerCase(Locale.ROOT));
   }
 
   public StatUnit(String name) {
@@ -41,10 +43,5 @@ public class StatUnit {
   public StatUnit(String name, String icon) {
     this(name, true);
     this.icon = icon;
-  }
-
-  public String localized() {
-    if (this == none) return "";
-    return Core.bundle.get("statUnit." + name.toLowerCase(Locale.ROOT));
   }
 }
