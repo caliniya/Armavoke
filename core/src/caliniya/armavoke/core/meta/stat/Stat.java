@@ -10,7 +10,7 @@ public class Stat implements Comparable<Stat> {
   public final StatType type;
   public final int id;
   
-  //表示某一种统计信息
+  //表示某一种统计信息，例如生命
   public Stat(String name , StatType type) {
     this.name = name;
     this.type = type;
@@ -23,4 +23,11 @@ public class Stat implements Comparable<Stat> {
   public int compareTo(Stat s) {
     return id - s.id;
   }
+  
+  @Override
+  public String toString() {
+    return "Stat." + this.name;
+  }
+  
+  
 }

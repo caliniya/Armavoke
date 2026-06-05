@@ -3,7 +3,7 @@ package caliniya.armavoke.core.meta.stat;
 import arc.*;
 import caliniya.armavoke.base.tool.Ar;
 
-/** 统计信息的组 */
+/** 统计信息的组，例如战斗 */
 public class StatType implements Comparable<StatType> {
   public static final Ar<StatType> all = new Ar<>();
 
