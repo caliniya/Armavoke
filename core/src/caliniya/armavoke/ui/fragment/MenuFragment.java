@@ -8,12 +8,14 @@ import arc.util.Log;
 import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.core.InitGame;
 import caliniya.armavoke.core.UI;
+import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
+import caliniya.armavoke.ui.windows.DataWindow;
 
 public class MenuFragment {
 
@@ -48,10 +50,16 @@ public class MenuFragment {
                       }));
               menu.row();
 
-              menu.add(new Button("test", () -> UI.Window("aaaa",0.5f ,0.5f)));
+              menu.add(new Button("test", () -> UI.Window("aaaa", 0.5f, 0.5f)));
               menu.row();
 
-              menu.add(new Button("A3", () -> Log.info("A3")));
+              menu.add(
+                  new Button(
+                      "stattest",
+                      () -> {
+                        UI.Window(
+                            0.8f, 0.6f, (new StatStack().add(Stats.health, 1000, StatUnit.none)));
+                      }));
               menu.row();
 
               menu.add(new Button("@exit", () -> Core.app.exit()));

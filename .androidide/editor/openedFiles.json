@@ -1,20 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/windows/DataWindow.java",
       "selection": {
         "end": {
-          "column": 17,
-          "index": 958,
-          "line": 36
+          "column": 13,
+          "index": 447,
+          "line": 20
         },
         "start": {
-          "column": 17,
-          "index": 958,
-          "line": 36
+          "column": 13,
+          "index": 447,
+          "line": 20
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MenuFragment.java",
+      "selection": {
+        "end": {
+          "column": 38,
+          "index": 1670,
+          "line": 60
+        },
+        "start": {
+          "column": 38,
+          "index": 1670,
+          "line": 60
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/language/language_zh_CN.properties",
+      "selection": {
+        "end": {
+          "column": 16,
+          "index": 550,
+          "line": 31
+        },
+        "start": {
+          "column": 16,
+          "index": 550,
+          "line": 31
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/meta/stat/StatStack.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/language/language_zh_CN.properties"
 }

@@ -8,6 +8,7 @@ import arc.graphics.g2d.Lines;
 import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.util.viewport.Viewport;
+import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.fragment.*;
 import caliniya.armavoke.ui.windows.*;
@@ -16,36 +17,36 @@ import static arc.Core.scene;
 import static arc.Core.graphics;
 
 public class UI {
-  
+
   public static float scl;
-  
-  //调试显示器
+
+  // 调试显示器
   public static DebugFragment debug;
-  //主游戏ui
+  // 主游戏ui
   public static HUDFragment hud;
-  //游戏菜单ui
+  // 游戏菜单ui
   public static MenuFragment menu;
-  //地图列表
+  // 地图列表
   public static MapsWindow maps;
-  //ui用的相机和视口
+  // ui用的相机和视口
   public static Camera camera;
   public static Viewport vport;
-  
+
   private static boolean isDebugShown = true;
-  
-  public static void initAll(){
+
+  public static void initAll() {
     scl = Scl.scl();
-    
-    if(debug == null) {
+
+    if (debug == null) {
       debug = new DebugFragment();
     }
-    if(hud == null) {
+    if (hud == null) {
       hud = new HUDFragment();
     }
-    if(menu == null) {
+    if (menu == null) {
       menu = new MenuFragment();
     }
-    if(maps == null) {
+    if (maps == null) {
       maps = new MapsWindow();
     }
   }
@@ -63,9 +64,9 @@ public class UI {
     float centerX = screenW / 2f;
     float centerY = screenH / 2f;
 
-    float barWidth = 300f; 
-    float barHeight = 20f; 
-    float padding = 4f; 
+    float barWidth = 300f;
+    float barHeight = 20f;
+    float padding = 4f;
 
     Draw.color(Color.white);
     Lines.stroke(2f);
@@ -84,17 +85,17 @@ public class UI {
     hud.build();
     Debug();
   }
-  
+
   public static void Maps() {
     Maps.load();
-    maps.h = (float)((graphics.getHeight() * 0.7) / scl);
-    maps.w = (float)((graphics.getWidth() * 0.7) / scl);
+    maps.h = (float) ((graphics.getHeight() * 0.7) / scl);
+    maps.w = (float) ((graphics.getWidth() * 0.7) / scl);
     maps.build();
-    
   }
-  
+
   /**
    * 创建一个窗口
+   *
    * @param title 窗口标题
    * @param widthRatio 窗口宽度占屏幕宽度的比例 (0~1)
    * @param heightRatio 窗口高度占屏幕高度的比例 (0~1)
@@ -102,10 +103,22 @@ public class UI {
   public static void Window(String Ttitle, float widthRatio, float heightRatio) {
     float actualW = graphics.getWidth() * widthRatio / scl;
     float actualH = graphics.getHeight() * heightRatio / scl;
-    Window win = new Window(){{
-      w = actualW;
-      h = actualH;
-    }};
+    Window win =
+        new Window() {
+          {
+            w = actualW;
+            h = actualH;
+          }
+        };
+    win.build();
+  }
+
+  public static void Window(float widthRatio, float heightRatio, StatStack data) {
+    float actualW = graphics.getWidth() * widthRatio / scl;
+    float actualH = graphics.getHeight() * heightRatio / scl;
+    DataWindow win = new DataWindow(data);
+    win.w = actualW;
+    win.h = actualH;
     win.build();
   }
 
