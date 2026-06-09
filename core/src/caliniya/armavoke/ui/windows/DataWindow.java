@@ -25,7 +25,7 @@ public class DataWindow extends Window {
     t.left();
     if (stack == null) return;
 
-    for (StatType type : StatType.all) {
+    for (StatType type : StatType.values()) {
       Ar<StatData> items = new Ar<>();
       stack.getByType(
           type,

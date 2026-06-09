@@ -1,35 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/main.txt",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/windows/DataWindow.java",
       "selection": {
         "end": {
-          "column": 59,
-          "index": 1463,
-          "line": 57
+          "column": 10,
+          "index": 233,
+          "line": 10
         },
         "start": {
-          "column": 59,
-          "index": 1463,
-          "line": 57
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/mengluo.txt",
-      "selection": {
-        "end": {
-          "column": 11,
-          "index": 118,
-          "line": 5
-        },
-        "start": {
-          "column": 11,
-          "index": 118,
-          "line": 5
+          "column": 10,
+          "index": 233,
+          "line": 10
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/mengluo.txt"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/windows/DataWindow.java"
 }
