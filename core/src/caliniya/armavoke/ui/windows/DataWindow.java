@@ -5,7 +5,11 @@ import arc.util.Align;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.core.meta.stat.*;
 
-/** 统计信息展示窗口。按 {@link StatType} 分组显示。 */
+/**
+ * 统计信息展示窗口。按 {@link StatType} 分组显示。
+ *
+ * <p>先这样了
+ */
 public class DataWindow extends Window {
 
   private StatStack stack;
@@ -23,20 +27,26 @@ public class DataWindow extends Window {
 
     for (StatType type : StatType.all) {
       Ar<StatData> items = new Ar<>();
-      stack.getByType(type, s -> {
-        if (s != null) items.add(s);
-      });
+      stack.getByType(
+          type,
+          s -> {
+            if (s != null) items.add(s);
+          });
 
       if (!items.any()) continue;
 
       // 分组标题
-      t.add("[#03ECED]" + type.localizedName + "[]").left().padTop(12).padBottom(4).labelAlign(Align.left);
+      t.add("[#03ECED]" + type.localizedName + "[]")
+          .left()
+          .padTop(12)
+          .padBottom(4)
+          .labelAlign(Align.left);
       t.row();
 
       // 数据项
       for (StatData item : items) {
-        if(item == null) {
-        	continue;
+        if (item == null) {
+          continue;
         }
         t.add(item.data).left().padLeft(16).padBottom(2).align(Align.left);
         t.row();

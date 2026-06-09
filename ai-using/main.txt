@@ -20,7 +20,7 @@
 | desktop | desktop/ | 桌面启动器 |
 | android | android/ | Android 入口 |
 | android-old | android-old/ | sdk14的老安卓兼容版本，通常不用管他 |
-| tools | tools/ | 构建工具(一般AI用不上) |
+| tools | tools/ | 构建工具(AI一般用不上) |
 
 ## 核心包结构 (core/src/caliniya/armavoke/)
 
@@ -34,7 +34,7 @@ type/ —— 游戏对象类型 (Weapon, Bullet, Item 及其模板)
 world/ —— 世界结构 (World, Block, Floor 等)
 map/ —— 地图/存档 (Map, Maps)
 io/ —— IO相关
-system/ —— ECS 系统框架 (System 基类 + 各子系统)
+system/ —— ECS 系统框架 (基类，访问点 + 各子系统)
 ui/ —— UI 组件 (Fonts, Styles, fragment, windows)
 content/ —— 内容声明 (Blocks, Items, UnitTypes 等静态注册)
 
@@ -53,8 +53,6 @@ assets-origin/ —— 原始素材(icon, sprites 子目录)(scheme不要去管�
 
 ## 给 AI 的注意事项
 
-1. 项目极早期，大量 test/占位符，不要动它们。
-2. base/tool/Ar.java 是我从 Seq 克隆改名的，用这个我觉得名字好听(不要管什么规范)。
-3. 新增内容类型要在 Contents.java 和对应 content/ 目录注册。
-4. 本地化键格式：statUnit.xxx，翻译在 language_zh_CN.properties。
-6. 更多架构细节见项目根目录 .architecture.md。
+- 项目目前极早期，大量 test/占位符，不要动它们。
+- base/tool/Ar.java 是我从 Seq 克隆改名的，用这个我觉得名字好听(不要管什么规范)。
+- 本地化键格式：statUnit.xxx，具体参照键名，翻译在 language_zh_CN.properties。

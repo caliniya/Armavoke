@@ -1,50 +1,35 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/windows/DataWindow.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/main.txt",
       "selection": {
         "end": {
-          "column": 13,
-          "index": 447,
-          "line": 20
+          "column": 59,
+          "index": 1463,
+          "line": 57
         },
         "start": {
-          "column": 13,
-          "index": 447,
-          "line": 20
+          "column": 59,
+          "index": 1463,
+          "line": 57
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/MenuFragment.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/mengluo.txt",
       "selection": {
         "end": {
-          "column": 38,
-          "index": 1670,
-          "line": 60
+          "column": 11,
+          "index": 118,
+          "line": 5
         },
         "start": {
-          "column": 38,
-          "index": 1670,
-          "line": 60
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/language/language_zh_CN.properties",
-      "selection": {
-        "end": {
-          "column": 16,
-          "index": 550,
-          "line": 31
-        },
-        "start": {
-          "column": 16,
-          "index": 550,
-          "line": 31
+          "column": 11,
+          "index": 118,
+          "line": 5
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/assets/language/language_zh_CN.properties"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/ai-using/mengluo.txt"
 }
