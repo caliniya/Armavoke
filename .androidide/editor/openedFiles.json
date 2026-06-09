@@ -1,0 +1,35 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/stars/Universe.java",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 93,
+          "line": 4
+        },
+        "start": {
+          "column": 0,
+          "index": 93,
+          "line": 4
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UniverseInput.java",
+      "selection": {
+        "end": {
+          "column": 61,
+          "index": 250,
+          "line": 8
+        },
+        "start": {
+          "column": 61,
+          "index": 250,
+          "line": 8
+        }
+      }
+    }
+  ],
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UniverseInput.java"
+}
