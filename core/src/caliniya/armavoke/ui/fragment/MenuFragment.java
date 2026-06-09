@@ -58,7 +58,7 @@ public class MenuFragment {
                       "stattest",
                       () -> {
                         UI.Window(
-                            0.8f, 0.6f, (new StatStack().add(Stats.health, 1000, StatUnit.none)));
+                            0.8f, 0.6f, (new StatStack().add(Stat.health, 1000, StatUnit.none)));
                       }));
               menu.row();
 
