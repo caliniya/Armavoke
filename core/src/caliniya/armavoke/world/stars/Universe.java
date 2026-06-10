@@ -1,5 +1,8 @@
 package caliniya.armavoke.world.stars;
 
 public class Universe {
-	public int chooseX,chooseY;
+	public static int chooseX,chooseY;
+  
+  
+  
 }
