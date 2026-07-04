@@ -2,12 +2,13 @@ package caliniya.armavoke.ui.fragment;
 
 import arc.Core;
 import arc.scene.ui.layout.Table;
+import caliniya.armavoke.core.UI;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.Styles;
 
 /**
  * 宇宙界面菜单 — 切换到宇宙视图时显示<br>
- * 提供网格开关、缩放等宇宙相关控制。
+ * 提供网格开关等宇宙相关控制。
  */
 public class UniverseFragment {
 
@@ -32,6 +33,10 @@ public class UniverseFragment {
             menu.add(new Button("返回地图", () -> {
                 showing = false;
                 root.remove();
+                // 恢复 HUD
+                if (UI.hud != null) {
+                    UI.hud.showHUD();
+                }
             })).height(48f);
             menu.row();
 

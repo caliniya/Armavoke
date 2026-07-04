@@ -33,24 +33,25 @@ public class SpaceShader implements Disposable {
         texture.setWrap(TextureWrap.repeat, TextureWrap.repeat);
     }
 
-    public void render() {
-        
-        float zoom = Render.currentZoom * baseScale;
+    /** 使用指定相机和缩放渲染（用于宇宙视图等自定义相机） */
+    public void render(Camera cam, float zoom) {
+        float z = zoom * baseScale;
 
         shader.bind();
-        
-        // 传递参数
         shader.setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-        shader.setUniformf("u_camPos", Core.camera.position.x, Core.camera.position.y);
-        shader.setUniformf("u_zoom", zoom);
+        shader.setUniformf("u_camPos", cam.position.x, cam.position.y);
+        shader.setUniformf("u_zoom", z);
         shader.setUniformf("u_texSize", (float)texture.width, (float)texture.height);
         shader.setUniformf("u_parallax", parallaxScale);
-        
-        // 绑定纹理
+
         texture.bind(0);
         shader.setUniformi("u_texture", 0);
-        
+
         Draw.blit(shader);
+    }
+
+    public void render() {
+        render(Core.camera, Render.currentZoom);
     }
 
     @Override

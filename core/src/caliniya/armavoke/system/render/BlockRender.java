@@ -13,6 +13,7 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.world.Block;
 import caliniya.armavoke.ui.*;
+import caliniya.armavoke.ui.fragment.UniverseFragment;
 
 public class BlockRender extends System<BlockRender> {
 
@@ -24,6 +25,7 @@ public class BlockRender extends System<BlockRender> {
 
   @Override
   public void update() {
+    if (UniverseFragment.showing) return;
     // 遍历所有建筑
     for (Building b : WorldData.buildings) {
       if (b == null || b.block == null) continue;

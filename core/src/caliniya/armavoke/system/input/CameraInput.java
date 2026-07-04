@@ -7,6 +7,7 @@ import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.core.Render;
+import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.system.System;
 
 @SuppressWarnings("unused")
@@ -25,7 +26,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public void update() {
-    if (!inited) return;
+    if (!inited || UniverseFragment.showing) return;
 
     float currentZoom = Render.currentZoom;
     float speed = keySpeed * currentZoom * (Core.input.keyDown(KeyCode.shiftLeft) ? 2f : 1f);
@@ -38,6 +39,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean pan(float x, float y, float deltaX, float deltaY) {
+    if (UniverseFragment.showing) return false;
 
     Core.camera.position.x -= deltaX * Render.currentZoom;
     Core.camera.position.y -= deltaY * Render.currentZoom;
@@ -52,7 +54,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean zoom(float initialDistance, float distance) {
-    if (initialDistance == 0) return false;
+    if (UniverseFragment.showing || initialDistance == 0) return false;
     float ratio = initialDistance / distance;
     Render.setZoom(lastZoomSnapshot * ratio);
     return true;
@@ -60,6 +62,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
+    if (UniverseFragment.showing) return false;
     float zoomSpeed = 0.1f * Render.currentZoom;
     Render.zoom(amountY * zoomSpeed);
     return true;
@@ -67,6 +70,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
   
   @Override
   public boolean keyDown(KeyCode key) {
+    if (UniverseFragment.showing) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = true;
     if (key == KeyCode.s || key == KeyCode.down) down = true;
     if (key == KeyCode.a || key == KeyCode.left) left = true;
@@ -76,6 +80,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean keyUp(KeyCode key) {
+    if (UniverseFragment.showing) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = false;
     if (key == KeyCode.s || key == KeyCode.down) down = false;
     if (key == KeyCode.a || key == KeyCode.left) left = false;

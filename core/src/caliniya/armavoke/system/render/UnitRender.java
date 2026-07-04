@@ -10,6 +10,7 @@ import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
+import caliniya.armavoke.ui.fragment.UniverseFragment;
 
 public class UnitRender extends System<UnitRender> {
 
@@ -26,6 +27,7 @@ public class UnitRender extends System<UnitRender> {
 
   @Override
   public void update() {
+    if (UniverseFragment.showing) return;
     // 绘制单位
     for (int i = 0; i < WorldData.units.size; i++) {
       Unit u = WorldData.units.get(i);

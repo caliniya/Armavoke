@@ -1,35 +1,20 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/UniverseRender.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UniverseInput.java",
       "selection": {
         "end": {
-          "column": 27,
-          "index": 2055,
-          "line": 73
+          "column": 11,
+          "index": 258,
+          "line": 9
         },
         "start": {
-          "column": 27,
-          "index": 2055,
-          "line": 73
-        }
-      }
-    },
-    {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/CameraInput.java",
-      "selection": {
-        "end": {
-          "column": 2,
-          "index": 659,
-          "line": 25
-        },
-        "start": {
-          "column": 2,
-          "index": 659,
-          "line": 25
+          "column": 11,
+          "index": 258,
+          "line": 9
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/CameraInput.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/input/UniverseInput.java"
 }

@@ -8,6 +8,7 @@ import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.core.Render;
 import caliniya.armavoke.game.data.CommandData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
@@ -17,12 +18,13 @@ import arc.files.Fi;
 
 public class HUDFragment {
 
+  private Table root;
   private Table rightContainer;
   private Table buildingPanel;
   private Table commandPanel;
 
   public void build() {
-    Table root = new Table();
+    root = new Table();
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
@@ -34,12 +36,22 @@ public class HUDFragment {
       top.add(new Button("宇宙", () -> {
         if (!UniverseFragment.showing) {
           UniverseFragment.showing = true;
+
+          // 同步宇宙相机到游戏相机位置
+          Render.universeCamera.position.set(Core.camera.position);
+          Render.universeCamera.width = Core.camera.width;
+          Render.universeCamera.height = Core.camera.height;
+
+          // 弹出宇宙菜单
           if (caliniya.armavoke.core.UI.universe != null
               && caliniya.armavoke.core.UI.universe.root != null) {
             caliniya.armavoke.core.UI.universe.root.remove();
           }
           caliniya.armavoke.core.UI.universe = new UniverseFragment();
           caliniya.armavoke.core.UI.universe.build();
+
+          // 隐藏 HUD
+          hideHUD();
         }
       })).size(100f, 44f);
     }).top().left();
@@ -68,6 +80,22 @@ public class HUDFragment {
 
     root.add(leftTable).expand().bottom().left();
     root.add(rightContainer).expand().bottom().right();
+  }
+
+  /** 隐藏游戏 HUD（切换至宇宙视图时） */
+  private void hideHUD() {
+    if (root != null) {
+      root.visible = false;
+      root.touchable = Touchable.disabled;
+    }
+  }
+
+  /** 恢复游戏 HUD（返回地图视图时） */
+  public void showHUD() {
+    if (root != null) {
+      root.visible = true;
+      root.touchable = Touchable.childrenOnly;
+    }
   }
 
   private void setupBuildingPanel() {
@@ -120,7 +148,6 @@ public class HUDFragment {
 
     rightContainer.add(currentPanel);
 
-    // --- 动画逻辑 ---
     currentPanel.pack();
     float height = currentPanel.getPrefHeight();
 
