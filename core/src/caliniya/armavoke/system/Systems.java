@@ -2,6 +2,7 @@ package caliniya.armavoke.system;
 
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.system.game.GameProcess;
+import caliniya.armavoke.system.input.UniverseInput;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 
@@ -17,4 +18,5 @@ public class Systems {
   public static GameProcess GP;
   public static DebugRender DE;
   public static UniverseRender UV;
+  public static UniverseInput UI;
 }

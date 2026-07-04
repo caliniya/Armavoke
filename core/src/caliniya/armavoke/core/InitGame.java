@@ -14,6 +14,7 @@ import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.system.game.GameProcess;
+import caliniya.armavoke.system.input.UniverseInput;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.Weapon;
@@ -34,8 +35,9 @@ public class InitGame {
     Systems.BR = new BlockRender().init();
     Systems.GP = new GameProcess().init();
     Systems.UV = new UniverseRender().init();
+    Systems.UI = new UniverseInput().init();
     Armavoke.addSystem(
-        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render().init());
+        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, Systems.UI, new Render().init());
     Systems.BP = new BulletProcess().init();
     Systems.UM = new UnitMath().init();
     Systems.EP = new EntityProces().init();

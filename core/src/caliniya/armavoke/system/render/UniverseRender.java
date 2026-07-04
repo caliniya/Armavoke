@@ -4,16 +4,18 @@ import arc.Core;
 import arc.graphics.Camera;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import caliniya.armavoke.base.shaders.SpaceShader;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.system.input.UniverseCameraInput;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
+import caliniya.armavoke.world.stars.Universe;
 
 /**
  * 渲染(网格)宇宙<br>
- * 太空着色器背景 + 白色网格线。<br>
+ * 太空着色器背景 + 白色网格线 + 选中格子高亮。<br>
  * 仅在宇宙视图激活时渲染，使用无边界限制的 universeCamera。
  */
 public class UniverseRender extends System<UniverseRender> {
@@ -27,12 +29,15 @@ public class UniverseRender extends System<UniverseRender> {
     /** 网格颜色 */
     public static final Color GRID_COLOR = Color.white;
 
+    /** 选中高亮颜色 */
+    private static final Color HIGHLIGHT = new Color(1f, 1f, 1f, 0.15f);
+
     /** 太空背景着色器 */
     private SpaceShader background;
 
     @Override
     public UniverseRender init() {
-        this.index = 2;
+        this.index = 3;
         background = new SpaceShader();
         background.parallaxScale = 0.05f;
         background.baseScale = 0.6f;
@@ -53,6 +58,20 @@ public class UniverseRender extends System<UniverseRender> {
         background.render(cam, zoom);
 
         // 2. 网格
+        drawGrid(cam);
+
+        // 3. 选中高亮
+        if (Universe.hasSelection) {
+            Draw.color(HIGHLIGHT);
+            Fill.rect(Universe.selectedX, Universe.selectedY, GRID_SIZE, GRID_SIZE);
+            Draw.color();
+        }
+
+        // 恢复游戏相机投影
+        Draw.proj(Core.camera);
+    }
+
+    private void drawGrid(Camera cam) {
         float viewLeft = cam.position.x - cam.width / 2f;
         float viewBottom = cam.position.y - cam.height / 2f;
         float viewRight = cam.position.x + cam.width / 2f;
@@ -74,9 +93,6 @@ public class UniverseRender extends System<UniverseRender> {
         }
 
         Draw.color();
-
-        // 恢复游戏相机投影
-        Draw.proj(Core.camera);
     }
 
     @Override

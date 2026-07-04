@@ -21,7 +21,7 @@ public class UniverseFragment {
         root = new Table();
         root.setFillParent(true);
         root.top().left();
-        root.background(Styles.background);
+        //root.background(Styles.background);
 
         root.table(menu -> {
             menu.defaults().pad(8f).width(200f);
