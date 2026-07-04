@@ -16,4 +16,5 @@ public class Systems {
   public static BlockRender BR;
   public static GameProcess GP;
   public static DebugRender DE;
+  public static UniverseRender UV;
 }

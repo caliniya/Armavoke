@@ -1,4 +1,2 @@
 include 'desktop', 'android', 'core' , 'tools'
-
-
 include(":android-old")

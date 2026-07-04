@@ -26,6 +26,8 @@ public class UI {
   public static HUDFragment hud;
   // 游戏菜单ui
   public static MenuFragment menu;
+  // 宇宙界面
+  public static UniverseFragment universe;
   // 地图列表
   public static MapsWindow maps;
   // ui用的相机和视口

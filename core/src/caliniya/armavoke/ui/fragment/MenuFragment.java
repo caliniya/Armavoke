@@ -18,9 +18,9 @@ import static caliniya.armavoke.base.type.EventType.*;
 import caliniya.armavoke.ui.windows.DataWindow;
 
 public class MenuFragment {
-  
+
   public Table root;
-  
+
   public void build() {
     root = new Table();
     root.setFillParent(true);

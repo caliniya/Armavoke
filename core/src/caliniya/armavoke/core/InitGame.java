@@ -33,9 +33,9 @@ public class InitGame {
     Systems.UR = new UnitRender().init();
     Systems.BR = new BlockRender().init();
     Systems.GP = new GameProcess().init();
-    //Systems.DE = new DebugRender().init();
+    Systems.UV = new UniverseRender().init();
     Armavoke.addSystem(
-        Systems.MR, Systems.UR, Systems.GP, Systems.BR, new Render().init());
+        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render().init());
     Systems.BP = new BulletProcess().init();
     Systems.UM = new UnitMath().init();
     Systems.EP = new EntityProces().init();

@@ -95,6 +95,7 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
 
   @Override
   public void update() {
+    if (caliniya.armavoke.ui.fragment.UniverseFragment.showing) return;
     if (!inited || chunks == null) return;
 
     // 计算摄像机视野范围内的 区块索引
