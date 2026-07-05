@@ -63,7 +63,7 @@ public class UniverseRender extends System<UniverseRender> {
         // 3. 选中高亮
         if (Universe.hasSelection) {
             Draw.color(HIGHLIGHT);
-            Fill.rect(Universe.selectedX, Universe.selectedY, GRID_SIZE, GRID_SIZE);
+            Fill.rect(Universe.selectedX + GRID_SIZE / 2f, Universe.selectedY + GRID_SIZE / 2f, GRID_SIZE, GRID_SIZE);
             Draw.color();
         }
 
