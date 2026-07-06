@@ -6,14 +6,16 @@ import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 
 public class ENVBlock extends ContentType {
-  
-    public TextureRegion region;
 
-    public ENVBlock(String name){
-        super(name, CType.ENVBlock);
-    }
-    
-    public void load() {
-        region = Core.atlas.find(name);
-    }
+  public TextureRegion region;
+  
+  public boolean solid = true;
+
+  public ENVBlock(String name) {
+    super(name, CType.ENVBlock);
+  }
+
+  public void load() {
+    region = Core.atlas.find(name);
+  }
 }

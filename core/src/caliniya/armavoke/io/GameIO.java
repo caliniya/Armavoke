@@ -29,6 +29,15 @@ public class GameIO {
   private static final String MAGIC = "AEVS";
   private static final int SAVE_VERSION = 1;
 
+  /** 单位/建筑结束标记：8 字节 0xAE，读取未知类型时跳过到此标记 */
+  private static final byte[] END_MARKER = {
+    (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE,
+    (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE
+  };
+
+  // ==================== 元数据读取 ====================
+
+  /** 快速读取存档头，返回 Map 元数据对象（不加载游戏数据） */
   public static Map readMeta(Fi file) {
     try (DataInputStream stream = new DataInputStream(file.read())) {
       Reads r = new Reads(stream);
@@ -45,7 +54,8 @@ public class GameIO {
       return null;
     }
   }
-    
+
+  // ==================== 存档 ====================
 
   public static void save(Fi file, @Nullable StringMap tags) {
     try (DataOutputStream stream = new DataOutputStream(file.write(false))) {
@@ -67,7 +77,6 @@ public class GameIO {
       }
 
       // --- 准备调色板 ---
-      // ... (Palette 逻辑保持不变) ...
       Ar<Floor> floorPalette = new Ar<>();
       ObjectIntMap<Floor> floorMap = new ObjectIntMap<>();
       Ar<ENVBlock> blockPalette = new Ar<>();
@@ -123,15 +132,15 @@ public class GameIO {
       for (Unit u : WorldData.units) {
         w.str(u.type.internalName);
         u.write(w);
+        w.b(END_MARKER); // 结束标记
       }
 
       // --- Buildings ---
       w.i(WorldData.buildings.size);
       for (Building b : WorldData.buildings) {
-        // 1. 先写入类型名称
         w.str(b.block.internalName);
-        // 2. 再写入实例数据
         b.write(w);
+        w.b(END_MARKER); // 结束标记
       }
 
       Log.info("Saved to @", file.path());
@@ -141,13 +150,124 @@ public class GameIO {
     }
   }
 
-  // ... (load(Map map) 保持不变) ...
+  // ==================== 读取辅助 ====================
 
+  /**
+   * 从当前读取位置开始，一路跳过字节直到找到 END_MARKER（8 个 0xAE）。 调用前假设 Reader 正处于未知数据的开头，调用后 Reader 位于 END_MARKER 之后。
+   */
+  private static void skipToEndMarker(Reads r) {
+    int matched = 0;
+    while (matched < 8) {
+      byte b = (byte) r.b();
+      if (b == END_MARKER[matched]) {
+        matched++;
+      } else {
+        matched = 0;
+        if (b == END_MARKER[0]) matched = 1;
+      }
+    }
+  }
+
+  /** 读取存档 body：调色板 → 地图数据 → 单位 → 建筑 → 寻路初始化。 调用前 WorldData.world 必须已经通过 reBuildAll 初始化。 */
+  private static void readBody(Reads r, int width, int height) {
+    // --- 调色板 ---
+    int floorPaletteSize = r.s();
+    Floor[] floorLookup = new Floor[floorPaletteSize];
+    for (int i = 0; i < floorPaletteSize; i++) {
+      String name = r.str();
+      floorLookup[i] = name.equals("null") ? null : Contents.get(name, Floor.class);
+    }
+
+    int blockPaletteSize = r.s();
+    ENVBlock[] blockLookup = new ENVBlock[blockPaletteSize];
+    for (int i = 0; i < blockPaletteSize; i++) {
+      String name = r.str();
+      blockLookup[i] = name.equals("null") ? null : Contents.get(name, ENVBlock.class);
+    }
+
+    // --- 地图数据 ---
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        short floorId = r.s();
+        short blockId = r.s();
+        Floor floor = (floorId >= 0 && floorId < floorLookup.length) ? floorLookup[floorId] : null;
+        ENVBlock block =
+            (blockId >= 0 && blockId < blockLookup.length) ? blockLookup[blockId] : null;
+        WorldData.world.setFloor(x, y, floor);
+        WorldData.world.setENVBlock(x, y, block);
+      }
+    }
+
+    // --- Units ---
+    int unitCount = r.i();
+    for (int i = 0; i < unitCount; i++) {
+      String typeName = r.str();
+      UnitType type = Contents.get(typeName, UnitType.class);
+      if (type != null) {
+        Unit u = type.create();
+        u.read(r);
+        skipToEndMarker(r); // 校验结束标记
+      } else {
+        Log.warn("Unknown unit type in save: @, skipping...", typeName);
+        skipToEndMarker(r);
+      }
+    }
+
+    // --- Buildings ---
+    int buildingCount = r.i();
+    for (int i = 0; i < buildingCount; i++) {
+      String typeName = r.str();
+      Block type = Contents.get(typeName, Block.class);
+      if (type != null) {
+        Building b = type.create(0, 0);
+        b.read(r);
+        skipToEndMarker(r); // 校验结束标记
+        WorldData.buildings.add(b);
+        b.getOccupiedCoords((tx, ty) -> WorldData.world.setBuilding(tx, ty, b.block));
+      } else {
+        Log.warn("Unknown block type in save: @, skipping...", typeName);
+        skipToEndMarker(r);
+      }
+    }
+
+    // --- 初始化寻路 ---
+    RouteData.init();
+  }
+
+  // ==================== 加载 ====================
+
+  /** 从 Map 元数据对象加载存档（Map 由 readMeta 预先读取头信息） */
+  public static void load(Map map) {
+    try (DataInputStream stream = new DataInputStream(map.file.read())) {
+      Reads r = new Reads(stream);
+
+      // 跳过 readMeta 已读的 header
+      r.b(4); // MAGIC
+      r.i(); // version
+      r.i(); // width (skip, use map.width)
+      r.i(); // height (skip, use map.height)
+
+      // 跳过 tags
+      int tagCount = r.s();
+      for (int i = 0; i < tagCount; i++) {
+        r.str();
+        r.str();
+      }
+
+      WorldData.reBuildAll(map.width, map.height, map.space);
+      readBody(r, map.width, map.height);
+
+    } catch (IOException e) {
+      Log.err("Load(Map) failed", e);
+      WorldData.initWorld();
+    }
+  }
+
+  /** 从文件直接加载存档 */
   public static void load(Fi file) {
     try (DataInputStream stream = new DataInputStream(file.read())) {
       Reads r = new Reads(stream);
 
-      // ... (Header & Tags & Palette reading logic) ...
       String magic = new String(r.b(4));
       if (!magic.equals(MAGIC)) throw new IOException("Invalid file format");
 
@@ -158,84 +278,12 @@ public class GameIO {
       StringMap tags = new StringMap();
       int tagCount = r.s();
       for (int i = 0; i < tagCount; i++) {
-        String key = r.str();
-        String value = r.str();
-        tags.put(key, value);
+        tags.put(r.str(), r.str());
       }
       boolean isSpace = tags.getBool("space");
 
       WorldData.reBuildAll(width, height, isSpace);
-
-      // ... (Palette reading) ...
-      int floorPaletteSize = r.s();
-      Floor[] floorLookup = new Floor[floorPaletteSize];
-      for (int i = 0; i < floorPaletteSize; i++) {
-        String name = r.str();
-        floorLookup[i] = name.equals("null") ? null : Contents.get(name, Floor.class);
-      }
-
-      int blockPaletteSize = r.s();
-      ENVBlock[] blockLookup = new ENVBlock[blockPaletteSize];
-      for (int i = 0; i < blockPaletteSize; i++) {
-        String name = r.str();
-        blockLookup[i] = name.equals("null") ? null : Contents.get(name, ENVBlock.class);
-      }
-
-      // 读取地图数据
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          short floorId = r.s();
-          short blockId = r.s();
-          Floor floor =
-              (floorId >= 0 && floorId < floorLookup.length) ? floorLookup[floorId] : null;
-          ENVBlock block =
-              (blockId >= 0 && blockId < blockLookup.length) ? blockLookup[blockId] : null;
-          WorldData.world.setFloor(x, y, floor);
-          WorldData.world.setENVBlock(x, y, block);
-        }
-      }
-
-      // --- Units ---
-      int unitCount = r.i();
-      for (int i = 0; i < unitCount; i++) {
-        String typeName = r.str();
-        UnitType type = Contents.get(typeName, UnitType.class);
-        if (type != null) {
-          Unit u = type.create();
-          u.read(r);
-        }
-      }
-
-      // --- Buildings ---
-      int buildingCount = r.i();
-      for (int i = 0; i < buildingCount; i++) {
-        // 1. 先读取类型名称
-        String typeName = r.str();
-        Block type = Contents.get(typeName, Block.class);
-
-        if (type != null) {
-          // 2. 创建空对象
-          Building b = type.create(0, 0);
-
-          // 4. 读取实例数据
-          b.read(r);
-
-          // 5. 添加到全局列表
-          WorldData.buildings.add(b);
-
-          // 6. 注册到世界网格
-          b.getOccupiedCoords(
-              (tx, ty) -> {
-                WorldData.world.setBuilding(tx, ty, b.block);
-              });
-        } else {
-          Log.err("Unknown block type in save: @", typeName);
-          // 如果类型丢失，存档结构会错位，可能导致后续读取失败
-        }
-      }
-
-      // 初始化寻路
-      RouteData.init();
+      readBody(r, width, height);
 
     } catch (IOException e) {
       Log.err("Load failed", e);

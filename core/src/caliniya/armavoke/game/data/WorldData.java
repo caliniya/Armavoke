@@ -17,8 +17,8 @@ public class WorldData {
 
   // 全局单位列表 (用于逻辑更新)
   public static Ar<Unit> units;
-  // 全局建筑列表 (用于渲染和逻辑更新)
-  public static Ar<Building> buildings; // 新增
+  // 全局建筑列表 (用于逻辑更新)
+  public static Ar<Building> buildings;
 
   // 有移动目标的单位
   public static Ar<Unit> moveunits;

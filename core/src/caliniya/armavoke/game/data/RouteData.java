@@ -5,8 +5,10 @@ import arc.math.geom.Point2;
 import arc.struct.IntQueue;
 import arc.struct.PQueue;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.world.ENVBlock;
+import caliniya.armavoke.game.Building;
+import caliniya.armavoke.world.Block;
 import caliniya.armavoke.world.World;
+import arc.util.pooling.Pools;
 
 public class RouteData {
 
@@ -68,7 +70,7 @@ public class RouteData {
     }
   }
 
-  /**动态更新某个方块的状态 自动处理级联腐蚀和局部距离场重算 */
+  /** 动态更新某个方块的状态 自动处理级联腐蚀和局部距离场重算 */
   public static void updateBlock(int x, int y, boolean isSolid) {
     synchronized (updateLock) {
       if (!isValid(x, y)) return;
@@ -83,19 +85,16 @@ public class RouteData {
       updateRegion(l0, x, y, x, y);
 
       // 2. 级联更新腐蚀层 (Layer 1 ~ MAX)
-      // Layer 0 变动一点，Layer 1 的腐蚀状态可能影响周围 3x3，Layer 2 影响 5x5
       for (int cap = 1; cap <= MAX_CAPABILITY; cap++) {
         NavLayer prev = layers[cap - 1];
         NavLayer curr = layers[cap];
 
-        // 腐蚀影响范围：每一层向外扩展 1 格
         int range = cap;
         int minX = Math.max(0, x - range);
         int maxX = Math.min(W - 1, x + range);
         int minY = Math.max(0, y - range);
         int maxY = Math.min(H - 1, y + range);
 
-        // 局部重新计算腐蚀图
         boolean changed = false;
         for (int ry = minY; ry <= maxY; ry++) {
           for (int rx = minX; rx <= maxX; rx++) {
@@ -108,9 +107,7 @@ public class RouteData {
           }
         }
 
-        // 如果这一层的墙壁分布变了，重算这一层的距离场
         if (changed) {
-          // 更新范围需要比腐蚀范围大，以传播距离场变化
           updateRegion(curr, minX, minY, maxX, maxY);
         }
       }
@@ -118,13 +115,137 @@ public class RouteData {
   }
 
   /**
+   * 放置建筑后更新：获取 (bx,by) 处的建筑，将其占据的所有坐标标记为空（通行）。
+   * 用于建筑被移除或放置前清空占位。
+   */
+  public static void updateBlock(int bx, int by) {
+    synchronized (updateLock) {
+      Building build = WorldData.world.getBuilding(bx, by);
+      if (build == null) return;
+
+      // 遍历建筑占据的所有坐标，全部标记为空
+      build.getOccupiedCoords(
+          (tx, ty) -> {
+            if (isValid(tx, ty)) {
+              NavLayer l0 = layers[0];
+              int idx = coordToIndex(tx, ty);
+              if (l0.baseSolidMap[idx]) {
+                l0.baseSolidMap[idx] = false;
+                updateRegion(l0, tx, ty, tx, ty);
+              }
+            }
+          });
+
+      // 级联更新腐蚀层：以建筑包围盒为范围
+      int s = build.block != null ? build.block.size : 1;
+      int minX = Math.max(0, bx);
+      int maxX = Math.min(W - 1, bx + s - 1);
+      int minY = Math.max(0, by);
+      int maxY = Math.min(H - 1, by + s - 1);
+
+      for (int cap = 1; cap <= MAX_CAPABILITY; cap++) {
+        NavLayer prev = layers[cap - 1];
+        NavLayer curr = layers[cap];
+        int range = cap;
+        int uminX = Math.max(0, minX - range);
+        int umaxX = Math.min(W - 1, maxX + range);
+        int uminY = Math.max(0, minY - range);
+        int umaxY = Math.min(H - 1, maxY + range);
+
+        boolean changed = false;
+        for (int ry = uminY; ry <= umaxY; ry++) {
+          for (int rx = uminX; rx <= umaxX; rx++) {
+            boolean oldState = curr.baseSolidMap[coordToIndex(rx, ry)];
+            boolean newState = calcErosionAt(prev.baseSolidMap, rx, ry);
+            if (oldState != newState) {
+              curr.baseSolidMap[coordToIndex(rx, ry)] = newState;
+              changed = true;
+            }
+          }
+        }
+        if (changed) {
+          updateRegion(curr, uminX, uminY, umaxX, umaxY);
+        }
+      }
+    }
+  }
+
+  /**
+   * 放置建筑方块：将 Block 在 (x,y) 处占据的所有坐标标记为实心。
+   */
+  public static void updateBlock(int x, int y, Block block) {
+    synchronized (updateLock) {
+      if (!isValid(x, y) || block == null) return;
+
+      NavLayer l0 = layers[0];
+      int[] minX = {W}, maxX = {0}, minY = {H}, maxY = {0};
+
+      // 遍历方块占据的所有坐标，批量标记实心
+      if (block.shapeOffsets != null) {
+        for (int i = 0; i < block.shapeOffsets.length; i += 2) {
+          int tx = x + block.shapeOffsets[i];
+          int ty = y + block.shapeOffsets[i + 1];
+          if (isValid(tx, ty)) {
+            int idx = coordToIndex(tx, ty);
+            l0.baseSolidMap[idx] = true;
+            if (tx < minX[0]) minX[0] = tx;
+            if (tx > maxX[0]) maxX[0] = tx;
+            if (ty < minY[0]) minY[0] = ty;
+            if (ty > maxY[0]) maxY[0] = ty;
+          }
+        }
+      } else {
+        int s = block.size;
+        for (int dy = 0; dy < s; dy++) {
+          for (int dx = 0; dx < s; dx++) {
+            int tx = x + dx;
+            int ty = y + dy;
+            if (isValid(tx, ty)) {
+              l0.baseSolidMap[coordToIndex(tx, ty)] = true;
+            }
+          }
+        }
+        minX[0] = Math.max(0, x);
+        maxX[0] = Math.min(W - 1, x + s - 1);
+        minY[0] = Math.max(0, y);
+        maxY[0] = Math.min(H - 1, y + s - 1);
+      }
+
+      // 一次性更新距离场 (包围盒范围)
+      updateRegion(l0, minX[0], minY[0], maxX[0], maxY[0]);
+
+      // 级联腐蚀：以包围盒 + 腐蚀范围
+      for (int cap = 1; cap <= MAX_CAPABILITY; cap++) {
+        NavLayer prev = layers[cap - 1];
+        NavLayer curr = layers[cap];
+        int range = cap;
+        int uminX = Math.max(0, minX[0] - range);
+        int umaxX = Math.min(W - 1, maxX[0] + range);
+        int uminY = Math.max(0, minY[0] - range);
+        int umaxY = Math.min(H - 1, maxY[0] + range);
+
+        boolean changed = false;
+        for (int ry = uminY; ry <= umaxY; ry++) {
+          for (int rx = uminX; rx <= umaxX; rx++) {
+            boolean oldState = curr.baseSolidMap[coordToIndex(rx, ry)];
+            boolean newState = calcErosionAt(prev.baseSolidMap, rx, ry);
+            if (oldState != newState) {
+              curr.baseSolidMap[coordToIndex(rx, ry)] = newState;
+              changed = true;
+            }
+          }
+        }
+        if (changed) {
+          updateRegion(curr, uminX, uminY, umaxX, umaxY);
+        }
+      }
+    }
+  }
+
+  /**
    * 局部区域重算距离场 (Bounded BFS)
-   *
-   * @param minX, minY, maxX, maxY 定义了发生物理变化的区域
    */
   private static void updateRegion(NavLayer layer, int minX, int minY, int maxX, int maxY) {
-    // 定义受影响的重算区域 (Update Box)
-    // 向外扩展 UPDATE_RANGE，确保距离场数值能平滑过渡到区域外
     int uMinX = Math.max(0, minX - UPDATE_RANGE);
     int uMaxX = Math.min(W - 1, maxX + UPDATE_RANGE);
     int uMinY = Math.max(0, minY - UPDATE_RANGE);
@@ -132,51 +253,41 @@ public class RouteData {
 
     IntQueue queue = new IntQueue();
 
-    // 1. 初始化重算区域
     for (int y = uMinY; y <= uMaxY; y++) {
       for (int x = uMinX; x <= uMaxX; x++) {
         int idx = coordToIndex(x, y);
 
         if (layer.baseSolidMap[idx]) {
-          // 如果是墙，距离为0，作为种子放入队列
           layer.clearanceMap[idx] = 0;
           queue.addLast(idx);
         } else {
-          // 如果是空地
-          // A. 如果在区域边缘：保留其原有值作为"边界条件"种子
           boolean isBorder = (x == uMinX || x == uMaxX || y == uMinY || y == uMaxY);
           if (isBorder) {
-            // 只有有效值才入队
             if (layer.clearanceMap[idx] < MAX_DIST_VAL) {
               queue.addLast(idx);
             }
           } else {
-            // B. 如果在区域内部：重置为无穷大，等待 BFS 填值
             layer.clearanceMap[idx] = MAX_DIST_VAL;
           }
         }
       }
     }
 
-    // 2. 局部 BFS 传播
     while (!queue.isEmpty()) {
       int curr = queue.removeFirst();
       int cVal = layer.clearanceMap[curr];
 
-      // 超过范围的值没必要继续传播 (优化)
       if (cVal >= UPDATE_RANGE + 5) continue;
 
       int cx = curr % W;
       int cy = curr / W;
 
-      // 检查 4 邻居
       if (cx > uMinX) checkAndPropagate(layer, curr - 1, cVal, queue);
       if (cx < uMaxX) checkAndPropagate(layer, curr + 1, cVal, queue);
       if (cy > uMinY) checkAndPropagate(layer, curr - W, cVal, queue);
       if (cy < uMaxY) checkAndPropagate(layer, curr + W, cVal, queue);
     }
 
-    // 3. 同步更新 sizeMaps (仅更新受影响区域)
     for (int r = 0; r <= MAX_PRECALC_RADIUS; r++) {
       for (int y = uMinY; y <= uMaxY; y++) {
         for (int x = uMinX; x <= uMaxX; x++) {
@@ -189,7 +300,6 @@ public class RouteData {
 
   private static void checkAndPropagate(
       NavLayer layer, int neighborIdx, int currentVal, IntQueue queue) {
-    // 如果邻居可以通过当前格变得更近
     if (layer.clearanceMap[neighborIdx] > currentVal + 1) {
       layer.clearanceMap[neighborIdx] = currentVal + 1;
       queue.addLast(neighborIdx);
@@ -199,15 +309,14 @@ public class RouteData {
   /** 计算单点的腐蚀状态 */
   private static boolean calcErosionAt(boolean[] srcMap, int x, int y) {
     int idx = coordToIndex(x, y);
-    if (!srcMap[idx]) return false; // 本来就是空的
+    if (!srcMap[idx]) return false;
 
-    // 检查四周是否有空地
     if (isValid(x + 1, y) && !srcMap[coordToIndex(x + 1, y)]) return false;
     if (isValid(x - 1, y) && !srcMap[coordToIndex(x - 1, y)]) return false;
     if (isValid(x, y + 1) && !srcMap[coordToIndex(x, y + 1)]) return false;
     if (isValid(x, y - 1) && !srcMap[coordToIndex(x, y - 1)]) return false;
 
-    return true; // 四周都是墙，保留
+    return true;
   }
 
   private static void erodeMapFull(boolean[] src, boolean[] dst) {
@@ -217,7 +326,6 @@ public class RouteData {
   }
 
   private static void calcClearanceFull(NavLayer layer) {
-    // 全量 Brushfire 初始化
     for (int i = 0; i < W * H; i++)
       layer.clearanceMap[i] = layer.baseSolidMap[i] ? 0 : MAX_DIST_VAL;
 
@@ -248,7 +356,7 @@ public class RouteData {
       }
     }
   }
-  
+
   public static boolean isValid(int x, int y) {
     return x >= 0 && x < W && y >= 0 && y < H;
   }
@@ -265,7 +373,7 @@ public class RouteData {
   public static int[] getDebugClearanceMap() {
     return layers != null ? layers[0].clearanceMap : null;
   }
-  
+
   /**
    * 获取路径
    *
@@ -273,20 +381,17 @@ public class RouteData {
    * @param capability 跨越能力 (0=普通, 1=机甲...)
    */
   public static Ar<Point2> findPath(int sx, int sy, int tx, int ty, int unitSize, int capability) {
-    // 加锁防止读取到正在更新的脏数据
     synchronized (updateLock) {
       capability = Mathf.clamp(capability, 0, MAX_CAPABILITY);
       NavLayer layer = layers[capability];
 
-      // 1. 终点检查
       if (!isPassable(layer, tx, ty, unitSize)) return null;
 
-      // 2. 初始化 A* 数据结构
       PQueue<Node> openList = new PQueue<>();
       boolean[] closedMap = new boolean[W * H];
       Node[] nodeIndex = new Node[W * H];
 
-      Node startNode = new Node(sx, sy, null, 0, dist(sx, sy, tx, ty));
+      Node startNode = Pools.obtain(Node.class, Node::new).set(sx, sy, null, 0, dist(sx, sy, tx, ty));
       openList.add(startNode);
       nodeIndex[coordToIndex(sx, sy)] = startNode;
 
@@ -294,21 +399,31 @@ public class RouteData {
         Node current = openList.poll();
         int cIndex = coordToIndex(current.x, current.y);
 
-        // Lazy Deletion: 如果节点已关闭或已被更新的节点取代，跳过
         if (closedMap[cIndex]) continue;
         if (nodeIndex[cIndex] != null && current != nodeIndex[cIndex]) continue;
 
-        // 到达终点 -> 平滑路径并返回
         if (current.x == tx && current.y == ty) {
-          return smoothPath(reconstructPath(current), layer, unitSize);
+          Ar<Point2> result = smoothPath(reconstructPath(current), layer, unitSize);
+          // 归还所有节点到对象池
+          for (int i = 0; i < nodeIndex.length; i++) {
+            if (nodeIndex[i] != null) {
+              Pools.free(nodeIndex[i]);
+            }
+          }
+          return result;
         }
 
         closedMap[cIndex] = true;
 
-        // 扩展节点 (JPS 逻辑)
         identifySuccessors(layer, current, tx, ty, openList, closedMap, nodeIndex, unitSize);
       }
 
+      // 归还所有节点到对象池
+      for (int i = 0; i < nodeIndex.length; i++) {
+        if (nodeIndex[i] != null) {
+          Pools.free(nodeIndex[i]);
+        }
+      }
       return null;
     }
   }
@@ -330,7 +445,6 @@ public class RouteData {
       int dx = dirs[i];
       int dy = dirs[i + 1];
 
-      // 尝试跳跃
       Point2 jp = jump(layer, current.x, current.y, dx, dy, tx, ty, unitSize);
 
       if (jp != null) {
@@ -343,9 +457,8 @@ public class RouteData {
         float g = current.g + dist(current.x, current.y, jx, jy);
         Node existingNode = nodeIndex[index];
 
-        // 如果发现了更优路径，添加到 openList (Lazy Deletion 模式)
         if (existingNode == null || g < existingNode.g) {
-          Node newNode = new Node(jx, jy, current, g, dist(jx, jy, tx, ty));
+          Node newNode = Pools.obtain(Node.class, Node::new).set(jx, jy, current, g, dist(jx, jy, tx, ty));
           nodeIndex[index] = newNode;
           openList.add(newNode);
         }
@@ -353,57 +466,97 @@ public class RouteData {
     }
   }
 
-  /** JPS: 递归/迭代 跳跃检测 */
+  /**
+   * JPS: 迭代式跳跃检测。
+   * 使用 while 循环沿方向扫描，彻底消除递归导致的栈溢出风险。
+   */
   private static Point2 jump(
-      NavLayer layer, int cx, int cy, int dx, int dy, int tx, int ty, int unitSize) {
+      NavLayer layer, int startX, int startY, int dx, int dy, int tx, int ty, int unitSize) {
 
-    int nx = cx + dx;
-    int ny = cy + dy;
+    int cx = startX;
+    int cy = startY;
 
-    // 基础检查：越界或不可通行
-    if (!isPassable(layer, nx, ny, unitSize)) return null;
-    // 到达终点
-    if (nx == tx && ny == ty) return new Point2(nx, ny);
+    while (true) {
+      int nx = cx + dx;
+      int ny = cy + dy;
 
-    // 强制邻居检测 (Forced Neighbor)
-    if (dx != 0 && dy != 0) { // 对角线
-      if ((!isPassable(layer, nx - dx, ny, unitSize)
-              && isPassable(layer, nx - dx, ny + dy, unitSize))
-          || (!isPassable(layer, nx, ny - dy, unitSize)
-              && isPassable(layer, nx + dx, ny - dy, unitSize))) {
-        return new Point2(nx, ny);
-      }
-      // 递归检查水平和垂直分量
-      if (jump(layer, nx, ny, dx, 0, tx, ty, unitSize) != null
-          || jump(layer, nx, ny, 0, dy, tx, ty, unitSize) != null) {
-        return new Point2(nx, ny);
-      }
-    } else { // 直线
-      if (dx != 0) { // 水平移动
-        if ((!isPassable(layer, nx, ny - 1, unitSize)
-                && isPassable(layer, nx + dx, ny - 1, unitSize))
-            || (!isPassable(layer, nx, ny + 1, unitSize)
-                && isPassable(layer, nx + dx, ny + 1, unitSize))) {
+      // 越界或不可通行 → 该方向无跳点
+      if (!isPassable(layer, nx, ny, unitSize)) return null;
+      // 到达终点
+      if (nx == tx && ny == ty) return new Point2(nx, ny);
+
+      if (dx != 0 && dy != 0) {
+        // --- 对角线移动 ---
+        // 强制邻居检测
+        if ((!isPassable(layer, nx - dx, ny, unitSize) && isPassable(layer, nx - dx, ny + dy, unitSize))
+            || (!isPassable(layer, nx, ny - dy, unitSize) && isPassable(layer, nx + dx, ny - dy, unitSize))) {
           return new Point2(nx, ny);
         }
-      } else { // 垂直移动
-        if ((!isPassable(layer, nx - 1, ny, unitSize)
-                && isPassable(layer, nx - 1, ny + dy, unitSize))
-            || (!isPassable(layer, nx + 1, ny, unitSize)
-                && isPassable(layer, nx + 1, ny + dy, unitSize))) {
+        // 正交分量检测：用独立的迭代扫描代替递归
+        if (scanOrtho(layer, nx, ny, dx, 0, tx, ty, unitSize) != null
+            || scanOrtho(layer, nx, ny, 0, dy, tx, ty, unitSize) != null) {
           return new Point2(nx, ny);
         }
+      } else {
+        // --- 直线移动 ---
+        if (dx != 0) { // 水平
+          if ((!isPassable(layer, nx, ny - 1, unitSize) && isPassable(layer, nx + dx, ny - 1, unitSize))
+              || (!isPassable(layer, nx, ny + 1, unitSize) && isPassable(layer, nx + dx, ny + 1, unitSize))) {
+            return new Point2(nx, ny);
+          }
+        } else { // 垂直
+          if ((!isPassable(layer, nx - 1, ny, unitSize) && isPassable(layer, nx - 1, ny + dy, unitSize))
+              || (!isPassable(layer, nx + 1, ny, unitSize) && isPassable(layer, nx + 1, ny + dy, unitSize))) {
+            return new Point2(nx, ny);
+          }
+        }
       }
+
+      // 继续沿当前方向扫描
+      cx = nx;
+      cy = ny;
     }
+  }
 
-    // 继续沿当前方向跳跃
-    return jump(layer, nx, ny, dx, dy, tx, ty, unitSize);
+  /**
+   * 从 (startX, startY) 沿正交方向 (dx,dy) 迭代扫描，
+   * 找到跳点则返回，否则返回 null。
+   * 仅用于对角线跳点检测中的正交分量扫描。
+   */
+  private static Point2 scanOrtho(
+      NavLayer layer, int startX, int startY, int dx, int dy, int tx, int ty, int unitSize) {
+
+    int cx = startX;
+    int cy = startY;
+
+    while (true) {
+      int nx = cx + dx;
+      int ny = cy + dy;
+
+      if (!isPassable(layer, nx, ny, unitSize)) return null;
+      if (nx == tx && ny == ty) return new Point2(nx, ny);
+
+      // 仅正交方向的强制邻居检测
+      if (dx != 0) { // 水平
+        if ((!isPassable(layer, nx, ny - 1, unitSize) && isPassable(layer, nx + dx, ny - 1, unitSize))
+            || (!isPassable(layer, nx, ny + 1, unitSize) && isPassable(layer, nx + dx, ny + 1, unitSize))) {
+          return new Point2(nx, ny);
+        }
+      } else { // 垂直
+        if ((!isPassable(layer, nx - 1, ny, unitSize) && isPassable(layer, nx - 1, ny + dy, unitSize))
+            || (!isPassable(layer, nx + 1, ny, unitSize) && isPassable(layer, nx + 1, ny + dy, unitSize))) {
+          return new Point2(nx, ny);
+        }
+      }
+
+      cx = nx;
+      cy = ny;
+    }
   }
 
   /** JPS: 获取剪枝后的搜索方向 */
   private static int[] getPrunedNeighbors(NavLayer layer, Node node, int unitSize) {
     if (node.parent == null) {
-      // 起点：返回所有8方向
       return new int[] {0, 1, 0, -1, -1, 0, 1, 0, 1, 1, 1, -1, -1, 1, -1, -1};
     }
 
@@ -451,8 +604,6 @@ public class RouteData {
             !isPassable(layer, node.x, node.y - dy, unitSize)
                 && isPassable(layer, node.x + dx, node.y - dy, unitSize);
 
-        // 简单的列表构建，避免复杂数组操作
-        // 顺序：前方，水平，垂直，以及可能的强制拐弯
         int[] temp = new int[10];
         int c = 0;
         temp[c++] = dx;
@@ -533,18 +684,14 @@ public class RouteData {
   public static boolean isPassable(NavLayer layer, int x, int y, int unitSize) {
     if (!isValid(x, y)) return false;
     int index = coordToIndex(x, y);
-    // 如果半径在预计算范围内，直接查 sizeMap
     if (unitSize <= MAX_PRECALC_RADIUS) {
-      // sizeMaps 存的是 isSolid，所以取反
       return !layer.sizeMaps[unitSize][index];
     } else {
-      // 超大单位回退到 Clearance 检查
       return layer.clearanceMap[index] > unitSize;
     }
   }
 
   private static float dist(int x1, int y1, int x2, int y2) {
-    // 使用曼哈顿距离作为启发式，符合4/8向移动特征
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
   }
 
@@ -558,18 +705,31 @@ public class RouteData {
     return p;
   }
 
-  // A* 节点类
+  // A* 节点类 (对象池复用，减少 GC)
   private static class Node implements Comparable<Node> {
     int x, y;
     Node parent;
     float g, h;
 
-    public Node(int x, int y, Node parent, float g, float h) {
+    public Node() {}
+
+    /** 从池中取出后设置字段，链式调用 */
+    public Node set(int x, int y, Node parent, float g, float h) {
       this.x = x;
       this.y = y;
       this.parent = parent;
       this.g = g;
       this.h = h;
+      return this;
+    }
+
+    /** 归还池时重置 */
+    public void reset() {
+      x = 0;
+      y = 0;
+      parent = null;
+      g = 0;
+      h = 0;
     }
 
     @Override

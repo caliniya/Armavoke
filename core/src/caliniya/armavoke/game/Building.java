@@ -111,14 +111,11 @@ public class Building extends Entity {
 
   @Override
   public void remove() {
-    if (WorldData.buildings != null) {
-      WorldData.buildings.remove(this);
-    }
+    WorldData.buildings.remove(this);
+    WorldData.world.removeBuilding(tx , ty);
     // 归还 ID
-    if (id > 0) {
-      Entities.freeID(id);
-      id = -1;
-    }
+    id = Entities.freeID(id);
+    
     Pools.free(this);
   }
 

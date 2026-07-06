@@ -80,10 +80,10 @@ public class World {
     // --- 新增：在地图中心生成敌方测试炮塔 ---
     int centerX = W / 2;
     int centerY = H / 2;
-    
+
     Building enemyTurret = setBuilding(centerX, centerY, Blocks.testTurret);
 
-      enemyTurret.team = TeamTypes.Mutex;
+    enemyTurret.team = TeamTypes.Mutex;
   }
 
   // --- 区块管理辅助方法 ---
@@ -140,12 +140,22 @@ public class World {
           }
         });
 
+    // 通知导航数据：标记建筑占据的格子为实心
+    if (block.solid) {
+      RouteData.updateBlock(x, y, block);
+    }
+
     return newBuild;
   }
 
   public void removeBuilding(int x, int y) {
     Building build = getBuilding(x, y);
     if (build == null) return;
+
+    // 通知导航数据：先取消实心标记（必须在清除区块前调用）
+    if (build.block.solid) {
+      RouteData.updateBlock(x, y);
+    }
 
     WorldData.buildings.remove(build);
     build.getOccupiedCoords(
@@ -184,9 +194,13 @@ public class World {
       WorldChunk chunk = getChunk(x, y);
       if (chunk == null) return;
       chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, (short) 0);
+      // 通知导航数据：移除环境方块
+      RouteData.updateBlock(x, y, false);
     } else {
       WorldChunk chunk = getOrCreateChunk(x, y);
       chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, id);
+      // 通知导航数据：放置环境方块
+      RouteData.updateBlock(x, y, block.solid);
     }
   }
 
