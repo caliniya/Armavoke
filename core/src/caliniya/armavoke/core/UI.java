@@ -35,6 +35,8 @@ public class UI {
   public static Viewport vport;
 
   private static boolean isDebugShown = true;
+  
+  public static float safeAreaSize;
 
   public static void initAll() {
     scl = Scl.scl();

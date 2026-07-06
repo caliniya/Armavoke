@@ -1,6 +1,9 @@
 package caliniya.armavoke;
 
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.view.DisplayCutout;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import static arc.Core.*;
@@ -14,6 +17,7 @@ import arc.files.Fi;
 import arc.graphics.Color;
 import arc.util.Log;
 import arc.util.Log.*;
+import caliniya.armavoke.core.UI;
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -21,6 +25,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class AndroidLauncher extends AndroidApplication {
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -40,6 +45,22 @@ public class AndroidLauncher extends AndroidApplication {
             useGL30 = true;
           }
         });
+
+    // --- 安全区检测 ---
+    View rootView = getWindow().getDecorView();
+    rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        DisplayCutout cutout = insets.getDisplayCutout();
+        if (cutout != null) {
+          UI.safeAreaSize = max(
+              max(cutout.getSafeInsetTop(), cutout.getSafeInsetBottom()),
+              max(cutout.getSafeInsetLeft(), cutout.getSafeInsetRight()));
+        }
+      }
+      return insets;
+    });
+    rootView.requestApplyInsets();
+    // --- 安全区检测结束 ---
 
     Fi data = Core.files.absolute(this.getExternalFilesDir(null).getAbsolutePath());
     // throw new ArcRuntimeException(data.toString());
@@ -99,5 +120,9 @@ public class AndroidLauncher extends AndroidApplication {
     synchronized (this.getListeners()) {
       this.getListeners().add(appl);
     }
+  }
+
+  private static int max(int a, int b) {
+    return a > b ? a : b;
   }
 }

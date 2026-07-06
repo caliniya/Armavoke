@@ -3,7 +3,7 @@ package caliniya.armavoke.ui.fragment;
 import arc.Core;
 import arc.Events;
 import arc.math.Interp;
-import arc.scene.actions.Actions; 
+import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
@@ -35,29 +35,30 @@ public class HUDFragment {
     a = new Table().top().left();
     b = new Table().bottom().left();
     a.add(
-        new Button(
-            "宇宙",
-            () -> {
-              if (!UniverseFragment.showing) {
-                UniverseFragment.showing = true;
+            new Button(
+                "宇宙",
+                () -> {
+                  if (!UniverseFragment.showing) {
+                    UniverseFragment.showing = true;
 
-                // 同步宇宙相机到游戏相机位置
-                Render.universeCamera.position.set(Core.camera.position);
-                Render.universeCamera.width = Core.camera.width;
-                Render.universeCamera.height = Core.camera.height;
+                    // 同步宇宙相机到游戏相机位置
+                    Render.universeCamera.position.set(Core.camera.position);
+                    Render.universeCamera.width = Core.camera.width;
+                    Render.universeCamera.height = Core.camera.height;
 
-                // 弹出宇宙菜单
-                if (caliniya.armavoke.core.UI.universe != null
-                    && caliniya.armavoke.core.UI.universe.root != null) {
-                  caliniya.armavoke.core.UI.universe.root.remove();
-                }
-                caliniya.armavoke.core.UI.universe = new UniverseFragment();
-                caliniya.armavoke.core.UI.universe.build();
+                    // 弹出宇宙菜单
+                    if (caliniya.armavoke.core.UI.universe != null
+                        && caliniya.armavoke.core.UI.universe.root != null) {
+                      caliniya.armavoke.core.UI.universe.root.remove();
+                    }
+                    caliniya.armavoke.core.UI.universe = new UniverseFragment();
+                    caliniya.armavoke.core.UI.universe.build();
 
-                // 隐藏 HUD
-                hideHUD();
-              }
-            })).size(120f , 50f);
+                    // 隐藏 HUD
+                    hideHUD();
+                  }
+                }))
+        .size(120f, 50f);
 
     Button commandBtn =
         new Button(
@@ -77,12 +78,10 @@ public class HUDFragment {
     setupCommandPanel();
 
     updateRightPanel();
-    
-    a.setHeight(Core.graphics.getHeight() / 2f);
-    b.setHeight(Core.graphics.getHeight() / 2f);
 
-    root.add(b).bottom().left();
     root.add(a).top().left();
+    root.row();
+    root.add(b).bottom().left();
     root.add(rightContainer).expand().bottom().right();
   }
 
