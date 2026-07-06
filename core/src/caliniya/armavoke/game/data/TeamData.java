@@ -6,15 +6,26 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Unit;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 public class TeamData {
   public final TeamTypes team;
 
-  // 该团队下的所有单位列表 (全局)
+  /** 该团队下的所有单位列表 (全局) */
   public Ar<Unit> units = new Ar<>();
 
-  // 空间划分网格 (Per-Team Spatial Grid)
-  // 每个格子存储该区域内属于本团队的单位
+  /** 空间划分网格 (Per-Team Spatial Grid) */
   public Ar<Unit>[] unitGrid;
+
+  /**
+   * 读写锁，保护 unitGrid 的并发访问。
+   *
+   * <ul>
+   *   <li>读锁：{@link #find} / {@link #get} — 允许多个线程同时搜索。
+   *   <li>写锁：{@link #updateChunk} — 单位增删/移动时独占。
+   * </ul>
+   */
+  private final ReentrantReadWriteLock gridLock = new ReentrantReadWriteLock();
 
   @SuppressWarnings("unchecked")
   public TeamData(TeamTypes team) {
@@ -25,139 +36,121 @@ public class TeamData {
   /** 初始化/重置网格 (需在地图加载后调用) */
   @SuppressWarnings("unchecked")
   public void initGrid() {
-    int w = WorldData.gridW;
-    int h = WorldData.gridH;
-    int total = w * h;
+    gridLock.writeLock().lock();
+    try {
+      int w = WorldData.gridW;
+      int h = WorldData.gridH;
+      int total = w * h;
 
-    this.unitGrid = new Ar[total];
-    for (int i = 0; i < total; i++) {
-      // 预设容量小一点，因为单个团队在单个格子的单位数通常比全局少
-      this.unitGrid[i] = new Ar<>(8);
+      this.unitGrid = new Ar[total];
+      for (int i = 0; i < total; i++) {
+        this.unitGrid[i] = new Ar<>(8);
+      }
+    } finally {
+      gridLock.writeLock().unlock();
     }
   }
 
   /**
-   * 获取指定矩形区域内的本团队单位
-   *
-   * @param minX 左下角 X (世界像素坐标)
-   * @param minY 左下角 Y
-   * @param maxX 右上角 X
-   * @param maxY 右上角 Y
-   * @param output 结果将存入此列表 (为了减少GC，传入一个可重用的列表)
+   * 获取指定矩形区域内的本团队单位（读锁保护）。
    */
   public void get(float minX, float minY, float maxX, float maxY, Ar<Unit> output) {
-    if (unitGrid == null) return;
+    gridLock.readLock().lock();
+    try {
+      if (unitGrid == null) return;
 
-    // 1. 将像素坐标转换为区块索引范围
-    int startX = (int) (minX / WorldData.CHUNK_PIXEL_SIZE);
-    int startY = (int) (minY / WorldData.CHUNK_PIXEL_SIZE);
-    int endX = (int) (maxX / WorldData.CHUNK_PIXEL_SIZE);
-    int endY = (int) (maxY / WorldData.CHUNK_PIXEL_SIZE);
+      int startX = (int) (minX / WorldData.CHUNK_PIXEL_SIZE);
+      int startY = (int) (minY / WorldData.CHUNK_PIXEL_SIZE);
+      int endX = (int) (maxX / WorldData.CHUNK_PIXEL_SIZE);
+      int endY = (int) (maxY / WorldData.CHUNK_PIXEL_SIZE);
 
-    // 2. 边界限制
-    startX = Mathf.clamp(startX, 0, WorldData.gridW - 1);
-    startY = Mathf.clamp(startY, 0, WorldData.gridH - 1);
-    endX = Mathf.clamp(endX, 0, WorldData.gridW - 1);
-    endY = Mathf.clamp(endY, 0, WorldData.gridH - 1);
+      startX = Mathf.clamp(startX, 0, WorldData.gridW - 1);
+      startY = Mathf.clamp(startY, 0, WorldData.gridH - 1);
+      endX = Mathf.clamp(endX, 0, WorldData.gridW - 1);
+      endY = Mathf.clamp(endY, 0, WorldData.gridH - 1);
 
-    // 3. 遍历覆盖的区块
-    for (int y = startY; y <= endY; y++) {
-      for (int x = startX; x <= endX; x++) {
-        int index = y * WorldData.gridW + x;
-        Ar<Unit> chunkUnits = unitGrid[index];
+      for (int y = startY; y <= endY; y++) {
+        for (int x = startX; x <= endX; x++) {
+          int index = y * WorldData.gridW + x;
+          Ar<Unit> chunkUnits = unitGrid[index];
 
-        // 4. 精确检测 (可选)
-        // 如果只想要粗略结果(区块内所有单位)，直接 addAll
-        // 如果需要精确矩形裁剪，则遍历 chunkUnits 检查 u.x/u.y
-
-        // 这里我们做简单矩形判断
-        for (int i = 0; i < chunkUnits.size; i++) {
-          Unit u = chunkUnits.get(i);
-          // 考虑单位半径，这里简单用点判断，或者用 AABB 判断
-          // u.x > minX - u.radius ...
-          if (u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
-            output.add(u);
+          for (int i = 0; i < chunkUnits.size; i++) {
+            Unit u = chunkUnits.get(i);
+            if (u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
+              output.add(u);
+            }
           }
         }
       }
+    } finally {
+      gridLock.readLock().unlock();
     }
   }
 
   /**
-   * 在指定圆形范围内查找本团队的单位，并对结果执行操作
-   *
-   * @param x 搜索中心 X
-   * @param y 搜索中心 Y
-   * @param radius 搜索半径
-   * @param consumer 对找到的每个有效单位执行的操作
+   * 在指定圆形范围内查找本团队的单位（读锁保护）。
    */
   public void find(float x, float y, float radius, Cons<Unit> consumer) {
-    if (unitGrid == null) return;
-    
-    // AABB
-    float minX = x - radius;
-    float minY = y - radius;
-    float maxX = x + radius;
-    float maxY = y + radius;
-    
-    int startX = (int) (minX / WorldData.CHUNK_PIXEL_SIZE);
-    int startY = (int) (minY / WorldData.CHUNK_PIXEL_SIZE);
-    int endX = (int) (maxX / WorldData.CHUNK_PIXEL_SIZE);
-    int endY = (int) (maxY / WorldData.CHUNK_PIXEL_SIZE);
+    gridLock.readLock().lock();
+    try {
+      if (unitGrid == null) return;
 
-    // 边界限制
-    startX = Mathf.clamp(startX, 0, WorldData.gridW - 1);
-    startY = Mathf.clamp(startY, 0, WorldData.gridH - 1);
-    endX = Mathf.clamp(endX, 0, WorldData.gridW - 1);
-    endY = Mathf.clamp(endY, 0, WorldData.gridH - 1);
+      float minX = x - radius;
+      float minY = y - radius;
+      float maxX = x + radius;
+      float maxY = y + radius;
 
-    float r2 = radius * radius;
+      int startX = (int) (minX / WorldData.CHUNK_PIXEL_SIZE);
+      int startY = (int) (minY / WorldData.CHUNK_PIXEL_SIZE);
+      int endX = (int) (maxX / WorldData.CHUNK_PIXEL_SIZE);
+      int endY = (int) (maxY / WorldData.CHUNK_PIXEL_SIZE);
 
-    for (int gy = startY; gy <= endY; gy++) {
-      for (int gx = startX; gx <= endX; gx++) {
-        int index = gy * WorldData.gridW + gx;
-        Ar<Unit> chunkUnits = unitGrid[index];
-        
-        for (int i = 0; i < chunkUnits.size; i++) {
-          Unit u = chunkUnits.get(i);
+      startX = Mathf.clamp(startX, 0, WorldData.gridW - 1);
+      startY = Mathf.clamp(startY, 0, WorldData.gridH - 1);
+      endX = Mathf.clamp(endX, 0, WorldData.gridW - 1);
+      endY = Mathf.clamp(endY, 0, WorldData.gridH - 1);
 
-          if (u == null || u.health <= 0) continue;
+      float r2 = radius * radius;
 
-          // 粗略矩形检查 (AABB) - 快速排除掉显然不在圆内的
-          if (u.x < minX || u.x > maxX || u.y < minY || u.y > maxY) continue;
+      for (int gy = startY; gy <= endY; gy++) {
+        for (int gx = startX; gx <= endX; gx++) {
+          int index = gy * WorldData.gridW + gx;
+          Ar<Unit> chunkUnits = unitGrid[index];
 
-          // 精确圆形距离检查 (Distance Squared)
-          if (Mathf.dst2(x, y, u.x, u.y) <= r2) {
-            // 执行回调
-            consumer.get(u);
+          for (int i = 0; i < chunkUnits.size; i++) {
+            Unit u = chunkUnits.get(i);
+
+            if (u == null || u.health <= 0) continue;
+            if (u.x < minX || u.x > maxX || u.y < minY || u.y > maxY) continue;
+
+            if (Mathf.dst2(x, y, u.x, u.y) <= r2) {
+              consumer.get(u);
+            }
           }
         }
       }
+    } finally {
+      gridLock.readLock().unlock();
     }
   }
 
-  // 网格更新方法
-  // 这些方法应该由 UnitProces.updateChunkPosition 调用
-  // 逻辑和 WorldData.unitGrid 一样
-
   /**
-   * 更新单位在团队空间网格中的位置
-   *
-   * @param u 单位对象
-   * @param oldIndex 旧的区块索引 (如果刚生成则为 -1)
-   * @param newIndex 新的区块索引
+   * 更新单位在团队空间网格中的位置（写锁保护）。
    */
   public void updateChunk(Unit u, int oldIndex, int newIndex) {
-    if (unitGrid == null) return;
+    gridLock.writeLock().lock();
+    try {
+      if (unitGrid == null) return;
 
-    // 1. 从旧区块移除
-    if (oldIndex != -1 && oldIndex < unitGrid.length) {
-      unitGrid[oldIndex].remove(u);
-    }
+      if (oldIndex != -1 && oldIndex < unitGrid.length) {
+        unitGrid[oldIndex].remove(u);
+      }
 
-    // 2. 加入新区块
-    if (newIndex >= 0 && newIndex < unitGrid.length) {
-      unitGrid[newIndex].add(u);
+      if (newIndex >= 0 && newIndex < unitGrid.length) {
+        unitGrid[newIndex].add(u);
+      }
+    } finally {
+      gridLock.writeLock().unlock();
     }
   }
 }

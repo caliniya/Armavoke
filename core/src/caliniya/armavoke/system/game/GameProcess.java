@@ -9,7 +9,7 @@ import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
 
-// 在这里进行游戏内容的更新
+// 在这里进行主线程游戏内容的更新
 public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override

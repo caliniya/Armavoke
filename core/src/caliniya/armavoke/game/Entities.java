@@ -73,6 +73,26 @@ public class Entities {
 
     return (Entity) result[0];
   }
+  
+  /** 查找最近的敌人实体 */
+  public static void closestEnemy(TeamTypes sourceTeam, float x, float y, float radius , Cons<Entity> con) {
+    final Object[] result = {null};
+    final float[] minDst2 = {radius * radius};
+
+    nearbyEnemies(
+        sourceTeam,
+        x,
+        y,
+        radius,
+        enemy -> {
+          float dst2 = Mathf.dst2(x, y, enemy.x, enemy.y);
+          if (dst2 < minDst2[0]) {
+            minDst2[0] = dst2;
+            result[0] = enemy;
+          }
+        });
+        con.get((Entity)result[0]);
+  }
 
   /**
    * 查找最近的敌人实体（带过滤 + 回调）

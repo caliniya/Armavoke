@@ -8,6 +8,7 @@ import arc.util.Log;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.game.ContentType;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
@@ -23,7 +24,7 @@ public class Block extends ContentType {
   public boolean solid = true; // 可以阻挡通行
   public float health = 100; // 顾名思义
   public int capacity = 100; // 物品容量，为0就是不能存
-  public ItemType[] allowItem = Contents.items; // 能存的,默认啥都能存一百(不能在这里调用，会空指针)(不对不对，可以的)
+  public ItemType[] allowItem = Contents.items; // 能存的,默认啥都能存一百
 
   public TextureRegion region; // 主贴图
 
@@ -33,7 +34,6 @@ public class Block extends ContentType {
 
   public Block(String name) {
     super(name, CType.Block);
-    // load();
   }
 
   public Building create(int tx, int ty) {
@@ -56,13 +56,22 @@ public class Block extends ContentType {
 
   public void read(Building b, Reads r) {}
 
-  // 允许全部
+  // --- 目标查找 ---
+
+  /** 查找目标实体。默认空实现，子类（如炮塔）可覆写。 */
+  public Entity findTarget(Building b) {
+    return null;
+  }
+
+  // --- 物品相关 ---
+
   public void allowAllItem(ItemType... types) {
     allowItem = types;
   }
 
   /**
-   * 辅助方法：获取旋转后的形状偏移量 这用于确定建筑在当前角度下实际占据了哪些格子
+   * 辅助方法：获取旋转后的形状偏移量
+   * 这用于确定建筑在当前角度下实际占据了哪些格子
    *
    * @param angle 建筑当前角度 (0-3)
    * @param baseOffsets 原始形状偏移 (通常是 block.shapeOffsets)
@@ -73,30 +82,24 @@ public class Block extends ContentType {
 
     int[] rotated = baseOffsets.clone();
 
-    // 根据 angle 顺时针旋转坐标
-    // 0: (x, y) -> (x, y)
-    // 1: (x, y) -> (y, -x)  (顺时针90度)
-    // 2: (x, y) -> (-x, -y) (180度)
-    // 3: (x, y) -> (-y, x)  (顺时针270度/逆时针90度)
-
     for (int i = 0; i < rotated.length; i += 2) {
       int x = baseOffsets[i];
       int y = baseOffsets[i + 1];
 
       switch (angle) {
-        case 1: // 右转90度
+        case 1:
           rotated[i] = y;
           rotated[i + 1] = -x;
           break;
-        case 2: // 右转180度
+        case 2:
           rotated[i] = -x;
           rotated[i + 1] = -y;
           break;
-        case 3: // 右转270度
+        case 3:
           rotated[i] = -y;
           rotated[i + 1] = x;
           break;
-        default: // 0度
+        default:
           rotated[i] = x;
           rotated[i + 1] = y;
           break;
