@@ -18,7 +18,6 @@ public class Building extends Entity {
   public int tx, ty, angle;
 
   public float rotation; // 实际渲染旋转角度 (精确到度，用于炮塔转动)
-  public Unit target; // 当前攻击目标 (运行时状态，不需要存档)
   public float reload; // 武器装填进度
 
   // --- 形状数据 (独立副本，已旋转) ---

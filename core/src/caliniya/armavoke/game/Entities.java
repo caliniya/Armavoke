@@ -1,10 +1,11 @@
 package caliniya.armavoke.game;
 
+import arc.func.Boolf;
 import arc.func.Cons;
 import arc.math.Mathf;
 import arc.struct.IntQueue;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.*;
 
 public class Entities {
@@ -25,7 +26,6 @@ public class Entities {
    同时直接返回-1便于调用 */
   public static int freeID(int id) {
     if (id > 0 && id <= lastEntityID) {
-      // 添加到队尾
       freeIDs.addLast(id);
     }
     return -1;
@@ -37,24 +37,24 @@ public class Entities {
     freeIDs.clear();
   }
 
-  // --- 原有的索敌逻辑 ---
+  // --- 索敌逻辑（以实体为基础） ---
 
-  /** 在指定范围内查找所有敌人 */
+  /** 在指定范围内查找所有敌人实体 */
   public static void nearbyEnemies(
-      TeamTypes sourceTeam, float x, float y, float radius, Cons<Unit> consumer) {
+      TeamTypes sourceTeam, float x, float y, float radius, Cons<Entity> consumer) {
     for (TeamTypes otherTeam : TeamTypes.values()) {
       if (otherTeam == sourceTeam) continue;
       if (otherTeam == TeamTypes.Abort) continue;
 
       TeamData data = Teams.get(otherTeam);
       if (data == null) continue;
-      
-      data.find(x, y, radius, consumer);
+
+      data.find(x, y, radius, u -> consumer.get(u));
     }
   }
 
-  /** 查找最近的敌人 */
-  public static Unit closestEnemy(TeamTypes sourceTeam, float x, float y, float radius) {
+  /** 查找最近的敌人实体 */
+  public static Entity closestEnemy(TeamTypes sourceTeam, float x, float y, float radius) {
     final Object[] result = {null};
     final float[] minDst2 = {radius * radius};
 
@@ -71,6 +71,36 @@ public class Entities {
           }
         });
 
-    return (Unit) result[0];
+    return (Entity) result[0];
+  }
+
+  /**
+   * 查找最近的敌人实体（带过滤 + 回调）
+   * @param filter 过滤条件，返回 true 才纳入考虑
+   * @param consumer 最近实体通过此回调传出，不直接返回值
+   */
+  public static void closestEnemy(
+      TeamTypes sourceTeam, float x, float y, float radius,
+      Boolf<Entity> filter, Cons<Entity> consumer) {
+    final Object[] result = {null};
+    final float[] minDst2 = {radius * radius};
+
+    nearbyEnemies(
+        sourceTeam,
+        x,
+        y,
+        radius,
+        enemy -> {
+          if (!filter.get(enemy)) return;
+          float dst2 = Mathf.dst2(x, y, enemy.x, enemy.y);
+          if (dst2 < minDst2[0]) {
+            minDst2[0] = dst2;
+            result[0] = enemy;
+          }
+        });
+
+    if (result[0] != null) {
+      consumer.get((Entity) result[0]);
+    }
   }
 }

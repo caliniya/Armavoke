@@ -8,6 +8,7 @@ import arc.math.Mathf;
 import arc.util.Log;
 import arc.util.io.Writes;
 import arc.util.io.Reads;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.game.Building;
 import caliniya.armavoke.game.Entities; // 导入 Entities 工具类
 import caliniya.armavoke.game.Unit;
@@ -88,14 +89,14 @@ public class Turret extends Block {
   }
 
   /** 寻找目标：使用全局索敌接口 */
-  private Unit findTarget(Building b) {
+  private Entity findTarget(Building b) {
     // 使用 Entities.closestEnemy 进行索敌
     // 参数：己方阵营, 中心X, 中心Y, 搜索半径
     return Entities.closestEnemy(b.team, b.x + psize / 2, b.y + psize / 2, range);
   }
 
   /** 验证目标有效性 */
-  private boolean isValidTarget(Building b, Unit target) {
+  private boolean isValidTarget(Building b, Entity target) {
     if (target == null || target.health <= 0) return false;
     // 检查距离是否还在范围内
     float dst = Mathf.dst2(b.x, b.y, target.x, target.y);
