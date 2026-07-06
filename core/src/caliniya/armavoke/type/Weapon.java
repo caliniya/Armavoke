@@ -15,7 +15,7 @@ public class Weapon {
   public float rotation;
   public float reloadTimer = 0f;
   
-  public boolean isShooting = false , rotate;
+  public boolean rotate;
 
   // 武器挂载点的世界坐标
   public float wx;
@@ -65,7 +65,7 @@ public class Weapon {
     }
 
     // 射击判定
-    if (isShooting && reloadTimer <= 0) {
+    if (target != null && reloadTimer <= 0) {
 
       boolean canShoot;
       float shootAngle; // 最终的射击绝对角度

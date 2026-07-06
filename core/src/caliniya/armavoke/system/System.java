@@ -172,7 +172,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
             "System-" + this.getClass().getSimpleName(),
             () -> {
               Log.info(
-                  "System thread started: @ (Pausable: @)",
+                  "thread started: @ ",
                   this.getClass().getSimpleName(),
                   isPausable);
 
@@ -207,7 +207,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                     tickCounter++;
                   } catch (Exception e) {
                     Log.err(
-                        "Error in system thread: @", this.getClass().getSimpleName() + "  " + e);
+                        "Error in thread: @", this.getClass().getSimpleName() + "  " + e);
                   }
 
                   // --- TPS 统计 ---
@@ -236,7 +236,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                   Log.err("Critical error in system loop: @", this.getClass().getSimpleName(), e);
                 }
               }
-              Log.info("System thread stopped: @", this.getClass().getSimpleName());
+              Log.info("thread stopped: @", this.getClass().getSimpleName());
             });
   }
 
