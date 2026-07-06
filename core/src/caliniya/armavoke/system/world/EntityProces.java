@@ -1,7 +1,8 @@
 package caliniya.armavoke.system.world;
 
+import arc.math.Mathf;
+import arc.util.Log;
 import caliniya.armavoke.game.Building;
-import caliniya.armavoke.game.Entities;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
@@ -10,8 +11,9 @@ import caliniya.armavoke.type.Weapon;
 /**
  * 实体处理系统，运行在独立线程（60TPS）。
  *
- * <p>在这里处理索敌锁定，为实体指定目标。 底层网格已通过 {@code TeamData.gridLock} 实现线程安全， 可直接调用 {@code
- * Entities.closestEnemy()} 等 API。 具体的开火逻辑在主线程运行。
+ * <p>在这里处理索敌锁定，为实体指定目标。
+ * 底层网格已通过 {@code TeamData.gridLock} 实现线程安全。
+ * 具体的开火逻辑在主线程运行。
  */
 public class EntityProces extends System<EntityProces> {
 
@@ -31,14 +33,20 @@ public class EntityProces extends System<EntityProces> {
       }
 
       for (Weapon w : u.weapons) {
-        if (w.type.mirror) continue;
 
         float wx = u.x + w.type.x;
         float wy = u.y + w.type.y;
 
-        // 锁定：目标有效不重搜
-        if (u.target == null || u.target.health <= 0) {
-          w.type.findTarget(u, wx, wy);
+        if (w.rotate) {
+          // 旋转武器（炮塔）：独立锁敌
+          // 目标失效 或 超出射程 → 重搜
+          if (w.target == null || w.target.health <= 0
+              || Mathf.dst2(wx, wy, w.target.x, w.target.y) > w.type.range * w.type.range) {
+            w.type.findTarget(w, wx, wy);
+          }
+        } else {
+          // 固定武器：直接瞄准单位锁定的目标
+          w.target = u.target;
         }
       }
     }
@@ -51,7 +59,6 @@ public class EntityProces extends System<EntityProces> {
         continue;
       }
 
-      // 锁定：目标有效不重搜（射程校验由各 Block.update 负责）
       if (b.target == null || b.target.health <= 0) {
         b.target = b.block.findTarget(b);
       }

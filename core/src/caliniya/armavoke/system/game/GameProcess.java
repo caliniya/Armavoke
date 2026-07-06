@@ -24,6 +24,7 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
         u -> {
           if (u != null || u.health <= 0) {
             u.update(Time.delta);
+            u.canShoot = true;
             u.updateWeapons(Time.delta);
           }
         });

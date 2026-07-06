@@ -42,8 +42,8 @@ public class Unit extends Entity {
   public float rotationSpeed;
   public float rotation;
   public float angleToTarget, distToTarget;
-
-  public boolean shooting = false;
+  
+  public boolean canShoot = true;
 
   // --- 导航属性 ---
   public float targetX, targetY;
@@ -112,7 +112,7 @@ public class Unit extends Entity {
 
     teamData = team.data();
     teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
-    shooting = false;
+    canShoot = true;// 单位一般情况都是可以射击的
 
     weapons.clear();
     mainFixedWeapon = null;
@@ -235,7 +235,7 @@ public class Unit extends Entity {
       angleToTarget = Angles.angle(x, y, targetX, targetY);
     }
 
-    if (shooting) {
+    if (canShoot) {
       if (mainFixedWeapon != null && distToTarget > 1f) {
         rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
       } else {
@@ -376,7 +376,7 @@ public class Unit extends Entity {
     }
 
     for (Weapon weapon : weapons) {
-      weapon.update(dt, aimX, aimY, shooting);
+      weapon.update(dt , canShoot);
     }
   }
 

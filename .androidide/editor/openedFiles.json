@@ -4,32 +4,47 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/EntityProces.java",
       "selection": {
         "end": {
-          "column": 29,
-          "index": 1032,
-          "line": 40
+          "column": 41,
+          "index": 1120,
+          "line": 44
         },
         "start": {
-          "column": 29,
-          "index": 1032,
-          "line": 40
+          "column": 41,
+          "index": 1120,
+          "line": 44
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/Weapon.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/type/WeaponType.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 62,
+          "index": 1289,
+          "line": 51
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 62,
+          "index": 1289,
+          "line": 51
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/blocks/defence/Turret.java",
+      "selection": {
+        "end": {
+          "column": 82,
+          "index": 2288,
+          "line": 81
+        },
+        "start": {
+          "column": 82,
+          "index": 2288,
+          "line": 81
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/Weapon.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/EntityProces.java"
 }

@@ -48,8 +48,8 @@ public class WeaponType implements Cloneable {
 
   /** 默认查找目标实现，使用武器射程进行索敌。
    *  特殊武器（如导弹、激光）可覆写此方法实现自定义索敌逻辑。 */
-  public void findTarget(Weapon w, float x, float y) {
-    Entities.closestEnemy(w.owner.team, x, y, range , e -> {
+  public void findTarget(Weapon w, float wx, float wy) {
+    Entities.closestEnemy(w.owner.team, wx, wy, range , e -> {
       w.target = e;
     } );
   }

@@ -15,7 +15,6 @@ public class Weapon {
   public float rotation;
   public float reloadTimer = 0f;
   
-  public float aimX, aimY;
   public boolean isShooting = false , rotate;
 
   // 武器挂载点的世界坐标
@@ -38,26 +37,25 @@ public class Weapon {
       this.reloadTimer = type.reload / 2f;
     }
   }
-
-  public void update(float dt, float targetX, float targetY, boolean shootCmd) {
-    this.aimX = targetX;
-    this.aimY = targetY;
-    this.isShooting = shootCmd;
-
+  
+  // 如果第2个参数为假 说明单位武器被瘫痪 不能射击
+  public void update(float dt , boolean can) {
     // 冷却逻辑
     if (reloadTimer > 0) {
       reloadTimer -= dt;
     }
+    
+    if(!can) return;
 
     // 计算武器挂载点的世界坐标
     wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
     wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
 
     // 旋转逻辑
-    if (rotate) {
+    if (rotate && (target != null)) {
       // 炮塔：尝试旋转以对准相对角度
       // 计算目标绝对角度 (从武器位置指向目标位置)
-      targetAngle = Angles.angle(wx, wy, aimX, aimY);
+      targetAngle = Angles.angle(wx, wy, target.x, target.y);
       // 计算目标相对角度 (目标相对于单位朝向的角度)
       mountAngle = targetAngle - owner.rotation - 90;
       this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
@@ -88,7 +86,7 @@ public class Weapon {
         // 射击角度 = 单位正前方
         shootAngle = unitFacing;
       }
-
+      
       if (canShoot) {
         shoot(wx, wy, shootAngle);
       }
