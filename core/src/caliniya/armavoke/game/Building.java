@@ -37,8 +37,8 @@ public class Building extends Entity {
     this.angle = angle % 4;
 
     // 初始化坐标
-    this.x = tx * WorldData.TILE_SIZE;
-    this.y = ty * WorldData.TILE_SIZE;
+    this.x = (tx * WorldData.TILE_SIZE) + block.psize / 2;
+    this.y = (ty * WorldData.TILE_SIZE) + block.psize / 2;
 
     // 初始化血量
     this.maxHealth = block.health;

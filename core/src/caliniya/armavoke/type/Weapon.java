@@ -55,7 +55,7 @@ public class Weapon {
     if (rotate && (target != null)) {
       // 炮塔：尝试旋转以对准相对角度
       // 计算目标绝对角度 (从武器位置指向目标位置)
-      targetAngle = Angles.angle(wx, wy, target.x, target.y);
+      targetAngle = Angles.angle(wx, wy, target.x , target.y);
       // 计算目标相对角度 (目标相对于单位朝向的角度)
       mountAngle = targetAngle - owner.rotation - 90;
       this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);

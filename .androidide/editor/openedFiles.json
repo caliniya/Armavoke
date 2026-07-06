@@ -1,35 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/World.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/type/Weapon.java",
       "selection": {
         "end": {
-          "column": 22,
-          "index": 1210,
-          "line": 49
+          "column": 42,
+          "index": 1128,
+          "line": 51
         },
         "start": {
-          "column": 6,
-          "index": 1194,
-          "line": 49
+          "column": 42,
+          "index": 1128,
+          "line": 51
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/Block.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 2400,
-          "line": 90
+          "column": 30,
+          "index": 1607,
+          "line": 57
         },
         "start": {
-          "column": 0,
-          "index": 2400,
-          "line": 90
+          "column": 30,
+          "index": 1607,
+          "line": 57
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/BlockRender.java",
+      "selection": {
+        "end": {
+          "column": 68,
+          "index": 1847,
+          "line": 64
+        },
+        "start": {
+          "column": 68,
+          "index": 1847,
+          "line": 64
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/render/BlockRender.java"
 }

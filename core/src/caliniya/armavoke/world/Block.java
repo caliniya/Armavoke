@@ -55,7 +55,7 @@ public class Block extends ContentType {
 
   public void draw(Building b) {
     float rotation = b.angle * 90f;
-    Draw.rect(region, b.x + psize / 2, b.y + psize / 2, rotation);
+    Draw.rect(region, b.x, b.y, rotation);
   }
 
   public void write(Building b, Writes w) {}

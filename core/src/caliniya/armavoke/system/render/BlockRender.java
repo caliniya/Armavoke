@@ -62,7 +62,7 @@ public class BlockRender extends System<BlockRender> {
     Draw.color(Color.green);
     Lines.stroke(4f);
     // 绘制基于 size 的包围盒
-    Lines.rect(pixelX, pixelY, drawSize, drawSize);
+    Lines.rect(pixelX - b.block.psize /2, pixelY - b.block.psize /2 , drawSize, drawSize);
 
     // 3. 绘制占据的实际格子 (黄色细线)
     // 对于异形建筑，这比包围盒更准确

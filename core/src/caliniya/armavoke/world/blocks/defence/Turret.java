@@ -18,7 +18,7 @@ import caliniya.armavoke.world.Block;
 
 public class Turret extends Block {
 
-  public float range = 200f;
+  public float range = 1000f;
   public float rotateSpeed = 500f;
   public float reloadTime = 10f;
   public BulletType bulletType;
@@ -41,7 +41,7 @@ public class Turret extends Block {
   public void update(Building b, float dt) {
     // 目标由 EntityProces 后台线程维护，这里只做射程 + 血量校验
     if (b.target != null) {
-      float dst2 = Mathf.dst2(b.x + psize / 2, b.y + psize / 2, b.target.x, b.target.y);
+      float dst2 = Mathf.dst2(b.x, b.y, b.target.x, b.target.y);
       if (b.target.health <= 0 || dst2 > range * range) {
         b.target = null;
       }
@@ -49,7 +49,7 @@ public class Turret extends Block {
 
     // 瞄准与射击
     if (b.target != null) {
-      float targetAngle = Angles.angle(b.x + psize / 2, b.y + psize / 2, b.target.x, b.target.y);
+      float targetAngle = Angles.angle(b.x, b.y, b.target.x, b.target.y);
       b.rotation = Angles.moveToward(b.rotation, targetAngle, rotateSpeed * dt);
 
       b.reload += dt;
@@ -63,23 +63,23 @@ public class Turret extends Block {
 
   @Override
   public void draw(Building b) {
-    Draw.rect(baseRegion, b.x + psize / 2, b.y + psize / 2, b.angle * 90f);
+    Draw.rect(baseRegion, b.x, b.y, b.angle * 90f);
 
     if (region != null) {
-      Draw.rect(region, b.x + psize / 2, b.y + psize / 2, b.rotation - 90f);
+      Draw.rect(region, b.x, b.y, b.rotation - 90f);
     }
   }
 
   private void shoot(Building b, float angle) {
-    float x = b.x + psize / 2;
-    float y = b.y + psize / 2;
+    float x = b.x;
+    float y = b.y;
     Bullet.create(bulletType, b, x, y, angle, 0, 0);
   }
 
   /** 覆写 Block 的空 findTarget，由 EntityProces 线程调用，线程安全。 */
   @Override
   public Entity findTarget(Building b) {
-    return Entities.closestEnemy(b.team, b.x + psize / 2, b.y + psize / 2, range);
+    return Entities.closestEnemy(b.team, b.x, b.y, range);
   }
 
   @Override
