@@ -133,7 +133,7 @@ public class Unit extends Entity {
 
     WorldData.units.add(this);
     updateChunkPosition();
-
+    updateTeamData();
     updateHitbox();
   }
 

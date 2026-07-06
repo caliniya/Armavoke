@@ -2,6 +2,7 @@ package caliniya.armavoke.game.data;
 
 import arc.func.Cons;
 import arc.math.Mathf;
+import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.base.game.Entity;

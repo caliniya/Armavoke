@@ -1,5 +1,6 @@
 package caliniya.armavoke.system;
 
+import arc.Core;
 import arc.Events;
 import arc.util.Log;
 import arc.util.Threads;
@@ -208,6 +209,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                   } catch (Exception e) {
                     Log.err(
                         "Error in thread: @", this.getClass().getSimpleName() + "  " + e);
+                       Threads.throwAppException(e);
                   }
 
                   // --- TPS 统计 ---

@@ -14,7 +14,7 @@ public class WeaponType implements Cloneable {
   public TextureRegion region;
 
   // 基础属性
-  public float range = 400f;
+  public float range = 2000f;
   public float rotateSpeed = 5f;
   public float reload = 60f;
   public float x = 0f, y = 0f;

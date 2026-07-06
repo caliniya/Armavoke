@@ -63,26 +63,7 @@ public class World {
           }
         }
       }
-
-      // 生成随机测试建筑
-      int buildingCount = 3;
-      for (int i = 0; i < buildingCount; i++) {
-        int bx = padding + (int) (Math.random() * (W - padding * 2));
-        int by = padding + (int) (Math.random() * (H - padding * 2));
-        if (isSolid(bx, by)) {
-          i--;
-          continue;
-        }
-        setBuilding(bx, by, Blocks.TestBlock, TeamTypes.Mutex);
-      }
     }
-
-    // --- 新增：在地图中心生成敌方测试炮塔 ---
-    int centerX = W / 2;
-    int centerY = H / 2;
-
-    Building enemyTurret = setBuilding(centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
-
   }
 
   // --- 区块管理辅助方法 ---

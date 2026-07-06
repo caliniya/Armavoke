@@ -4,32 +4,32 @@
       "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/World.java",
       "selection": {
         "end": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 22,
+          "index": 1210,
+          "line": 49
         },
         "start": {
-          "column": 0,
-          "index": 0,
-          "line": 0
+          "column": 6,
+          "index": 1194,
+          "line": 49
         }
       }
     },
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Building.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java",
       "selection": {
         "end": {
           "column": 0,
-          "index": 1311,
-          "line": 57
+          "index": 2400,
+          "line": 90
         },
         "start": {
           "column": 0,
-          "index": 1311,
-          "line": 57
+          "index": 2400,
+          "line": 90
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/world/World.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/data/WorldData.java"
 }

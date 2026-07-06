@@ -1,6 +1,7 @@
 package caliniya.armavoke.game;
 
 import arc.func.Intc2;
+import arc.util.Log;
 import arc.util.io.*;
 import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.TeamTypes;
@@ -60,16 +61,9 @@ public class Building extends Entity {
       this.shapeOffsets = null;
     }
     
-    teamData = Teams.get(this.team);
-
-    // 注册到团队空间网格（用于敌方索敌）
-    if (this.team != null) {
-      Teams.add(this);
-      if (teamData != null) {
-        teamData.entityGrid[WorldData.getChunkIndex(x, y)].add(this);
-        this.currentChunkIndex = WorldData.getChunkIndex(x, y);
-      }
-    }
+    Teams.add(this);
+    teamData = team.data();
+    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
   }
 
   @Override
