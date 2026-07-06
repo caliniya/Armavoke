@@ -23,7 +23,6 @@ public class UniverseFragment {
         root.setFillParent(true);
         root.top().left();
         root.touchable = Touchable.childrenOnly;
-        //root.background(Styles.background);
 
         root.table(menu -> {
             menu.defaults().pad(8f).width(200f);

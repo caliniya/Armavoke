@@ -31,6 +31,7 @@ public class Armavoke extends ApplicationCore {
   public boolean assinited = false;
   public CameraInput camInput;
   public UniverseCameraInput uniInput;
+  public UniverseInput universeInput;
 
   // 用于记录开始时间
   private long startTime;
@@ -67,6 +68,7 @@ public class Armavoke extends ApplicationCore {
       UnitControl unitCtrl = new UnitControl().init();
       camInput = new CameraInput().init();
       uniInput = new UniverseCameraInput().init();
+      universeInput = new UniverseInput().init();
       InputMultiplexer multiplexer =
           new InputMultiplexer(
               scene,
@@ -75,10 +77,12 @@ public class Armavoke extends ApplicationCore {
               new GestureDetector(uniInput),
               unitCtrl,
               camInput,
-              uniInput);
+              uniInput,
+              universeInput);
       input.addProcessor(multiplexer);
       addSystem(camInput);
       addSystem(uniInput);
+      addSystem(universeInput);
       Contents.load();
       UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();

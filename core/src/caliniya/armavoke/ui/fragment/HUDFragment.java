@@ -3,7 +3,7 @@ package caliniya.armavoke.ui.fragment;
 import arc.Core;
 import arc.Events;
 import arc.math.Interp;
-import arc.scene.actions.Actions;
+import arc.scene.actions.Actions; 
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
@@ -23,53 +23,53 @@ public class HUDFragment {
   private Table buildingPanel;
   private Table commandPanel;
 
+  //  A左上  B左下
+  public Table a, b;
+
   public void build() {
     root = new Table();
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
 
-    // ===== 左上角：宇宙视图按钮 =====
-    root.table(top -> {
-      top.defaults().pad(12f);
+    a = new Table().top().left();
+    b = new Table().bottom().left();
+    a.add(
+        new Button(
+            "宇宙",
+            () -> {
+              if (!UniverseFragment.showing) {
+                UniverseFragment.showing = true;
 
-      top.add(new Button("宇宙", () -> {
-        if (!UniverseFragment.showing) {
-          UniverseFragment.showing = true;
+                // 同步宇宙相机到游戏相机位置
+                Render.universeCamera.position.set(Core.camera.position);
+                Render.universeCamera.width = Core.camera.width;
+                Render.universeCamera.height = Core.camera.height;
 
-          // 同步宇宙相机到游戏相机位置
-          Render.universeCamera.position.set(Core.camera.position);
-          Render.universeCamera.width = Core.camera.width;
-          Render.universeCamera.height = Core.camera.height;
+                // 弹出宇宙菜单
+                if (caliniya.armavoke.core.UI.universe != null
+                    && caliniya.armavoke.core.UI.universe.root != null) {
+                  caliniya.armavoke.core.UI.universe.root.remove();
+                }
+                caliniya.armavoke.core.UI.universe = new UniverseFragment();
+                caliniya.armavoke.core.UI.universe.build();
 
-          // 弹出宇宙菜单
-          if (caliniya.armavoke.core.UI.universe != null
-              && caliniya.armavoke.core.UI.universe.root != null) {
-            caliniya.armavoke.core.UI.universe.root.remove();
-          }
-          caliniya.armavoke.core.UI.universe = new UniverseFragment();
-          caliniya.armavoke.core.UI.universe.build();
+                // 隐藏 HUD
+                hideHUD();
+              }
+            }));
 
-          // 隐藏 HUD
-          hideHUD();
-        }
-      })).size(100f, 44f);
-    }).top().left();
+    Button commandBtn =
+        new Button(
+            () -> {
+              CommandData.commanding = !CommandData.commanding;
+              updateRightPanel();
+            },
+            "@command");
 
-    // ===== 左下角：指挥/建筑按钮 =====
-    Table leftTable = new Table();
-    leftTable.bottom().left();
+    b.add(commandBtn).size(120f, 50f).margin(10f);
 
-    Button commandBtn = new Button(
-        () -> {
-          CommandData.commanding = !CommandData.commanding;
-          updateRightPanel();
-        },
-        "@command");
-
-    leftTable.add(commandBtn).size(120f, 50f).margin(10f);
-
-    // === 右下角：动态面板容器 ===
+    // === 右下角：动态面板容器 ===""
     rightContainer = new Table();
     rightContainer.bottom().right();
 
@@ -78,7 +78,8 @@ public class HUDFragment {
 
     updateRightPanel();
 
-    root.add(leftTable).expand().bottom().left();
+    root.add(b).bottom().left();
+    root.add(a).top().left();
     root.add(rightContainer).expand().bottom().right();
   }
 

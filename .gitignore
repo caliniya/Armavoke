@@ -92,7 +92,7 @@ nbactions.xml
 nb-configuration.xml
 
 ## Gradle
-
+androidide
 /local.properties
 .gradle/
 gradle-app.setting
