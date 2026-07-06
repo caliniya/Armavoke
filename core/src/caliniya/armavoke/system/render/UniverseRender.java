@@ -14,23 +14,37 @@ import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.world.stars.Universe;
 
 /**
- * 渲染(网格)宇宙<br>
- * 太空着色器背景 + 白色网格线 + 选中格子高亮。<br>
- * 仅在宇宙视图激活时渲染，使用无边界限制的 universeCamera。
+ * 宇宙渲染 —— 参照 Godot 版世界.gd<br>
+ * 太空着色器背景 + 主/次网格线 + 交叉点圆点 + 选中高亮(填充+边框)。
  */
 public class UniverseRender extends System<UniverseRender> {
 
-    /** 网格大小（像素） */
-    public static final float GRID_SIZE = 128f;
+    /** 网格单元大小（像素） */
+    public static final float GRID_SIZE = 256f;
 
-    /** 网格线粗细 */
-    public static final float GRID_THICKNESS = 5f;
+    /** 主网格线颜色 */
+    private static final Color MAJOR_COLOR = Color.white;
 
-    /** 网格颜色 */
-    public static final Color GRID_COLOR = Color.white;
+    /** 次要网格线颜色（半透明） */
+    private static final Color MINOR_COLOR = new Color(1f, 1f, 1f, 0.35f);
 
-    /** 选中高亮颜色 */
-    private static final Color HIGHLIGHT = new Color(1f, 1f, 1f, 0.15f);
+    /** 主网格线粗细 */
+    private static final float MAJOR_THICKNESS = 3f;
+
+    /** 次要网格线粗细 */
+    private static final float MINOR_THICKNESS = 6f;
+
+    /** 选中高亮填充色 */
+    private static final Color HIGHLIGHT_FILL = new Color(1f, 1f, 1f, 0.15f);
+
+    /** 选中高亮边框色 */
+    private static final Color HIGHLIGHT_OUTLINE = new Color(1f, 1f, 1f, 0.4f);
+
+    /** 网格点颜色 */
+    private static final Color DOT_COLOR = Color.white;
+
+    /** 网格点半径 */
+    private static final float DOT_RADIUS = 4f;
 
     /** 太空背景着色器 */
     private SpaceShader background;
@@ -51,47 +65,95 @@ public class UniverseRender extends System<UniverseRender> {
         Camera cam = Render.universeCamera;
         float zoom = UniverseCameraInput.zoom;
 
-        // 切换到宇宙相机投影
         Draw.proj(cam);
 
         // 1. 太空背景
         background.render(cam, zoom);
 
-        // 2. 网格
+        // 2. 网格线（主/次）
         drawGrid(cam);
 
-        // 3. 选中高亮
+        // 3. 交叉点圆点
+        drawDots(cam, zoom);
+
+        // 4. 选中高亮（填充 + 粗边框）
         if (Universe.hasSelection) {
-            Draw.color(HIGHLIGHT);
-            Fill.rect(Universe.selectedX + GRID_SIZE / 2f, Universe.selectedY + GRID_SIZE / 2f, GRID_SIZE, GRID_SIZE);
+            float cx = Universe.selectedX;
+            float cy = Universe.selectedY;
+
+            // 填充
+            Draw.color(HIGHLIGHT_FILL);
+            Fill.rect(cx + GRID_SIZE / 2f, cy + GRID_SIZE / 2f, GRID_SIZE, GRID_SIZE);
+
+            // 粗边框（对应 Godot 的 draw_polyline 线条宽度*16）
+            Draw.color(HIGHLIGHT_OUTLINE);
+            Lines.stroke(MAJOR_THICKNESS * 4f);
+            Lines.rect(cx, cy, GRID_SIZE, GRID_SIZE);
+
             Draw.color();
         }
 
-        // 恢复游戏相机投影
         Draw.proj(Core.camera);
     }
 
+    /** 绘制主/次网格线 */
     private void drawGrid(Camera cam) {
-        float viewLeft = cam.position.x - cam.width / 2f;
+        float viewLeft   = cam.position.x - cam.width / 2f;
         float viewBottom = cam.position.y - cam.height / 2f;
-        float viewRight = cam.position.x + cam.width / 2f;
-        float viewTop = cam.position.y + cam.height / 2f;
+        float viewRight  = cam.position.x + cam.width / 2f;
+        float viewTop    = cam.position.y + cam.height / 2f;
 
-        float sx = (float) Math.floor(viewLeft / GRID_SIZE) * GRID_SIZE;
+        float sx = (float) Math.floor(viewLeft   / GRID_SIZE) * GRID_SIZE;
         float sy = (float) Math.floor(viewBottom / GRID_SIZE) * GRID_SIZE;
-        float ex = (float) Math.ceil(viewRight / GRID_SIZE) * GRID_SIZE;
-        float ey = (float) Math.ceil(viewTop / GRID_SIZE) * GRID_SIZE;
+        float ex = (float) Math.ceil(viewRight   / GRID_SIZE) * GRID_SIZE;
+        float ey = (float) Math.ceil(viewTop     / GRID_SIZE) * GRID_SIZE;
 
-        Draw.color(GRID_COLOR);
-        Lines.stroke(GRID_THICKNESS);
-
-        for (float x = sx; x <= ex; x += GRID_SIZE) {
+        // 垂直线
+        int col = (int) (sx / GRID_SIZE);
+        for (float x = sx; x <= ex; x += GRID_SIZE, col++) {
+            Draw.color(MINOR_COLOR);
+            Lines.stroke(MINOR_THICKNESS);
+            Lines.line(x, sy, x, ey);
+            Draw.color(MAJOR_COLOR);
+            Lines.stroke(MAJOR_THICKNESS);
             Lines.line(x, sy, x, ey);
         }
-        for (float y = sy; y <= ey; y += GRID_SIZE) {
+
+        // 水平线
+        int row = (int) (sy / GRID_SIZE);
+        for (float y = sy; y <= ey; y += GRID_SIZE, row++) {
+            Draw.color(MINOR_COLOR);
+            Lines.stroke(MINOR_THICKNESS);
+            Lines.line(sx, y, ex, y);
+            Draw.color(MAJOR_COLOR);
+            Lines.stroke(MAJOR_THICKNESS);
             Lines.line(sx, y, ex, y);
         }
 
+        Draw.color();
+    }
+
+    /** 绘制交叉点圆点（对应 Godot 的 绘制网格点） */
+    private void drawDots(Camera cam, float zoom) {
+        // 缩太远不画点，避免性能问题
+        if (zoom < 0.25f) return;
+
+        float viewLeft   = cam.position.x - cam.width / 2f;
+        float viewBottom = cam.position.y - cam.height / 2f;
+        float viewRight  = cam.position.x + cam.width / 2f;
+        float viewTop    = cam.position.y + cam.height / 2f;
+
+        float sx = (float) Math.floor(viewLeft   / GRID_SIZE) * GRID_SIZE;
+        float sy = (float) Math.floor(viewBottom / GRID_SIZE) * GRID_SIZE;
+        float ex = (float) Math.ceil(viewRight   / GRID_SIZE) * GRID_SIZE;
+        float ey = (float) Math.ceil(viewTop     / GRID_SIZE) * GRID_SIZE;
+
+        Draw.color(DOT_COLOR);
+        for (float x = sx; x <= ex; x += GRID_SIZE) {
+            for (float y = sy; y <= ey; y += GRID_SIZE) {
+                Fill.circle(x, y, DOT_RADIUS);
+            }
+        }
         Draw.color();
     }
 

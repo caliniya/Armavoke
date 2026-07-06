@@ -24,8 +24,8 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   /** 宇宙相机自身缩放（供外部读取） */
   public static float zoom = 1f;
-  private static final float MIN_ZOOM = 0.3f;
-  private static final float MAX_ZOOM = 4f;
+  private static final float MIN_ZOOM = 0.5f;
+  private static final float MAX_ZOOM = 2f;
 
   @Override
   public UniverseCameraInput init() {

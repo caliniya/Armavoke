@@ -1,6 +1,7 @@
 package caliniya.armavoke.ui.fragment;
 
 import arc.Core;
+import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.ui.Button;
@@ -21,6 +22,7 @@ public class UniverseFragment {
         root = new Table();
         root.setFillParent(true);
         root.top().left();
+        root.touchable = Touchable.childrenOnly;
         //root.background(Styles.background);
 
         root.table(menu -> {
