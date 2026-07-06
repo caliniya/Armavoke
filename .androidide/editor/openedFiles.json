@@ -1,20 +1,35 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Armavoke.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/HUDFragment.java",
       "selection": {
         "end": {
-          "column": 26,
-          "index": 146,
-          "line": 7
+          "column": 0,
+          "index": 4546,
+          "line": 161
         },
         "start": {
-          "column": 26,
-          "index": 146,
-          "line": 7
+          "column": 0,
+          "index": 4546,
+          "line": 161
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/core/UI.java",
+      "selection": {
+        "end": {
+          "column": 40,
+          "index": 1455,
+          "line": 64
+        },
+        "start": {
+          "column": 20,
+          "index": 1435,
+          "line": 64
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/Armavoke.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/ui/fragment/HUDFragment.java"
 }

@@ -57,7 +57,7 @@ public class HUDFragment {
                 // 隐藏 HUD
                 hideHUD();
               }
-            }));
+            })).size(120f , 50f);
 
     Button commandBtn =
         new Button(
@@ -77,6 +77,9 @@ public class HUDFragment {
     setupCommandPanel();
 
     updateRightPanel();
+    
+    a.setHeight(Core.graphics.getHeight() / 2f);
+    b.setHeight(Core.graphics.getHeight() / 2f);
 
     root.add(b).bottom().left();
     root.add(a).top().left();
