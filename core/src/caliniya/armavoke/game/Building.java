@@ -9,14 +9,15 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.module.*;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.game.*;
 
 public class Building extends Entity {
 
   // --- 锚点坐标 (左下角起始点) ---
   // 0:上, 1:右, 2:下, 3:左
   public int tx, ty, angle;
-
+  
+  public TeamData teamData;
+  
   public float rotation; // 实际渲染旋转角度 (精确到度，用于炮塔转动)
   public float reload; // 武器装填进度
 
@@ -57,6 +58,17 @@ public class Building extends Entity {
       this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
     } else {
       this.shapeOffsets = null;
+    }
+    
+    teamData = Teams.get(this.team);
+
+    // 注册到团队空间网格（用于敌方索敌）
+    if (this.team != null) {
+      Teams.add(this);
+      if (teamData != null) {
+        teamData.entityGrid[WorldData.getChunkIndex(x, y)].add(this);
+        this.currentChunkIndex = WorldData.getChunkIndex(x, y);
+      }
     }
   }
 
@@ -110,6 +122,15 @@ public class Building extends Entity {
 
   @Override
   public void remove() {
+    // 从团队空间网格注销
+    Teams.remove(this);
+    if (this.team != null && currentChunkIndex != -1) {
+      TeamData td = Teams.get(this.team);
+      if (td != null && td.entityGrid != null && currentChunkIndex < td.entityGrid.length) {
+        td.entityGrid[currentChunkIndex].remove(this);
+      }
+    }
+
     WorldData.buildings.remove(this);
     WorldData.world.removeBuilding(tx , ty);
     // 归还 ID
@@ -131,7 +152,7 @@ public class Building extends Entity {
     target = null;
   }
 
-  /** 写入存档数据 顺序：BlockID -> 坐标/朝向 -> 实体状态 -> 动态状态 -> 模块数据 */
+  /** 写入存档数据 */
   @Override
   public void write(Writes w) {
 
@@ -139,17 +160,15 @@ public class Building extends Entity {
     w.i(ty);
     w.b((byte) angle); // 0-3 只需要一个字节
 
-    // 3. 写入实体状态
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
 
     block.write(this, w);
 
-    // 5. 写入物品模块
     item.write(w);
   }
 
-  /** 读取存档数据 注意：调用此方法前，对象通常是通过 Pools.obtain 获得的空对象 */
+  /** 读取存档数据 */
   @Override
   public void read(Reads r) {
     this.tx = r.i();
@@ -167,10 +186,8 @@ public class Building extends Entity {
       this.item.setFilter(block.allowItem);
     }
 
-    // 读取物品数据
     item.read(r);
 
-    // 计算派生数据
     this.x = tx * WorldData.TILE_SIZE;
     this.y = ty * WorldData.TILE_SIZE;
     if (block != null) {
@@ -180,22 +197,29 @@ public class Building extends Entity {
       }
     }
 
-    // 分配新 ID
     this.id = Entities.assignID();
   }
 
   // --- 静态工厂方法 ---
-  public static Building create(Block block, int tx, int ty, int angle) {
+  public static Building create(Block block, int tx, int ty, int angle, TeamTypes team) {
     Building building = Pools.obtain(Building.class, Building::new);
     building.block = block;
     building.tx = tx;
     building.ty = ty;
     building.angle = angle;
+    building.team = team;
     building.init();
     return building;
   }
 
+  public static Building create(Block block, int tx, int ty, int angle) {
+    return create(block, tx, ty, angle, null);
+  }
+  public static Building create(Block block, int tx, int ty, TeamTypes team) {
+    return create(block, tx, ty, 0, team);
+  }
+
   public static Building create(Block block, int tx, int ty) {
-    return create(block, tx, ty, 0);
+    return create(block, tx, ty, 0, null);
   }
 }

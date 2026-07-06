@@ -43,6 +43,7 @@ public class EntityProces extends System<EntityProces> {
           if (w.target == null || w.target.health <= 0
               || Mathf.dst2(wx, wy, w.target.x, w.target.y) > w.type.range * w.type.range) {
             w.type.findTarget(w, wx, wy);
+            Log.info(w.target);
           }
         } else {
           // 固定武器：直接瞄准单位锁定的目标

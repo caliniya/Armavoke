@@ -2,7 +2,7 @@ package caliniya.armavoke.base.game;
 
 import arc.util.pooling.Pool.Poolable;
 import caliniya.armavoke.type.module.ItemModule;
-import caliniya.armavoke.base.type.TeamTypes; // 导入
+import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
 
 public abstract class Entity implements Poolable {
@@ -19,24 +19,19 @@ public abstract class Entity implements Poolable {
   // --- 公共组件 ---
   public ItemModule item;
   
-  // 此实体所锁定的目标，对于单位个炮塔这就是他要攻击的对象
-  // 对于其他实体而言 这个值通常是null
+  // 此实体所锁定的目标
   public Entity target;
+
+  // 实体在空间网格中的区块索引，-1 表示未注册
+  public int currentChunkIndex = -1;
 
   public Entity() {}
 
-  /** 核心逻辑更新 */
   public abstract void update(float dt);
-
-  /** 渲染逻辑 */
   public abstract void draw();
-  
   public abstract void remove();
-  
   public abstract void kill();
-  
   public abstract void write(Writes w);
-  
   public abstract void read(Reads r);
 
   @Override
@@ -45,7 +40,9 @@ public abstract class Entity implements Poolable {
     y = 0;
     health = 0;
     maxHealth = 0;
-    team = null; // 重置阵营
+    team = null;
     item = null;
+    target = null;
+    currentChunkIndex = -1;
   }
 }

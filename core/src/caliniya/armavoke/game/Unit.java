@@ -57,7 +57,6 @@ public class Unit extends Entity {
   public boolean moving = false;
   public float size, speed;
   public TextureRegion region, cell;
-  public int currentChunkIndex = -1;
   public float pathFindCooldown = 0f;
 
   // --- 碰撞体积缓存 (世界坐标) ---
@@ -180,7 +179,6 @@ public class Unit extends Entity {
     this.id = Entities.freeID(this.id);
     this.velocityDirty = true;
 
-    this.currentChunkIndex = -1;
     this.isSelected = false;
     this.moving = false;
     this.hitboxData = null;

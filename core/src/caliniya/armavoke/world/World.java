@@ -73,7 +73,7 @@ public class World {
           i--;
           continue;
         }
-        setBuilding(bx, by, Blocks.TestBlock);
+        setBuilding(bx, by, Blocks.TestBlock, TeamTypes.Mutex);
       }
     }
 
@@ -81,9 +81,8 @@ public class World {
     int centerX = W / 2;
     int centerY = H / 2;
 
-    Building enemyTurret = setBuilding(centerX, centerY, Blocks.testTurret);
+    Building enemyTurret = setBuilding(centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
 
-    enemyTurret.team = TeamTypes.Mutex;
   }
 
   // --- 区块管理辅助方法 ---
@@ -141,6 +140,31 @@ public class World {
         });
 
     // 通知导航数据：标记建筑占据的格子为实心
+    if (block.solid) {
+      RouteData.updateBlock(x, y, block);
+    }
+
+    return newBuild;
+  }
+
+  public Building setBuilding(int x, int y, Block block, TeamTypes team) {
+    if (!isValidCoord(x, y) || block == null) return null;
+
+    Building newBuild = block.create(x, y, team);
+    WorldData.buildings.add(newBuild);
+
+    newBuild.getOccupiedCoords(
+        (tx, ty) -> {
+          if (isValidCoord(tx, ty)) {
+            Building existing = getBuilding(tx, ty);
+            if (existing != null && existing != newBuild) {
+              removeBuilding(existing.tx, existing.ty);
+            }
+            WorldChunk chunk = getOrCreateChunk(tx, ty);
+            chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, newBuild);
+          }
+        });
+
     if (block.solid) {
       RouteData.updateBlock(x, y, block);
     }

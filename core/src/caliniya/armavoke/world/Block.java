@@ -11,6 +11,7 @@ import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.core.*;
+import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.type.ItemType;
@@ -39,6 +40,11 @@ public class Block extends ContentType {
   public Building create(int tx, int ty) {
     psize = size * WorldData.TILE_SIZE;
     return Building.create(this, tx, ty);
+  }
+
+  public Building create(int tx, int ty, TeamTypes team) {
+    psize = size * WorldData.TILE_SIZE;
+    return Building.create(this, tx, ty, team);
   }
 
   public void load() {

@@ -4,27 +4,19 @@ import arc.func.Cons;
 import arc.math.Mathf;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.base.game.Entity;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class TeamData {
   public final TeamTypes team;
 
-  /** 该团队下的所有单位列表 (全局) */
-  public Ar<Unit> units = new Ar<>();
+  /** 该团队下的所有实体列表 (全局) */
+  public Ar<Entity> entities = new Ar<>();
 
   /** 空间划分网格 (Per-Team Spatial Grid) */
-  public Ar<Unit>[] unitGrid;
+  public Ar<Entity>[] entityGrid;
 
-  /**
-   * 读写锁，保护 unitGrid 的并发访问。
-   *
-   * <ul>
-   *   <li>读锁：{@link #find} / {@link #get} — 允许多个线程同时搜索。
-   *   <li>写锁：{@link #updateChunk} — 单位增删/移动时独占。
-   * </ul>
-   */
   private final ReentrantReadWriteLock gridLock = new ReentrantReadWriteLock();
 
   @SuppressWarnings("unchecked")
@@ -33,7 +25,6 @@ public class TeamData {
     initGrid();
   }
 
-  /** 初始化/重置网格 (需在地图加载后调用) */
   @SuppressWarnings("unchecked")
   public void initGrid() {
     gridLock.writeLock().lock();
@@ -42,22 +33,19 @@ public class TeamData {
       int h = WorldData.gridH;
       int total = w * h;
 
-      this.unitGrid = new Ar[total];
+      this.entityGrid = new Ar[total];
       for (int i = 0; i < total; i++) {
-        this.unitGrid[i] = new Ar<>(8);
+        this.entityGrid[i] = new Ar<>(8);
       }
     } finally {
       gridLock.writeLock().unlock();
     }
   }
 
-  /**
-   * 获取指定矩形区域内的本团队单位（读锁保护）。
-   */
-  public void get(float minX, float minY, float maxX, float maxY, Ar<Unit> output) {
+  public void get(float minX, float minY, float maxX, float maxY, Ar<Entity> output) {
     gridLock.readLock().lock();
     try {
-      if (unitGrid == null) return;
+      if (entityGrid == null) return;
 
       int startX = (int) (minX / WorldData.CHUNK_PIXEL_SIZE);
       int startY = (int) (minY / WorldData.CHUNK_PIXEL_SIZE);
@@ -72,12 +60,12 @@ public class TeamData {
       for (int y = startY; y <= endY; y++) {
         for (int x = startX; x <= endX; x++) {
           int index = y * WorldData.gridW + x;
-          Ar<Unit> chunkUnits = unitGrid[index];
+          Ar<Entity> chunk = entityGrid[index];
 
-          for (int i = 0; i < chunkUnits.size; i++) {
-            Unit u = chunkUnits.get(i);
-            if (u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
-              output.add(u);
+          for (int i = 0; i < chunk.size; i++) {
+            Entity e = chunk.get(i);
+            if (e.x >= minX && e.x <= maxX && e.y >= minY && e.y <= maxY) {
+              output.add(e);
             }
           }
         }
@@ -87,13 +75,11 @@ public class TeamData {
     }
   }
 
-  /**
-   * 在指定圆形范围内查找本团队的单位（读锁保护）。
-   */
-  public void find(float x, float y, float radius, Cons<Unit> consumer) {
+  /** 在指定圆形范围内查找本团队的实体（读锁保护）。 */
+  public void find(float x, float y, float radius, Cons<Entity> consumer) {
     gridLock.readLock().lock();
     try {
-      if (unitGrid == null) return;
+      if (entityGrid == null) return;
 
       float minX = x - radius;
       float minY = y - radius;
@@ -115,16 +101,16 @@ public class TeamData {
       for (int gy = startY; gy <= endY; gy++) {
         for (int gx = startX; gx <= endX; gx++) {
           int index = gy * WorldData.gridW + gx;
-          Ar<Unit> chunkUnits = unitGrid[index];
+          Ar<Entity> chunk = entityGrid[index];
 
-          for (int i = 0; i < chunkUnits.size; i++) {
-            Unit u = chunkUnits.get(i);
+          for (int i = 0; i < chunk.size; i++) {
+            Entity e = chunk.get(i);
 
-            if (u == null || u.health <= 0) continue;
-            if (u.x < minX || u.x > maxX || u.y < minY || u.y > maxY) continue;
+            if (e == null || e.health <= 0) continue;
+            if (e.x < minX || e.x > maxX || e.y < minY || e.y > maxY) continue;
 
-            if (Mathf.dst2(x, y, u.x, u.y) <= r2) {
-              consumer.get(u);
+            if (Mathf.dst2(x, y, e.x, e.y) <= r2) {
+              consumer.get(e);
             }
           }
         }
@@ -134,20 +120,18 @@ public class TeamData {
     }
   }
 
-  /**
-   * 更新单位在团队空间网格中的位置（写锁保护）。
-   */
-  public void updateChunk(Unit u, int oldIndex, int newIndex) {
+  /** 更新实体在团队空间网格中的位置（写锁保护）。 */
+  public void updateChunk(Entity e, int oldIndex, int newIndex) {
     gridLock.writeLock().lock();
     try {
-      if (unitGrid == null) return;
+      if (entityGrid == null) return;
 
-      if (oldIndex != -1 && oldIndex < unitGrid.length) {
-        unitGrid[oldIndex].remove(u);
+      if (oldIndex != -1 && oldIndex < entityGrid.length) {
+        entityGrid[oldIndex].remove(e);
       }
 
-      if (newIndex >= 0 && newIndex < unitGrid.length) {
-        unitGrid[newIndex].add(u);
+      if (newIndex >= 0 && newIndex < entityGrid.length) {
+        entityGrid[newIndex].add(e);
       }
     } finally {
       gridLock.writeLock().unlock();
