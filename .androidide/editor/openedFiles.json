@@ -1,20 +1,50 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/io/GameIO.java",
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/system/world/EntityProces.java",
+      "selection": {
+        "end": {
+          "column": 10,
+          "index": 819,
+          "line": 31
+        },
+        "start": {
+          "column": 10,
+          "index": 819,
+          "line": 31
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Unit.java",
       "selection": {
         "end": {
           "column": 0,
-          "index": 8764,
-          "line": 293
+          "index": 0,
+          "line": 0
         },
         "start": {
           "column": 0,
-          "index": 8764,
-          "line": 293
+          "index": 0,
+          "line": 0
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Entities.java",
+      "selection": {
+        "end": {
+          "column": 21,
+          "index": 248,
+          "line": 9
+        },
+        "start": {
+          "column": 13,
+          "index": 240,
+          "line": 9
         }
       }
     }
   ],
-  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/io/GameIO.java"
+  "selectedFile": "/storage/emulated/0/AndroidIDEProjects/Armavoke/core/src/caliniya/armavoke/game/Entities.java"
 }

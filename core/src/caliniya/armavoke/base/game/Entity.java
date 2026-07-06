@@ -8,7 +8,7 @@ import arc.util.io.*;
 public abstract class Entity implements Poolable {
 
   // --- 公共坐标 ---
-  public float x, y;
+  public float x, y ;
 
   // --- 公共状态 ---
   public float health;
@@ -18,6 +18,10 @@ public abstract class Entity implements Poolable {
 
   // --- 公共组件 ---
   public ItemModule item;
+  
+  // 此实体所锁定的目标，对于单位个炮塔这就是他要攻击的对象
+  // 对于其他实体而言 这个值通常是null
+  public Entity target;
 
   public Entity() {}
 

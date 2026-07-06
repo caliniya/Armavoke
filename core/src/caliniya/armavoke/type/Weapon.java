@@ -11,7 +11,7 @@ public class Weapon {
 
   public float rotation;
   public float reloadTimer = 0f;
-
+  
   public float aimX, aimY;
   public boolean isShooting = false , rotate;
 

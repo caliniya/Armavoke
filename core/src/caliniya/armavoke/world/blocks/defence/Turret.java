@@ -18,7 +18,7 @@ import caliniya.armavoke.world.Block;
 public class Turret extends Block {
 
   // --- 炮塔属性 ---
-  public float range = 2000f; // 攻击范围 (像素)
+  public float range = 200f; // 攻击范围 (像素)
   public float rotateSpeed = 500f; // 炮管旋转速度
   public float reloadTime = 10f; // 射击冷却 (帧)
   public BulletType bulletType; // 使用的子弹类型

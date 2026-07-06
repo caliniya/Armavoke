@@ -22,9 +22,12 @@ public class UnitType extends ContentType {
       rotationSpeend = 1f // 旋转速度(单位帧每度？)
   ;
   
-  //物理数据
+  //物理数据，若碰撞盒为空 则使用size进行填充
   public float[] hitbox = null;
   public float size = 100f;
+  
+  // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
+  public float scanDistance = 200f;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();
 
