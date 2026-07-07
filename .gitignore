@@ -102,6 +102,7 @@ gradle-app.setting
 /desktop/build/
 /html/build/
 /ios/build/
+/.androidide
 
 ## OS Specific
 .DS_Store
