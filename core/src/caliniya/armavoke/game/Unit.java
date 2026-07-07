@@ -42,7 +42,7 @@ public class Unit extends Entity {
   public float rotationSpeed;
   public float rotation;
   public float angleToTarget, distToTarget;
-  
+
   public boolean canShoot = true;
 
   // --- 导航属性 ---
@@ -71,17 +71,20 @@ public class Unit extends Entity {
     u.team = team;
     u.x = x;
     u.y = y;
-    u.item = new ItemModule(100);
+    //u.item = new ItemModule(100);
     u.init();
+    WorldData.units.add(u);
+    u.updateChunkPosition();
+    u.updateTeamData();
+    u.updateHitbox();
     return u;
   }
 
-  public static Unit create(UnitType type, float x, float y) {
-    return create(TeamTypes.Evoke, type, x, y);
-  }
-
   public static Unit create(UnitType type) {
-    return create(type, 100, 100);
+    Unit u = Pools.obtain(Unit.class, Unit::new);
+    u.type = type;
+    u.init();
+    return u;
   }
 
   public void init() {
@@ -111,7 +114,7 @@ public class Unit extends Entity {
 
     teamData = team.data();
     teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
-    canShoot = true;// 单位一般情况都是可以射击的
+    canShoot = true; // 单位一般情况都是可以射击的
 
     weapons.clear();
     mainFixedWeapon = null;
@@ -130,11 +133,6 @@ public class Unit extends Entity {
 
     this.targetX = this.x;
     this.targetY = this.y;
-
-    WorldData.units.add(this);
-    updateChunkPosition();
-    updateTeamData();
-    updateHitbox();
   }
 
   /** 根据自定义碰撞体积计算最小外接圆直径 并赋值给 size */
@@ -374,7 +372,7 @@ public class Unit extends Entity {
     }
 
     for (Weapon weapon : weapons) {
-      weapon.update(dt , canShoot);
+      weapon.update(dt, canShoot);
     }
   }
 
@@ -440,7 +438,9 @@ public class Unit extends Entity {
     this.pathed = false;
     this.velocityDirty = true;
     WorldData.moveunits.add(this);
-
+    
+    updateHitbox();
+    
     updateChunkPosition();
   }
 

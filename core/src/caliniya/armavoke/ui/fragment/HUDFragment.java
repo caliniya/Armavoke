@@ -6,9 +6,11 @@ import arc.math.Interp;
 import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
+import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.Render;
+import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.data.CommandData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
@@ -23,6 +25,8 @@ public class HUDFragment {
   private Table buildingPanel;
   private Table commandPanel;
 
+  public Table menu;
+
   //  A左上  B左下
   public Table a, b;
 
@@ -32,9 +36,11 @@ public class HUDFragment {
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
 
+    menu = new Table().center();
+    menu.setBackground(Styles.background);
     a = new Table().top().left();
     b = new Table().bottom().left();
-    a.add(
+    menu.add(
             new Button(
                 "宇宙",
                 () -> {
@@ -47,18 +53,29 @@ public class HUDFragment {
                     Render.universeCamera.height = Core.camera.height;
 
                     // 弹出宇宙菜单
-                    if (caliniya.armavoke.core.UI.universe != null
-                        && caliniya.armavoke.core.UI.universe.root != null) {
-                      caliniya.armavoke.core.UI.universe.root.remove();
+                    if (UI.universe != null && UI.universe.root != null) {
+                      UI.universe.root.remove();
                     }
-                    caliniya.armavoke.core.UI.universe = new UniverseFragment();
-                    caliniya.armavoke.core.UI.universe.build();
+                    UI.universe = new UniverseFragment();
+                    UI.universe.build();
 
                     // 隐藏 HUD
                     hideHUD();
                   }
                 }))
-        .size(120f, 50f);
+        .size(120f, 50f)
+        .left()
+        .top();
+
+    a.add(new Button("@菜单", () -> {
+      if(menu.visible) {
+      	menu.visible = false;
+        menu.touchable = Touchable.disabled;
+      }else{
+        menu.visible = true;
+        menu.touchable = Touchable.childrenOnly;
+      }
+    })).size(120f , 50f);
 
     Button commandBtn =
         new Button(
@@ -78,8 +95,15 @@ public class HUDFragment {
     setupCommandPanel();
 
     updateRightPanel();
-
+    
+    menu.visible = false;
+    
     root.add(a).top().left();
+    root.row();
+    root.addChild(menu);
+    menu.setPosition(
+        (Core.scene.getWidth() - menu.getWidth()) / 2,
+        (Core.scene.getHeight() - menu.getHeight()) / 2);
     root.row();
     root.add(b).bottom().left();
     root.add(rightContainer).expand().bottom().right();
@@ -111,7 +135,7 @@ public class HUDFragment {
     Table btnRow = new Table();
     btnRow.defaults().size(70f, 50f).pad(5f);
 
-    btnRow.button("电力", () -> Log.info("打开电力建筑列表"));
+    btnRow.button("@aa", () -> Log.info("打开电力建筑列表"));
     btnRow.button("生产", () -> Log.info("打开生产建筑列表"));
     btnRow.button("防御", () -> Log.info("打开防御建筑列表"));
 

@@ -66,27 +66,8 @@ public class WorldData {
     int totalChunks = gridW * gridH;
     unitGrid = new Ar[totalChunks];
     for (int i = 0; i < totalChunks; i++) {
-      unitGrid[i] = new Ar<>(16); // 预设每个格子大概有16个单位，减少扩容开销
+      unitGrid[i] = new Ar<>(8); // 预设每个格子大概有8个单位，减少扩容开销
     }
-
-    // 生成随机测试建筑
-    int padding = 5;
-    int buildingCount = 3;
-    for (int i = 0; i < buildingCount; i++) {
-      int bx = padding + (int) (Math.random() * (world.W - padding * 2));
-      int by = padding + (int) (Math.random() * (world.H - padding * 2));
-      if (world.isSolid(bx, by)) {
-        i--;
-        continue;
-      }
-      world.setBuilding(bx, by, Blocks.TestBlock, TeamTypes.Mutex);
-    }
-
-    // --- 新增：在地图中心生成敌方测试炮塔 ---
-    int centerX = world.W / 2;
-    int centerY = world.H / 2;
-
-    Building enemyTurret = world.setBuilding(centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
   }
 
   public static void clear() {

@@ -9,6 +9,7 @@ import arc.util.Log;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.*;
@@ -21,11 +22,11 @@ public class UnitType extends ContentType {
       speedt, // 像素每帧
       rotationSpeend = 1f // 旋转速度(单位帧每度？)
   ;
-  
-  //物理数据，若碰撞盒为空 则使用size进行填充
+
+  // 物理数据，若碰撞盒为空 则使用size进行填充
   public float[] hitbox = null;
   public float size = 100f;
-  
+
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
 
@@ -48,14 +49,14 @@ public class UnitType extends ContentType {
     }
   }
 
-  // 工厂方法：创建一个该类型的单位
-  public Unit create() {
-    return Unit.create(this);
-  }
 
-  // 带坐标
-  public Unit create(float x, float y) {
-    return Unit.create(this, x, y);
+  public Unit create(TeamTypes team, float x, float y) {
+    return Unit.create(team, this, x, y);
+  }
+  
+  // 用于存档读取的创建
+  public Unit create(){
+    return Unit.create(this);
   }
 
   public void draw(Unit u) {
@@ -76,8 +77,8 @@ public class UnitType extends ContentType {
       Draw.rect(weapon.type.region, weapon.wx, weapon.wy, wRot);
     }
   }
-  
-  public void update(Unit u , float dt){
+
+  public void update(Unit u, float dt) {
     // TODO: 以后再说
   }
 
