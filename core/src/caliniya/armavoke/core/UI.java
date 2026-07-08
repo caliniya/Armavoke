@@ -34,25 +34,19 @@ public class UI {
   public static Camera camera;
   public static Viewport vport;
 
+  public static PauseWindow pauseWindow;
+
   private static boolean isDebugShown = true;
-  
+
   public static float safeAreaSize;
 
   public static void initAll() {
     scl = Scl.scl();
 
-    if (debug == null) {
-      debug = new DebugFragment();
-    }
-    if (hud == null) {
-      hud = new HUDFragment();
-    }
-    if (menu == null) {
-      menu = new MenuFragment();
-    }
-    if (maps == null) {
-      maps = new MapsWindow();
-    }
+    debug = new DebugFragment();
+    hud = new HUDFragment();
+    menu = new MenuFragment();
+    maps = new MapsWindow();
   }
 
   public static void Menu() {

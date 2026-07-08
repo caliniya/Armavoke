@@ -13,6 +13,8 @@ import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import caliniya.armavoke.ui.Button;
 
+import javax.swing.JFrame;
+
 public class Window {
 
   public Table window;
@@ -20,6 +22,17 @@ public class Window {
   public float w = 400f, h = 300f;
   public float maxOut = 0.8f; // 允许80%移出屏幕
   public String title = "Window";
+  
+  public javax.swing.JFrame j;
+
+  /** 是否为模态窗口。模态窗口会显示暗色遮罩并阻断背景所有输入。 */
+  public boolean modal = false;
+
+  /** 模态遮罩层，仅 modal=true 时使用 */
+  protected Table modalOverlay;
+
+  /** 遮罩透明度，0=完全透明，1=完全不透明。默认 0.5 */
+  public float modalAlpha = 0.5f;
 
   public Window() {
     this("");
@@ -29,17 +42,53 @@ public class Window {
     this.title = titleText;
   }
 
+  /** 链式设置模态 */
+  public Window modal(boolean modal) {
+    this.modal = modal;
+    return this;
+  }
+
+  /** 链式设置遮罩透明度 */
+  public Window modalAlpha(float alpha) {
+    this.modalAlpha = alpha;
+    return this;
+  }
+
   public void build() {
     if (window != null) window.remove();
+    if (modalOverlay != null) modalOverlay.remove();
 
     window = new Table();
-    window.setSize(w, h); // 强制设定大小
+    window.setSize(w, h);
 
     window.setBackground(
         new NinePatchDrawable((NinePatchDrawable) Core.atlas.getDrawable("Window")));
 
     window.touchable = Touchable.enabled;
     window.cullable = true;
+
+    // --- 模态遮罩 ---
+    if (modal) {
+      modalOverlay = new Table();
+      modalOverlay.setFillParent(true);
+      modalOverlay.touchable = Touchable.enabled;
+
+      // 暗色半透明背景
+      modalOverlay.setBackground(Core.atlas.getDrawable("white"));
+      modalOverlay.setColor(0, 0, 0, modalAlpha);
+
+      // 拦截所有点击，阻止穿透到背景
+      modalOverlay.addListener(
+          new InputListener() {
+            @Override
+            public boolean touchDown(
+                InputEvent event, float x, float y, int pointer, arc.input.KeyCode button) {
+              return true;
+            }
+          });
+
+      Core.scene.add(modalOverlay);
+    }
 
     // 容器
     main = new Table();
@@ -115,6 +164,10 @@ public class Window {
 
   public void remove() {
     if (window != null) window.remove();
+    if (modalOverlay != null) {
+      modalOverlay.remove();
+      modalOverlay = null;
+    }
   }
 
   public void main(Table t) {}
