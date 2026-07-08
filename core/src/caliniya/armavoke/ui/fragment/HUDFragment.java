@@ -25,8 +25,6 @@ public class HUDFragment {
   private Table buildingPanel;
   private Table commandPanel;;
 
-  public Table menu;
-
   //  A左上  B左下
   public Table a, b;
 
@@ -36,45 +34,11 @@ public class HUDFragment {
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
     
-    menu.setBackground(Styles.background);
-    menu.sizeBy(Core.graphics.getWidth() / 2f , Core.graphics.getHeight() / 2f);
     a = new Table().top().left();
     b = new Table().bottom().left();
-    menu.add(
-            new Button(
-                "宇宙",
-                () -> {
-                  if (!UniverseFragment.showing) {
-                    UniverseFragment.showing = true;
-
-                    // 同步宇宙相机到游戏相机位置
-                    Render.universeCamera.position.set(Core.camera.position);
-                    Render.universeCamera.width = Core.camera.width;
-                    Render.universeCamera.height = Core.camera.height;
-
-                    // 弹出宇宙菜单
-                    if (UI.universe != null && UI.universe.root != null) {
-                      UI.universe.root.remove();
-                    }
-                    UI.universe = new UniverseFragment();
-                    UI.universe.build();
-
-                    // 隐藏 HUD
-                    hideHUD();
-                  }
-                }))
-        .size(120f, 50f)
-        .left()
-        .top();
 
     a.add(new Button("@菜单", () -> {
-      if(menu.visible) {
-      	menu.visible = false;
-        menu.touchable = Touchable.disabled;
-      }else{
-        menu.visible = true;
-        menu.touchable = Touchable.childrenOnly;
-      }
+      UI.pauseWindow.build();
     })).size(120f , 50f);
 
     Button commandBtn =
@@ -96,21 +60,15 @@ public class HUDFragment {
 
     updateRightPanel();
     
-    menu.visible = false;
-    
     root.add(a).top().left();
     root.row();
-    root.addChild(menu);
-    menu.setPosition(
-        (Core.scene.getWidth() - menu.getWidth()) / 2,
-        (Core.scene.getHeight() - menu.getHeight()) / 2);
     root.row();
     root.add(b).bottom().left();
     root.add(rightContainer).expand().bottom().right();
   }
 
   /** 隐藏游戏 HUD（切换至宇宙视图时） */
-  private void hideHUD() {
+  public void hideHUD() {
     if (root != null) {
       root.visible = false;
       root.touchable = Touchable.disabled;

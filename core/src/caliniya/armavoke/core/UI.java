@@ -47,6 +47,7 @@ public class UI {
     hud = new HUDFragment();
     menu = new MenuFragment();
     maps = new MapsWindow();
+    pauseWindow = new PauseWindow();
   }
 
   public static void Menu() {

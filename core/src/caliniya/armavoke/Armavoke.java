@@ -117,7 +117,7 @@ public class Armavoke extends ApplicationCore {
     }
     scene.act();
     scene.draw();
-    Draw.flush();
+    //Draw.flush();
 
     if (Systems.DE != null) {
       Draw.proj(UI.camera);
