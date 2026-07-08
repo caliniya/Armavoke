@@ -1,16 +1,23 @@
 package caliniya.armavoke.system.render;
 
 import static arc.Core.*;
-import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.geom.Vec2;
 import arc.scene.Element;
-import arc.scene.ui.layout.Table;
-import arc.util.Log;
+import arc.scene.Group;
 import caliniya.armavoke.core.meta.ui.Pal;
-import caliniya.armavoke.ui.Button;
 
+/**
+ * 调试渲染器：给 scene 中每一个 UI 元素绘制边框，便于制作 UI 时定位。
+ *
+ * <p>在 {@code Armavoke.update()} 中于 {@code Draw.proj(UI.camera)} 之后单独调用，
+ * 因此这里的绘制坐标必须是 stage 全局坐标系。
+ */
 public class DebugRender extends caliniya.armavoke.system.System<DebugRender> {
+
+  /** 复用的坐标转换缓存，避免每帧每元素 new。 */
+  private final Vec2 tmp = new Vec2();
 
   @Override
   public DebugRender init() {
@@ -20,10 +27,36 @@ public class DebugRender extends caliniya.armavoke.system.System<DebugRender> {
 
   @Override
   public void update() {
+    // 线宽/颜色只需设置一次
+    Lines.stroke(2f, Pal.light);
+
+    // 递归遍历整棵 UI 树，给每个元素画边框
     for (Element e : scene.root.getChildren()) {
-      if (e.fillParent) continue;
-      Lines.stroke(2f, Pal.light);
-      Lines.rect(e.x, e.y, e.getWidth(), e.getHeight());
+      drawBounds(e);
+    }
+
+    // 重置绘制状态，避免污染后续（尤其是地图）的渲染
+    Draw.reset();
+  }
+
+  /** 递归绘制某元素及其所有子元素的边框（转换到 stage 全局坐标）。 */
+  private void drawBounds(Element e) {
+    if (e == null || !e.visible) return;
+
+    // fillParent 的全屏容器画出来就是整屏边框，无意义 —— 跳过自身，但仍递归子元素
+    if (!e.fillParent && e.getWidth() > 0f && e.getHeight() > 0f) {
+      // 关键：把元素局部原点 (0,0)=左下角 转换成 stage 全局坐标。
+      // 嵌套子元素的 e.x/e.y 是相对父容器的局部坐标，不转换位置会全错。
+      tmp.set(0f, 0f);
+      e.localToStageCoordinates(tmp);
+      Lines.rect(tmp.x, tmp.y, e.getWidth(), e.getHeight());
+    }
+
+    // 递归子元素
+    if (e instanceof Group g) {
+      for (Element child : g.getChildren()) {
+        drawBounds(child);
+      }
     }
   }
 }

@@ -40,7 +40,7 @@ public class InitGame {
     Systems.GP = new GameProcess().init();
     Systems.UV = new UniverseRender().init();
     Systems.UI = new UniverseInput().init();
-    //Systems.DE = new DebugRender().init();
+    Systems.DE = new DebugRender().init();
     Armavoke.addSystem(
         Systems.MR,
         Systems.UR,
