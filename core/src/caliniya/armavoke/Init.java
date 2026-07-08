@@ -39,6 +39,8 @@ public class Init {
   public static void init() {
     // assets.load("");
     inited = false;
+    
+    //assert false : "Assert！";
 
     settings.setAppName("Armavoke");
 

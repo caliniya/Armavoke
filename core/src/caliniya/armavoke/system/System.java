@@ -209,7 +209,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                   } catch (Exception e) {
                     Log.err(
                         "Error in thread: @", this.getClass().getSimpleName() + "  " + e);
-                       Threads.throwAppException(e);
+                       //Threads.throwAppException(e);
                   }
 
                   // --- TPS 统计 ---

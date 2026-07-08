@@ -23,7 +23,7 @@ public class HUDFragment {
   private Table root;
   private Table rightContainer;
   private Table buildingPanel;
-  private Table commandPanel;
+  private Table commandPanel;;
 
   public Table menu;
 
@@ -35,9 +35,9 @@ public class HUDFragment {
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
-
-    menu = new Table().center();
+    
     menu.setBackground(Styles.background);
+    menu.sizeBy(Core.graphics.getWidth() / 2f , Core.graphics.getHeight() / 2f);
     a = new Table().top().left();
     b = new Table().bottom().left();
     menu.add(
