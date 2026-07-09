@@ -95,6 +95,9 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
 
   @Override
   public void update() {
+    
+    Draw.color();
+    
     if (caliniya.armavoke.ui.fragment.UniverseFragment.showing) return;
     if (!inited || chunks == null) return;
 

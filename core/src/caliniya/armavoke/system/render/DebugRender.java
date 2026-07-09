@@ -1,6 +1,7 @@
 package caliniya.armavoke.system.render;
 
 import static arc.Core.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.geom.Vec2;
@@ -27,8 +28,7 @@ public class DebugRender extends caliniya.armavoke.system.System<DebugRender> {
 
   @Override
   public void update() {
-    // 线宽/颜色只需设置一次
-    Lines.stroke(2f, Pal.light);
+    Lines.stroke(2f, Color.green);
 
     // 递归遍历整棵 UI 树，给每个元素画边框
     for (Element e : scene.root.getChildren()) {
@@ -45,8 +45,6 @@ public class DebugRender extends caliniya.armavoke.system.System<DebugRender> {
 
     // fillParent 的全屏容器画出来就是整屏边框，无意义 —— 跳过自身，但仍递归子元素
     if (!e.fillParent && e.getWidth() > 0f && e.getHeight() > 0f) {
-      // 关键：把元素局部原点 (0,0)=左下角 转换成 stage 全局坐标。
-      // 嵌套子元素的 e.x/e.y 是相对父容器的局部坐标，不转换位置会全错。
       tmp.set(0f, 0f);
       e.localToStageCoordinates(tmp);
       Lines.rect(tmp.x, tmp.y, e.getWidth(), e.getHeight());
