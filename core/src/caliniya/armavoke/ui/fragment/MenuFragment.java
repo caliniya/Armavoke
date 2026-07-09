@@ -2,8 +2,11 @@ package caliniya.armavoke.ui.fragment;
 
 import arc.Core;
 import arc.Events;
+import arc.files.Fi;
 import arc.scene.Group;
 import arc.scene.ui.layout.Table;
+import arc.struct.ObjectMap;
+import arc.struct.StringMap;
 import arc.util.Log;
 import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.core.InitGame;
@@ -11,6 +14,8 @@ import caliniya.armavoke.core.UI;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.io.GameIO;
+import caliniya.armavoke.map.Map;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.ui.*;
 
@@ -20,6 +25,8 @@ import caliniya.armavoke.ui.windows.DataWindow;
 public class MenuFragment {
 
   public Table root;
+  
+  public static String temp;
 
   public void build() {
     root = new Table();
@@ -52,15 +59,21 @@ public class MenuFragment {
                       }));
               menu.row();
 
-              menu.add(new Button("test", () -> UI.Window("aaaa", 0.5f, 0.5f)));
+              menu.add(new Button("test2", () -> {
+                      InitGame.testinit();
+                      ObjectMap<String , String> tag = new ObjectMap<String , String>();
+                      tag.put("author" , "calinya");
+                      tag.put("name" , "spaceTest");
+                      tag.put("map" , "0000");
+                      GameIO.save(Core.settings.getDataDirectory().child("maps/space.aevs") , new StringMap(tag));
+              }));
               menu.row();
 
               menu.add(
                   new Button(
-                      "stattest",
+                      "test3",
                       () -> {
-                        UI.Window(
-                            0.8f, 0.6f, (new StatStack().add(Stat.health, 1000, StatUnit.none)));
+                        Log.info(temp);
                       }));
               menu.row();
 

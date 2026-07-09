@@ -61,9 +61,7 @@ public class AndroidLauncher extends AndroidApplication {
     });
     rootView.requestApplyInsets();
     // --- 安全区检测结束 ---
-
     Fi data = Core.files.absolute(this.getExternalFilesDir(null).getAbsolutePath());
-    // throw new ArcRuntimeException(data.toString());
     Core.settings.setDataDirectory(data);
     try {
       Writer writer = settings.getDataDirectory().child("log.txt").writer(false);

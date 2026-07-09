@@ -58,9 +58,11 @@ public class GameIO {
   // ==================== 存档 ====================
 
   public static void save(Fi file, @Nullable StringMap tags) {
+    file.parent().mkdirs();
     try (DataOutputStream stream = new DataOutputStream(file.write(false))) {
       Writes w = new Writes(stream);
 
+      // file.mkdirs();
       // --- Header ---
       w.b(MAGIC.getBytes());
       w.i(SAVE_VERSION);

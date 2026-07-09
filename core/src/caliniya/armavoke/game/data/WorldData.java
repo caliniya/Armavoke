@@ -51,8 +51,7 @@ public class WorldData {
     // 有移动目标的单位
     moveunits = new Ar<>(5);
     bullets = new Ar<>(false, 1000);
-    world = new World(100, 100, false);
-    world.test = true;
+    world = new World(1000, 1000 ,true);
     world.init();
 
     // 1. 初始化网格尺寸

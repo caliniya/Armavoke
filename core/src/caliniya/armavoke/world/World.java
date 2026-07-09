@@ -35,35 +35,6 @@ public class World {
     for (int i = 0; i < chunks.length; i++) {
       chunks[i] = null;
     }
-
-    if (test) {
-      // 填充基础地板
-      if (!space) {
-        for (int y = 0; y < H; y++) {
-          for (int x = 0; x < W; x++) {
-            setFloor(x, y, Floors.TestFloor);
-          }
-        }
-      }
-
-      // 生成随机障碍物
-      int padding = 5;
-      for (int y = padding; y < H - padding; y++) {
-        for (int x = padding; x < W - padding; x++) {
-          if (Math.random() < 0.003) {
-            for (int oy = -1; oy <= 1; oy++) {
-              for (int ox = -1; ox <= 1; ox++) {
-                int px = x + ox;
-                int py = y + oy;
-                if (isValidCoord(px, py)) {
-                  setENVBlock(px, py, ENVBlocks.a);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   // --- 区块管理辅助方法 ---
