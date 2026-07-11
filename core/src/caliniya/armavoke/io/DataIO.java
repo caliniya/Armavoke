@@ -12,7 +12,7 @@ public class DataIO {
   public static volatile ByteArrayOutputStream bos = new ByteArrayOutputStream(1 << 20); // 预分配 1MB
   public static volatile DataOutputStream stream = new DataOutputStream(bos);
   public static volatile Writes w = new Writes(stream);
-  public byte[] meta;
+  public static volatile byte[] data;
 
   // 命令实体处理线程开始写入数据
   // 线程会使用三次循环来写入地图数据和实体数据
@@ -32,5 +32,7 @@ public class DataIO {
       w.str(entry.value);
     }
     Systems.EP.task = true;
-  }
+  } 
+  
+  
 }

@@ -11,9 +11,8 @@ import arc.util.Log;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.content.Blocks;
 import caliniya.armavoke.game.Building;
-import caliniya.armavoke.content.UnitTypes;
-import caliniya.armavoke.core.InitGame;
-import caliniya.armavoke.core.UI;
+import caliniya.armavoke.content.*;
+import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
@@ -49,7 +48,7 @@ public class MenuFragment {
                   new Button(
                       "@start",
                       () -> {
-                        InitGame.testinit();
+                        //InitGame.testinit();
                         UI.Game();
                       }));
               menu.row();
