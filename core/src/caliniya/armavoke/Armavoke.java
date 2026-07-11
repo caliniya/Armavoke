@@ -36,9 +36,6 @@ public class Armavoke extends ApplicationCore {
   // 用于记录开始时间
   private long startTime;
 
-  public static Ar<caliniya.armavoke.system.System> systems =
-      new Ar<caliniya.armavoke.system.System>(15);
-
   @Override
   public void setup() {
     // 记录应用启动时的纳秒时间
@@ -80,9 +77,9 @@ public class Armavoke extends ApplicationCore {
               uniInput,
               universeInput);
       input.addProcessor(multiplexer);
-      addSystem(camInput);
-      addSystem(uniInput);
-      addSystem(universeInput);
+      Systems.addSystem(camInput);
+      Systems.addSystem(uniInput);
+      Systems.addSystem(universeInput);
       Contents.load();
       UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();
@@ -107,7 +104,7 @@ public class Armavoke extends ApplicationCore {
     } else {
       Draw.proj(camera);
 
-      for (caliniya.armavoke.system.System sys : systems) {
+      for (caliniya.armavoke.system.System sys : Systems.systems) {
         if (sys == null) {
           continue;
         }
@@ -125,20 +122,6 @@ public class Armavoke extends ApplicationCore {
     }
 
     Draw.flush();
-  }
-
-  public static void addSystem(caliniya.armavoke.system.System<?>... newSystems) {
-    boolean added = false;
-    for (caliniya.armavoke.system.System<?> s : newSystems) {
-      if (s != null && !systems.contains(s)) {
-        if (!s.inited) s.init();
-        systems.add(s);
-        added = true;
-      } // TODO: 应不应该重复添加
-    }
-    if (added) {
-      systems.sort();
-    }
   }
 
   @Override

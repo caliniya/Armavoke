@@ -46,6 +46,9 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   /** 目标帧时间（纳秒），默认为 16.6ms（约 60 TPS）。 */
   protected long targetNs = 16_666_666L;
+  
+  // 给一些特殊系统所使用的特殊标记
+  public volatile boolean task;
 
   // ========== 公有测量变量 ==========
 

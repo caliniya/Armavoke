@@ -31,8 +31,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameIO {
 
-  private static final String MAGIC = "AEVS";
-  private static final int SAVE_VERSION = 1;
+  public static final String MAGIC = "AEVS";
+  public static final int SAVE_VERSION = 1;
 
   /** 单位/建筑结束标记：8 字节 0xAE，读取未知类型时跳过到此标记 */
   private static final byte[] END_MARKER = {
@@ -474,7 +474,7 @@ public class GameIO {
                   applyFromBytes(data, onProgress);
                 } catch (Throwable e) {
                   Log.err("Load(async) parse failed", e);
-                  WorldData.initWorld();
+                  //WorldData.initWorld();
                   ok = false;
                 }
                 if (onComplete != null) onComplete.get(ok);
