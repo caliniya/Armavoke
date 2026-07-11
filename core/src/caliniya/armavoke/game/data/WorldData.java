@@ -43,7 +43,7 @@ public class WorldData {
   private WorldData() {}
 
   @SuppressWarnings("unchecked")
-  public static void initWorld() {
+  public static void initWorld(int w, int h, boolean space) {
 
     Game.team = TeamTypes.Evoke;
     units = new Ar<>(100);
@@ -51,7 +51,7 @@ public class WorldData {
     // 有移动目标的单位
     moveunits = new Ar<>(5);
     bullets = new Ar<>(false, 1000);
-    world = new World(1000, 1000 ,true);
+    world = new World(w, h, space);
     world.init();
 
     // 1. 初始化网格尺寸
@@ -80,7 +80,7 @@ public class WorldData {
 
     // 清理建筑
     if (buildings != null) {
-      buildings.each(b -> b.remove()); // 使用 remove 归还对象池
+      buildings.each(b -> b.remove()); // 使用 remove 归还对象池,kill会有回调
       buildings.clear();
     }
 
@@ -110,75 +110,5 @@ public class WorldData {
     if (unitGrid == null) return null;
     int index = getChunkIndex(x, y);
     return unitGrid[index];
-  }
-
-  /**
-   * 彻底清理并准备接收新数据的环境
-   *
-   * @param newW 新地图的宽
-   * @param newH 新地图的高
-   * @param space 是否为太空地图
-   */
-  public static void reBuildAll(int newW, int newH, boolean space) {
-
-    if (units != null) {
-      units.each(
-          unit -> {
-            unit.reset();
-          });
-      units.clear();
-    }
-
-    // 清理建筑
-    if (buildings != null) {
-      buildings.each(b -> b.remove());
-      buildings.clear();
-    }
-
-    if (moveunits != null) {
-      moveunits.clear();
-    }
-
-    if (bullets != null) {
-      bullets.clear();
-    }
-
-    unitGrid = null;
-    Entities.clearIDs();
-
-    world = new World(newW, newH, space);
-
-    // 重置空间网格 (Spatial Grid)
-    gridW = Mathf.ceil((float) newW / CHUNK_SIZE);
-    gridH = Mathf.ceil((float) newH / CHUNK_SIZE);
-
-    int totalChunks = gridW * gridH;
-    unitGrid = new Ar[totalChunks];
-    for (int i = 0; i < totalChunks; i++) {
-      unitGrid[i] = new Ar<>(16);
-    }
-
-    // 注意：这里调用 initWorld 会重新创建 world 并重置所有列表
-    // 但我们已经创建了新的 world 和网格，为避免重复初始化，可以只调用必要的部分
-    world.test = true;
-    world.init();
-    Game.team = TeamTypes.Evoke;
-
-    // 重新创建列表（如果 initWorld 中创建了新的，这里可以省略，但为了清晰保留）
-    units = new Ar<>(100);
-    buildings = new Ar<>(100);
-    moveunits = new Ar<>(5);
-    bullets = new Ar<>(false, 1000);
-
-    Teams.init();
-    Events.fire(EventType.events.Mapinit);
-    RouteData.init();
-  }
-
-  /** 简化的重建方法，使用当前世界参数 */
-  public static void reBuildAll() {
-    if (world != null) {
-      reBuildAll(world.W, world.H, world.space);
-    }
   }
 }
