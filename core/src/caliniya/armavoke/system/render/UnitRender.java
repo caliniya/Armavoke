@@ -10,6 +10,7 @@ import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
+import caliniya.armavoke.system.world.BulletProcess;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 
 public class UnitRender extends System<UnitRender> {
@@ -41,8 +42,10 @@ public class UnitRender extends System<UnitRender> {
     }
 
     // 绘制子弹
+    // 用与 BulletProcess 相同的固定锁对象，确保与逻辑线程的缓冲交换互斥，
+    // 避免拷到正在被清空/重填的缓冲导致子弹闪烁。
     temp.clear();
-    synchronized (WorldData.bullets) {
+    synchronized (BulletProcess.BULLET_LOCK) {
       temp.addAll(WorldData.bullets);
     }
 

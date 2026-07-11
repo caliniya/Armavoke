@@ -15,6 +15,17 @@ import caliniya.armavoke.type.Bullet;
 public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess> {
 
   /**
+   * 子弹双缓冲的专用锁对象。
+   *
+   * <p><b>关键：</b>逻辑线程会交换 {@link WorldData#bullets} 与 {@link #renderBuffer} 的引用，
+   * 所以绝对不能用 {@code synchronized(WorldData.bullets)} 加锁——那样锁的是"当前指向的对象实例"，
+   * 交换后两个线程会锁在不同实例上，互斥失效，导致渲染读到正在被清空/重填的缓冲 → 子弹闪烁。
+   *
+   * <p>因此这里用一个永不变化的 final 锁对象，逻辑线程（swap / clearAll）与渲染线程 都统一锁它。
+   */
+  public static final Object BULLET_LOCK = new Object();
+
+  /**
    * 待处理子弹列表。
    *
    * <p>用于临时存储从外部线程添加的子弹对象。 使用同步锁机制保证线程安全。
@@ -82,8 +93,8 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
     }
     activeBullets.size = 0;
 
-    // 清理全局渲染引用
-    synchronized (WorldData.bullets) {
+    // 清理全局渲染引用（用固定锁，不锁会被交换的 WorldData.bullets 引用）
+    synchronized (BULLET_LOCK) {
       WorldData.bullets.clear();
     }
   }
@@ -240,8 +251,8 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       }
     }
 
-    // 5. 交换渲染缓冲区
-    synchronized (WorldData.bullets) {
+    // 5. 交换渲染缓冲区（用固定锁对象，保证与渲染线程互斥）
+    synchronized (BULLET_LOCK) {
       Ar<Bullet> temp = WorldData.bullets;
       WorldData.bullets = renderBuffer;
       renderBuffer = temp;

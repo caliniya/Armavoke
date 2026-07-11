@@ -71,7 +71,7 @@ public class Unit extends Entity {
     u.team = team;
     u.x = x;
     u.y = y;
-    //u.item = new ItemModule(100);
+    u.item = new ItemModule(type.itemCap);
     u.init();
     WorldData.units.add(u);
     u.updateChunkPosition();

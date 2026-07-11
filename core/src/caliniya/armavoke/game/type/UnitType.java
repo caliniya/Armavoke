@@ -29,6 +29,8 @@ public class UnitType extends ContentType {
 
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
+  
+  public int itemCap = 50;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();
 

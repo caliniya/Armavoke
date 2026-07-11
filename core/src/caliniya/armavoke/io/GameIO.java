@@ -1,5 +1,6 @@
 package caliniya.armavoke.io;
 
+import arc.Core;
 import arc.files.Fi;
 import arc.struct.ObjectIntMap;
 import arc.struct.StringMap;
@@ -20,9 +21,13 @@ import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.world.Floor;
 import caliniya.armavoke.base.game.WorldChunk;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameIO {
 
@@ -34,6 +39,53 @@ public class GameIO {
     (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE,
     (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE
   };
+
+  // ==================== IO 后台线程 ====================
+  //
+  // 一个常驻守护线程 + 阻塞队列。所有磁盘读写任务都排进队列，由这个线程串行执行：
+  //   - 单线程 → 天然按调用顺序执行，两次保存不会互相踩踏；
+  //   - 守护线程 → 不会阻止 JVM/App 退出；
+  //   - 懒启动 → 第一次真正用到时才起线程；
+  //   - 不用 ThreadPoolExecutor，避免 ThreadFactory 语义坑。
+
+  private static final BlockingQueue<Runnable> ioQueue = new LinkedBlockingQueue<>();
+  private static volatile Thread ioThread;
+
+  /** 确保后台 IO 线程已启动（线程安全，懒加载）。 */
+  private static void ensureIoThread() {
+    if (ioThread != null) return;
+    synchronized (GameIO.class) {
+      if (ioThread != null) return;
+      Thread t =
+          new Thread(
+              () -> {
+                while (true) {
+                  Runnable task;
+                  try {
+                    task = ioQueue.take(); // 队列空时阻塞等待
+                  } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break; // 被中断则退出线程
+                  }
+                  try {
+                    task.run();
+                  } catch (Throwable err) {
+                    Log.err("IO task failed", err);
+                  }
+                }
+              },
+              "Armavoke-IO");
+      t.setDaemon(true);
+      t.start();
+      ioThread = t;
+    }
+  }
+
+  /** 把一个任务丢进后台 IO 线程执行。 */
+  private static void submitIo(Runnable task) {
+    ensureIoThread();
+    ioQueue.add(task);
+  }
 
   // ==================== 元数据读取 ====================
 
@@ -55,14 +107,68 @@ public class GameIO {
     }
   }
 
-  // ==================== 存档 ====================
+  // ==================== 保存 ====================
 
+  /**
+   * 异步保存（推荐）。 在【调用线程】先把游戏状态序列化成内存字节快照（一致性副本，很快），
+   * 然后把字节丢到后台 IO 线程写盘，主线程立即返回，不会因磁盘 I/O 卡住。
+   *
+   * @param file 目标文件
+   * @param tags 附加标签（可空）
+   */
   public static void save(Fi file, @Nullable StringMap tags) {
-    file.parent().mkdirs();
-    try (DataOutputStream stream = new DataOutputStream(file.write(false))) {
+    save(file, tags, null);
+  }
+
+  /**
+   * 异步保存，带完成回调。
+   *
+   * @param file 目标文件
+   * @param tags 附加标签（可空）
+   * @param onComplete 写盘完成后的回调（在【主线程】执行，参数为是否成功；可空）
+   */
+  public static void save(Fi file, @Nullable StringMap tags, @Nullable arc.func.Boolc onComplete) {
+    final byte[] snapshot;
+    try {
+      // ① 主线程：序列化到内存 = 复制一份一致性快照
+      snapshot = snapshot(tags);
+    } catch (Throwable e) {
+      Log.err("Snapshot failed", e);
+      if (onComplete != null) onComplete.get(false);
+      return;
+    }
+
+    // ② 后台线程：把快照写盘（慢的磁盘 I/O 不在主线程）
+    submitIo(
+        () -> {
+          boolean ok = writeSnapshot(file, snapshot);
+          if (onComplete != null) {
+            // 回调切回主线程，方便调用方安全操作 UI / 游戏状态
+            Core.app.post(() -> onComplete.get(ok));
+          }
+        });
+  }
+
+  /**
+   * 同步保存（会阻塞调用线程直到写盘完成，一般不用；提供给需要"存完再退出"等场景）。 依然遵循"先内存快照，再写盘"，只是不异步。
+   */
+  public static void saveSync(Fi file, @Nullable StringMap tags) {
+    try {
+      byte[] snapshot = snapshot(tags);
+      writeSnapshot(file, snapshot);
+    } catch (Throwable e) {
+      Log.err("Save(sync) failed", e);
+    }
+  }
+
+  /**
+   * 把当前游戏状态序列化成内存字节数组（一致性快照）。 该方法必须在【游戏逻辑线程/主线程】调用，调用期间不应有其他线程修改世界数据。
+   */
+  private static byte[] snapshot(@Nullable StringMap tags) throws IOException {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream(1 << 20); // 预分配 1MB
+    try (DataOutputStream stream = new DataOutputStream(bos)) {
       Writes w = new Writes(stream);
 
-      // file.mkdirs();
       // --- Header ---
       w.b(MAGIC.getBytes());
       w.i(SAVE_VERSION);
@@ -145,10 +251,21 @@ public class GameIO {
         w.b(END_MARKER); // 结束标记
       }
 
-      Log.info("Saved to @", file.path());
+      stream.flush();
+    }
+    return bos.toByteArray();
+  }
 
-    } catch (IOException e) {
+  /** 把内存快照写入磁盘（可在任意线程调用，通常在 IO 线程）。返回是否成功。 */
+  private static boolean writeSnapshot(Fi file, byte[] data) {
+    try {
+      file.parent().mkdirs();
+      file.writeBytes(data, false);
+      Log.info("Saved to @ (@ bytes)", file.path(), data.length);
+      return true;
+    } catch (Throwable e) {
       Log.err("Save failed", e);
+      return false;
     }
   }
 
@@ -236,9 +353,81 @@ public class GameIO {
     RouteData.init();
   }
 
+  /**
+   * 从内存字节数据解析并重建世界（直接读完整 header）。 必须在【主线程】调用，因为会创建游戏对象、修改 WorldData。
+   */
+  private static void applyFromBytes(byte[] data) throws IOException {
+    try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(data))) {
+      Reads r = new Reads(stream);
+
+      String magic = new String(r.b(4));
+      if (!magic.equals(MAGIC)) throw new IOException("Invalid file format");
+
+      int ver = r.i();
+      int width = r.i();
+      int height = r.i();
+
+      StringMap tags = new StringMap();
+      int tagCount = r.s();
+      for (int i = 0; i < tagCount; i++) {
+        tags.put(r.str(), r.str());
+      }
+      boolean isSpace = tags.getBool("space");
+
+      WorldData.reBuildAll(width, height, isSpace);
+      readBody(r, width, height);
+    }
+  }
+
   // ==================== 加载 ====================
 
-  /** 从 Map 元数据对象加载存档（Map 由 readMeta 预先读取头信息） */
+  /**
+   * 异步加载（推荐）。 后台线程把文件读成字节（慢的磁盘 I/O 不在主线程），读完再切回【主线程】解析、重建世界，
+   * 保证造 Unit/Building、改 WorldData 都在主线程执行。
+   *
+   * @param file 存档文件
+   * @param onComplete 完成回调（主线程执行，参数为是否成功；可空）
+   */
+  public static void loadAsync(Fi file, @Nullable arc.func.Boolc onComplete) {
+    submitIo(
+        () -> {
+          final byte[] data;
+          try {
+            data = file.readBytes(); // 后台读盘
+          } catch (Throwable e) {
+            Log.err("Load(async) read failed", e);
+            if (onComplete != null) Core.app.post(() -> onComplete.get(false));
+            return;
+          }
+          // 切回主线程解析 + 应用
+          Core.app.post(
+              () -> {
+                boolean ok = true;
+                try {
+                  applyFromBytes(data);
+                } catch (Throwable e) {
+                  Log.err("Load(async) parse failed", e);
+                  WorldData.initWorld();
+                  ok = false;
+                }
+                if (onComplete != null) onComplete.get(ok);
+              });
+        });
+  }
+
+  /** 异步加载（无回调重载）。 */
+  public static void loadAsync(Fi file) {
+    loadAsync(file, null);
+  }
+
+  /** 异步加载（从 Map 元数据）。 */
+  public static void loadAsync(Map map, @Nullable arc.func.Boolc onComplete) {
+    loadAsync(map.file, onComplete);
+  }
+
+  // -------------------- 同步加载（保留，兼容旧调用） --------------------
+
+  /** 从 Map 元数据对象加载存档（同步，会阻塞调用线程）。 */
   public static void load(Map map) {
     try (DataInputStream stream = new DataInputStream(map.file.read())) {
       Reads r = new Reads(stream);
@@ -265,7 +454,7 @@ public class GameIO {
     }
   }
 
-  /** 从文件直接加载存档 */
+  /** 从文件直接加载存档（同步，会阻塞调用线程）。 */
   public static void load(Fi file) {
     try (DataInputStream stream = new DataInputStream(file.read())) {
       Reads r = new Reads(stream);
