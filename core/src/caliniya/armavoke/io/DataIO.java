@@ -13,6 +13,7 @@ public class DataIO {
   public static volatile DataOutputStream stream = new DataOutputStream(bos);
   public static volatile Writes w = new Writes(stream);
   public static volatile byte[] data;
+  public static volatile boolean copyed;// 向内存中复制数据是否已完成
 
   // 命令实体处理线程开始写入数据
   // 线程会使用三次循环来写入地图数据和实体数据

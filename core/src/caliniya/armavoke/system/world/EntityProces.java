@@ -123,6 +123,7 @@ public class EntityProces extends System<EntityProces> {
             b.write(DataIO.w);
             // 当这一步执行完的时候，向内存中的数据写入就完成了
             DataIO.data = DataIO.bos.toByteArray();
+            DataIO.copyed = true;
           }
         });
 
