@@ -16,9 +16,11 @@ import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.io.DataIO;
 import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Map;
 import caliniya.armavoke.map.Maps;
+import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
@@ -48,7 +50,7 @@ public class MenuFragment {
                   new Button(
                       "@start",
                       () -> {
-                        //InitGame.testinit();
+                        // InitGame.testinit();
                         UI.Game();
                       }));
               menu.row();
@@ -65,15 +67,19 @@ public class MenuFragment {
                   new Button(
                       "test2",
                       () -> {
-                        WorldData.initWorld();
+                        WorldData.initWorld(400, 400, true);
+                        Data.loadSystems();
+                        Systems.EP.init();
                         Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
 
                         // 生成随机测试建筑
                         int padding = 100;
                         int buildingCount = 3;
                         for (int i = 0; i < buildingCount; i++) {
-                          int bx = padding + (int) (Math.random() * (WorldData.world.W - padding * 2));
-                          int by = padding + (int) (Math.random() * (WorldData.world.H - padding * 2));
+                          int bx =
+                              padding + (int) (Math.random() * (WorldData.world.W - padding * 2));
+                          int by =
+                              padding + (int) (Math.random() * (WorldData.world.H - padding * 2));
                           if (WorldData.world.isSolid(bx, by)) {
                             i--;
                             continue;
@@ -86,12 +92,13 @@ public class MenuFragment {
                         int centerY = WorldData.world.H / 2;
 
                         Building enemyTurret =
-                            WorldData.world.setBuilding(centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
+                            WorldData.world.setBuilding(
+                                centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
                         ObjectMap<String, String> tag = new ObjectMap<String, String>();
                         tag.put("author", "calinya");
                         tag.put("name", "spaceTest");
                         tag.put("map", "0000");
-                        GameIO.save(
+                        DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
                       }));
@@ -101,7 +108,7 @@ public class MenuFragment {
                   new Button(
                       "test3",
                       () -> {
-                        Log.info(temp);
+                        Data.load(Core.settings.getDataDirectory().child("map/space.aevs"));
                       }));
               menu.row();
 

@@ -48,7 +48,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
   protected long targetNs = 16_666_666L;
   
   // 给一些特殊系统所使用的特殊标记
-  public volatile boolean task;
+  public volatile boolean task = false;
 
   // ========== 公有测量变量 ==========
 

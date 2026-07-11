@@ -14,6 +14,7 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.world.Block;
 import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.world.Floor;
+import caliniya.armavoke.core.*;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -22,7 +23,7 @@ import java.util.concurrent.*;
 public class DataIO {
 
   /** 单位/建筑结束标记：8 字节 0xAE，读取未知类型时跳过到此标记。 */
-  private static final byte[] END_MARKER = {
+  public static final byte[] END_MARKER = {
     (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE,
     (byte) 0xAE, (byte) 0xAE, (byte) 0xAE, (byte) 0xAE
   };
@@ -64,9 +65,12 @@ public class DataIO {
     copy(tags);
   }
 
-  //
   public static void load() {
-    if (loaded) return;
+    load(data);
+  }
+
+  public static void load(byte[] bytes) {
+    if (!loaded) return;
     try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes))) {
       Reads r = new Reads(in);
 
@@ -85,7 +89,12 @@ public class DataIO {
       boolean isSpace = tags.getBool("space");
 
       WorldData.initWorld(width, height, isSpace);
-      GameIO.submitIo(() -> readBody(r, width, height));
+      GameIO.submitIo(
+          () -> {
+            read(r, width, height);
+            Data.loadSystems();
+            Data.enter();
+          });
     } catch (Throwable e) {
       Log.err("Restore failed", e);
     }
@@ -163,7 +172,7 @@ public class DataIO {
   private static void skipToEndMarker(Reads r) {
     int matched = 0;
     while (matched < 8) {
-      byte b = (byte) r.b();
+      byte b = r.b();
       if (b == END_MARKER[matched]) {
         matched++;
       } else {

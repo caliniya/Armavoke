@@ -93,20 +93,23 @@ public class GameIO {
    * <p>指定文件路径
    */
   public static void save(Fi file, Cons<byte[]> con) {
-    if (DataIO.copyed) return; // 如果数据尚未复制完，那就不可以执行
+    if (!DataIO.copyed) return; // 如果数据尚未复制完，那就不可以执行
     submitIo(
         () -> {
           try {
             file.writeBytes(DataIO.data);
+            Log.info("Save success - @", file.absolutePath());
           } catch (Throwable e) {
             Log.err("Save field -", e);
           }
-          Core.app.post(() -> con.get(DataIO.data));
+          if (con != null) {
+            Core.app.post(() -> con.get(DataIO.data));
+          }
         });
   }
-  
+
   public static void load(Fi file) {
-  	load(file , null);
+    load(file, null);
   }
 
   // 从指定文件将数据加载到内存
@@ -120,7 +123,9 @@ public class GameIO {
             Log.err("Load read failed", e);
             DataIO.data = null;
           }
-          Core.app.post(() -> onData.get(DataIO.data));
+          if (onData != null) {
+            Core.app.post(() -> onData.get(DataIO.data));
+          }
         });
   }
 }

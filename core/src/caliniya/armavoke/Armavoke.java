@@ -105,7 +105,7 @@ public class Armavoke extends ApplicationCore {
       Draw.proj(camera);
 
       for (caliniya.armavoke.system.System sys : Systems.systems) {
-        if (sys == null) {
+        if (sys == null || !sys.inited) {
           continue;
         }
         sys.update();

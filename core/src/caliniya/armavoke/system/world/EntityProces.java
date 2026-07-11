@@ -63,47 +63,7 @@ public class EntityProces extends System<EntityProces> {
           }
           if (task3) {
             u.write(DataIO.w);
-          }
-          if (task2) {
-            // 任务二写入调试版
-            for (int y = 0; y < WorldData.world.H; y++) {
-              for (int x = 0; x < WorldData.world.W; x++) {
-                Floor floor = WorldData.world.getFloor(x, y);
-                ENVBlock block = WorldData.world.getENVBlock(x, y);
-                DataIO.w.s(floor == null ? 0 : floorMap.get(floor, 0));
-                DataIO.w.s(block == null ? 0 : blockMap.get(block, 0));
-              }
-            }
-          }
-          if (task) {
-            // 任务一 --- 准备调色板 ---
-            floorPalette = new Ar<>();
-            floorMap = new ObjectIntMap<>();
-            blockPalette = new Ar<>();
-            blockMap = new ObjectIntMap<>();
-
-            floorPalette.add((Floor) null);
-            blockPalette.add((ENVBlock) null);
-
-            int width = WorldData.world.W;
-            int height = WorldData.world.H;
-
-            // [进度] 阶段1：扫描调色板 0.00 → 0.35
-            for (int y = 0; y < height; y++) {
-              for (int x = 0; x < width; x++) {
-                Floor floor = WorldData.world.getFloor(x, y);
-                ENVBlock block = WorldData.world.getENVBlock(x, y);
-
-                if (floor != null && !floorMap.containsKey(floor)) {
-                  floorMap.put(floor, floorPalette.size);
-                  floorPalette.add(floor);
-                }
-                if (block != null && !blockMap.containsKey(block)) {
-                  blockMap.put(block, blockPalette.size);
-                  blockPalette.add(block);
-                }
-              }
-            }
+            DataIO.w.b(DataIO.END_MARKER);
           }
         });
 
@@ -121,15 +81,57 @@ public class EntityProces extends System<EntityProces> {
           }
           if (task3) {
             b.write(DataIO.w);
+            DataIO.w.b(DataIO.END_MARKER);
             // 当这一步执行完的时候，向内存中的数据写入就完成了
-            DataIO.data = DataIO.bos.toByteArray();
-            DataIO.copyed = true;
-            GameIO.save(DataIO.saveTarget);
           }
         });
+    if (task2) {
+      // 任务二写入调试版
+      for (int y = 0; y < WorldData.world.H; y++) {
+        for (int x = 0; x < WorldData.world.W; x++) {
+          Floor floor = WorldData.world.getFloor(x, y);
+          ENVBlock block = WorldData.world.getENVBlock(x, y);
+          DataIO.w.s(floor == null ? 0 : floorMap.get(floor, 0));
+          DataIO.w.s(block == null ? 0 : blockMap.get(block, 0));
+        }
+      }
+    }
+    if (task) {
+      // 任务一 --- 准备调色板 ---
+      floorPalette = new Ar<>();
+      floorMap = new ObjectIntMap<>();
+      blockPalette = new Ar<>();
+      blockMap = new ObjectIntMap<>();
+
+      floorPalette.add((Floor) null);
+      blockPalette.add((ENVBlock) null);
+
+      int width = WorldData.world.W;
+      int height = WorldData.world.H;
+
+      // [进度] 阶段1：扫描调色板 0.00 → 0.35
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          Floor floor = WorldData.world.getFloor(x, y);
+          ENVBlock block = WorldData.world.getENVBlock(x, y);
+
+          if (floor != null && !floorMap.containsKey(floor)) {
+            floorMap.put(floor, floorPalette.size);
+            floorPalette.add(floor);
+          }
+          if (block != null && !blockMap.containsKey(block)) {
+            blockMap.put(block, blockPalette.size);
+            blockPalette.add(block);
+          }
+        }
+      }
+    }
 
     if (task3) {
       task3 = false;
+      DataIO.data = DataIO.bos.toByteArray();
+      DataIO.copyed = true;
+      GameIO.save(DataIO.saveTarget);
     }
 
     if (task2) {
