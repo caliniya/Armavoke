@@ -97,6 +97,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
     if (isThreaded) {
       startThread();
       Events.run(EventType.events.ThreadedStop, () -> stopThread());
+      //Events.on(EventType.events.)
     }
 
     // 只有可暂停的系统才注册暂停事件监听

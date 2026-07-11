@@ -13,7 +13,7 @@ public class Maps {
     public static void load() {
         maps.clear();
         
-        Fi mapDir = Core.settings.getDataDirectory().child("/saves");
+        Fi mapDir = Core.settings.getDataDirectory().child("/map");
         if (!mapDir.exists()) mapDir.mkdirs();
 
         // 遍历所有文件

@@ -87,6 +87,11 @@ public class GameIO {
     ioQueue.add(task);
   }
 
+  /** 进度回调（判空 + 裁剪到 [0,1]）。 */
+  private static void report(arc.func.Floatc cb, float v) {
+    if (cb != null) cb.get(v < 0f ? 0f : (v > 1f ? 1f : v));
+  }
+
   // ==================== 元数据读取 ====================
 
   /** 快速读取存档头，返回 Map 元数据对象（不加载游戏数据） */
@@ -117,7 +122,7 @@ public class GameIO {
    * @param tags 附加标签（可空）
    */
   public static void save(Fi file, @Nullable StringMap tags) {
-    save(file, tags, null);
+    save(file, tags, null, null);
   }
 
   /**
@@ -128,22 +133,44 @@ public class GameIO {
    * @param onComplete 写盘完成后的回调（在【主线程】执行，参数为是否成功；可空）
    */
   public static void save(Fi file, @Nullable StringMap tags, @Nullable arc.func.Boolc onComplete) {
+    save(file, tags, onComplete, null);
+  }
+
+  /**
+   * 异步保存，带完成回调 + 进度回调。
+   *
+   * <p><b>进度回调线程说明：</b>{@code onProgress} 在【执行序列化的线程】被调用。
+   * 由于 snapshot 默认跑在调用线程（通常主线程），对大地图它会阻塞渲染，
+   * 进度条在序列化阶段不会刷新，只有写盘阶段能看到 0.95→1.0。
+   * 想让进度条在整段过程都流畅，需把 snapshot 放后台线程执行
+   * （并保证此期间世界数据不被并发修改，例如先暂停逻辑线程）。
+   *
+   * @param file 目标文件
+   * @param tags 附加标签（可空）
+   * @param onComplete 写盘完成后回调（主线程执行，参数为是否成功；可空）
+   * @param onProgress 进度回调 [0,1]（在序列化线程执行；可空）
+   */
+  public static void save(
+      Fi file,
+      @Nullable StringMap tags,
+      @Nullable arc.func.Boolc onComplete,
+      @Nullable arc.func.Floatc onProgress) {
     final byte[] snapshot;
     try {
-      // ① 主线程：序列化到内存 = 复制一份一致性快照
-      snapshot = snapshot(tags);
+      // ① 序列化到内存（大头耗时，进度 0.00 → 0.95 在此产生）
+      snapshot = snapshot(tags, onProgress);
     } catch (Throwable e) {
       Log.err("Snapshot failed", e);
       if (onComplete != null) onComplete.get(false);
       return;
     }
 
-    // ② 后台线程：把快照写盘（慢的磁盘 I/O 不在主线程）
+    // ② 后台线程写盘（进度 0.95 → 1.00）
     submitIo(
         () -> {
           boolean ok = writeSnapshot(file, snapshot);
+          report(onProgress, 1f);
           if (onComplete != null) {
-            // 回调切回主线程，方便调用方安全操作 UI / 游戏状态
             Core.app.post(() -> onComplete.get(ok));
           }
         });
@@ -154,7 +181,7 @@ public class GameIO {
    */
   public static void saveSync(Fi file, @Nullable StringMap tags) {
     try {
-      byte[] snapshot = snapshot(tags);
+      byte[] snapshot = snapshot(tags, null);
       writeSnapshot(file, snapshot);
     } catch (Throwable e) {
       Log.err("Save(sync) failed", e);
@@ -164,7 +191,8 @@ public class GameIO {
   /**
    * 把当前游戏状态序列化成内存字节数组（一致性快照）。 该方法必须在【游戏逻辑线程/主线程】调用，调用期间不应有其他线程修改世界数据。
    */
-  private static byte[] snapshot(@Nullable StringMap tags) throws IOException {
+  private static byte[] snapshot(@Nullable StringMap tags, @Nullable arc.func.Floatc onProgress)
+      throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream(1 << 20); // 预分配 1MB
     try (DataOutputStream stream = new DataOutputStream(bos)) {
       Writes w = new Writes(stream);
@@ -196,6 +224,7 @@ public class GameIO {
       int width = WorldData.world.W;
       int height = WorldData.world.H;
 
+      // [进度] 阶段1：扫描调色板 0.00 → 0.35
       for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
           Floor floor = WorldData.world.getFloor(x, y);
@@ -210,6 +239,7 @@ public class GameIO {
             blockPalette.add(block);
           }
         }
+        report(onProgress, 0.35f * (y + 1) / height);
       }
 
       // 写入调色板
@@ -225,7 +255,7 @@ public class GameIO {
         w.str(b == null ? "null" : b.internalName);
       }
 
-      // 写入地图数据
+      // [进度] 阶段2：写入地图数据 0.35 → 0.70
       for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
           Floor floor = WorldData.world.getFloor(x, y);
@@ -233,23 +263,35 @@ public class GameIO {
           w.s(floor == null ? 0 : floorMap.get(floor, 0));
           w.s(block == null ? 0 : blockMap.get(block, 0));
         }
+        report(onProgress, 0.35f + 0.35f * (y + 1) / height);
       }
 
-      // --- Units ---
-      w.i(WorldData.units.size);
+      // --- Units --- [进度] 0.70 → 0.85
+      int unitCount = WorldData.units.size;
+      w.i(unitCount);
+      int ui = 0;
       for (Unit u : WorldData.units) {
         w.str(u.type.internalName);
         u.write(w);
         w.b(END_MARKER); // 结束标记
+        ui++;
+        if ((ui & 63) == 0 && unitCount > 0) report(onProgress, 0.70f + 0.15f * ui / unitCount);
       }
+      report(onProgress, 0.85f);
 
-      // --- Buildings ---
-      w.i(WorldData.buildings.size);
+      // --- Buildings --- [进度] 0.85 → 0.95
+      int buildingCount = WorldData.buildings.size;
+      w.i(buildingCount);
+      int bi = 0;
       for (Building b : WorldData.buildings) {
         w.str(b.block.internalName);
         b.write(w);
         w.b(END_MARKER); // 结束标记
+        bi++;
+        if ((bi & 63) == 0 && buildingCount > 0)
+          report(onProgress, 0.85f + 0.10f * bi / buildingCount);
       }
+      report(onProgress, 0.95f);
 
       stream.flush();
     }
@@ -288,7 +330,7 @@ public class GameIO {
   }
 
   /** 读取存档 body：调色板 → 地图数据 → 单位 → 建筑 → 寻路初始化。 调用前 WorldData.world 必须已经通过 reBuildAll 初始化。 */
-  private static void readBody(Reads r, int width, int height) {
+  private static void readBody(Reads r, int width, int height, @Nullable arc.func.Floatc onProgress) {
     // --- 调色板 ---
     int floorPaletteSize = r.s();
     Floor[] floorLookup = new Floor[floorPaletteSize];
@@ -304,7 +346,7 @@ public class GameIO {
       blockLookup[i] = name.equals("null") ? null : Contents.get(name, ENVBlock.class);
     }
 
-    // --- 地图数据 ---
+    // --- 地图数据 --- [进度] 0.00 → 0.55
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         short floorId = r.s();
@@ -315,9 +357,10 @@ public class GameIO {
         WorldData.world.setFloor(x, y, floor);
         WorldData.world.setENVBlock(x, y, block);
       }
+      report(onProgress, 0.55f * (y + 1) / height);
     }
 
-    // --- Units ---
+    // --- Units --- [进度] 0.55 → 0.80
     int unitCount = r.i();
     for (int i = 0; i < unitCount; i++) {
       String typeName = r.str();
@@ -330,9 +373,11 @@ public class GameIO {
         Log.warn("Unknown unit type in save: @, skipping...", typeName);
         skipToEndMarker(r);
       }
+      if ((i & 63) == 0 && unitCount > 0) report(onProgress, 0.55f + 0.25f * (i + 1) / unitCount);
     }
+    report(onProgress, 0.80f);
 
-    // --- Buildings ---
+    // --- Buildings --- [进度] 0.80 → 0.95
     int buildingCount = r.i();
     for (int i = 0; i < buildingCount; i++) {
       String typeName = r.str();
@@ -347,16 +392,21 @@ public class GameIO {
         Log.warn("Unknown block type in save: @, skipping...", typeName);
         skipToEndMarker(r);
       }
+      if ((i & 63) == 0 && buildingCount > 0)
+        report(onProgress, 0.80f + 0.15f * (i + 1) / buildingCount);
     }
+    report(onProgress, 0.95f);
 
     // --- 初始化寻路 ---
     RouteData.init();
+    report(onProgress, 1f);
   }
 
   /**
    * 从内存字节数据解析并重建世界（直接读完整 header）。 必须在【主线程】调用，因为会创建游戏对象、修改 WorldData。
    */
-  private static void applyFromBytes(byte[] data) throws IOException {
+  private static void applyFromBytes(byte[] data, @Nullable arc.func.Floatc onProgress)
+      throws IOException {
     try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(data))) {
       Reads r = new Reads(stream);
 
@@ -375,7 +425,7 @@ public class GameIO {
       boolean isSpace = tags.getBool("space");
 
       WorldData.reBuildAll(width, height, isSpace);
-      readBody(r, width, height);
+      readBody(r, width, height, onProgress);
     }
   }
 
@@ -389,6 +439,23 @@ public class GameIO {
    * @param onComplete 完成回调（主线程执行，参数为是否成功；可空）
    */
   public static void loadAsync(Fi file, @Nullable arc.func.Boolc onComplete) {
+    loadAsync(file, onComplete, null);
+  }
+
+  /**
+   * 异步加载，带进度回调。
+   *
+   * <p><b>线程说明：</b>读盘在后台线程；解析/重建世界（applyFromBytes）切回【主线程】执行，
+   * 所以 {@code onProgress} 在主线程被调用。对大地图，解析会阻塞主线程/渲染，
+   * 进度条同样可能不流畅——建议加载时用加载遮罩挡住画面，或把解析也放后台
+   * （需保证渲染线程此刻不遍历 WorldData）。
+   *
+   * @param file 存档文件
+   * @param onComplete 完成回调（主线程执行，参数为是否成功；可空）
+   * @param onProgress 进度回调 [0,1]（主线程执行；可空）
+   */
+  public static void loadAsync(
+      Fi file, @Nullable arc.func.Boolc onComplete, @Nullable arc.func.Floatc onProgress) {
     submitIo(
         () -> {
           final byte[] data;
@@ -404,7 +471,7 @@ public class GameIO {
               () -> {
                 boolean ok = true;
                 try {
-                  applyFromBytes(data);
+                  applyFromBytes(data, onProgress);
                 } catch (Throwable e) {
                   Log.err("Load(async) parse failed", e);
                   WorldData.initWorld();
@@ -446,7 +513,7 @@ public class GameIO {
       }
 
       WorldData.reBuildAll(map.width, map.height, map.space);
-      readBody(r, map.width, map.height);
+      readBody(r, map.width, map.height, null);
 
     } catch (IOException e) {
       Log.err("Load(Map) failed", e);
@@ -474,7 +541,7 @@ public class GameIO {
       boolean isSpace = tags.getBool("space");
 
       WorldData.reBuildAll(width, height, isSpace);
-      readBody(r, width, height);
+      readBody(r, width, height, null);
 
     } catch (IOException e) {
       Log.err("Load failed", e);

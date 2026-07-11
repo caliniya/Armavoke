@@ -8,6 +8,9 @@ import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.StringMap;
 import arc.util.Log;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.content.Blocks;
+import caliniya.armavoke.game.Building;
 import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.core.InitGame;
 import caliniya.armavoke.core.UI;
@@ -25,7 +28,7 @@ import caliniya.armavoke.ui.windows.DataWindow;
 public class MenuFragment {
 
   public Table root;
-  
+
   public static String temp;
 
   public void build() {
@@ -59,14 +62,40 @@ public class MenuFragment {
                       }));
               menu.row();
 
-              menu.add(new Button("test2", () -> {
-                      InitGame.testinit();
-                      ObjectMap<String , String> tag = new ObjectMap<String , String>();
-                      tag.put("author" , "calinya");
-                      tag.put("name" , "spaceTest");
-                      tag.put("map" , "0000");
-                      GameIO.save(Core.settings.getDataDirectory().child("maps/space.aevs") , new StringMap(tag));
-              }));
+              menu.add(
+                  new Button(
+                      "test2",
+                      () -> {
+                        WorldData.initWorld();
+                        Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
+
+                        // 生成随机测试建筑
+                        int padding = 100;
+                        int buildingCount = 3;
+                        for (int i = 0; i < buildingCount; i++) {
+                          int bx = padding + (int) (Math.random() * (WorldData.world.W - padding * 2));
+                          int by = padding + (int) (Math.random() * (WorldData.world.H - padding * 2));
+                          if (WorldData.world.isSolid(bx, by)) {
+                            i--;
+                            continue;
+                          }
+                          WorldData.world.setBuilding(bx, by, Blocks.TestBlock, TeamTypes.Mutex);
+                        }
+
+                        // --- 新增：在地图中心生成敌方测试炮塔 ---
+                        int centerX = WorldData.world.W / 2;
+                        int centerY = WorldData.world.H / 2;
+
+                        Building enemyTurret =
+                            WorldData.world.setBuilding(centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
+                        ObjectMap<String, String> tag = new ObjectMap<String, String>();
+                        tag.put("author", "calinya");
+                        tag.put("name", "spaceTest");
+                        tag.put("map", "0000");
+                        GameIO.save(
+                            Core.settings.getDataDirectory().child("map/space.aevs"),
+                            new StringMap(tag));
+                      }));
               menu.row();
 
               menu.add(

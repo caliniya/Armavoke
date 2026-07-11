@@ -1,13 +1,16 @@
 package caliniya.armavoke.base.type;
 
 public class EventType {
-  
-  public enum events{
+
+  public enum events {
     Mapinit,
-    ThreadedStop,//线程终止
-    ;
+    ThreadedStop, // 线程终止
+    StartLoad, // 开始从存储中加载内容
+    FinishLoad, // 完成加载，所有线程系统可以开始继续工作
+    StartSave // 开始保存，所有系统应立即暂停(？)
+  ;
   }
-  
+
   public static class GameInit {}
 
   public static class CommandChange {
@@ -18,7 +21,7 @@ public class EventType {
     }
   }
 
-public static class GamePause {
+  public static class GamePause {
     public final boolean pause;
 
     public GamePause(boolean pause) {
