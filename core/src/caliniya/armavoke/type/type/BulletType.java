@@ -13,7 +13,7 @@ import caliniya.armavoke.ui.Fonts;
 public class BulletType {
 
   public float speed = 6f;
-  public float damage = 10f;
+  public float damage = 10000f;
   public float lifetime = 600f;
   public float size = 60f;
   

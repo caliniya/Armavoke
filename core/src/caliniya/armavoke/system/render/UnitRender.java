@@ -50,13 +50,11 @@ public class UnitRender extends System<UnitRender> {
     synchronized (BulletProcess.BULLET_LOCK) {
       temp.addAll(WorldData.bullets);
     }
-
-    for (int i = 0; i < temp.size; ++i) {
-      Bullet b = temp.get(i);
-      if (shouldDraw(b.x, b.y, 64f)) {
-        b.type.draw(b);
+    temp.each(b ->{
+      if(shouldDraw(b.x ,b.y ,b.type.size)) {
+      	b.type.draw(b);
       }
-    }
+    });
   }
 
   // 通用的剔除方法
