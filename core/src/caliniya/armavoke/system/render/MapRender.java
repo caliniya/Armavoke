@@ -39,13 +39,8 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
     // WorldData.initWorld();
     world = WorldData.world;
     this.index = 5;
-    spaceShader = new SpaceShader();
+    spaceShader = Shaders.spaceShader;
     initChunks();
-    try {
-      spaceShader = new SpaceShader();
-    } catch (Exception e) {
-      arc.util.Log.err("Failed to load space shader", e);
-    }
     return super.init();
   }
 

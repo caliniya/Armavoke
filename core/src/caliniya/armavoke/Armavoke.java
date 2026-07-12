@@ -24,6 +24,7 @@ import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.base.shaders.*;
 import caliniya.armavoke.type.type.*;
 
 public class Armavoke extends ApplicationCore {
@@ -55,6 +56,7 @@ public class Armavoke extends ApplicationCore {
     graphics.clear(Color.black);
     // 资源加载完成后的初始化
     if (assets.update() && !assinited) {
+      Shaders.load();
       Fonts.setup();
       atlas = assets.get("sprites/sprites.aatls", TextureAtlas.class);
       Styles.load();

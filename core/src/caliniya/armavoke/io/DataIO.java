@@ -1,5 +1,6 @@
 package caliniya.armavoke.io;
 
+import arc.Core;
 import arc.files.Fi;
 import arc.struct.StringMap;
 import arc.util.io.*;
@@ -92,9 +93,13 @@ public class DataIO {
       GameIO.submitIo(
           () -> {
             read(r, width, height);
-            Data.loadSystems();
-            Data.enter();
+            Core.app.post(
+                () -> {
+                  Data.loadSystems();
+                  Data.enter();
+                });
           });
+
     } catch (Throwable e) {
       Log.err("Restore failed", e);
     }
@@ -130,6 +135,8 @@ public class DataIO {
       }
     }
 
+    RouteData.init();
+
     // --- Units ---
     int unitCount = r.i();
     for (int i = 0; i < unitCount; i++) {
@@ -161,9 +168,6 @@ public class DataIO {
         skipToEndMarker(r);
       }
     }
-
-    // --- 初始化寻路 ---
-    RouteData.init();
   }
 
   /**

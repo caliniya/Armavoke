@@ -16,9 +16,9 @@ public class Building extends Entity {
   // --- 锚点坐标 (左下角起始点) ---
   // 0:上, 1:右, 2:下, 3:左
   public int tx, ty, angle;
-  
+
   public TeamData teamData;
-  
+
   public float rotation; // 实际渲染旋转角度 (精确到度，用于炮塔转动)
   public float reload; // 武器装填进度
 
@@ -51,19 +51,12 @@ public class Building extends Entity {
       this.item.setFilter(block.allowItem);
     }
 
-    // 分配 ID
-    if (this.id <= 0) this.id = Entities.assignID();
-
     // 计算旋转后的形状数据
     if (block.shapeOffsets != null) {
       this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
     } else {
       this.shapeOffsets = null;
     }
-    
-    Teams.add(this);
-    teamData = team.data();
-    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
   }
 
   @Override
@@ -126,10 +119,10 @@ public class Building extends Entity {
     }
 
     WorldData.buildings.remove(this);
-    WorldData.world.removeBuilding(tx , ty);
+    WorldData.world.removeBuilding(tx, ty);
     // 归还 ID
     id = Entities.freeID(id);
-    
+
     Pools.free(this);
   }
 
@@ -149,32 +142,28 @@ public class Building extends Entity {
   /** 写入存档数据 */
   @Override
   public void write(Writes w) {
-
-    w.i(tx);
-    w.i(ty);
     w.b((byte) angle); // 0-3 只需要一个字节
 
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
-
+    w.s(id);
+    
     block.write(this, w);
-
     item.write(w);
   }
 
   /** 读取存档数据 */
   @Override
   public void read(Reads r) {
-    this.tx = r.i();
-    this.ty = r.i();
     this.angle = r.b();
-    
+
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];
-    
+    this.id = r.s();
+
     block.read(this, r);
-    
+
     if (this.item == null && block != null) {
       this.item = new ItemModule(block.capacity);
       this.item.setFilter(block.allowItem);
@@ -191,6 +180,10 @@ public class Building extends Entity {
       }
     }
 
+    Teams.add(this);
+    teamData = team.data();
+    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
+
     this.id = Entities.assignID();
   }
 
@@ -202,18 +195,29 @@ public class Building extends Entity {
     building.ty = ty;
     building.angle = angle;
     building.team = team;
+    Teams.add(building);
+    building.teamData = team.data();
+    building.teamData.updateChunk(building, -1, WorldData.getChunkIndex(building.x, building.y));
     building.init();
+    building.id = Entities.assignID();
     return building;
   }
 
   public static Building create(Block block, int tx, int ty, int angle) {
-    return create(block, tx, ty, angle, null);
+    Building building = Pools.obtain(Building.class, Building::new);
+    building.block = block;
+    building.tx = tx;
+    building.ty = ty;
+    building.angle = angle;
+    building.init();
+    return building;
   }
+
   public static Building create(Block block, int tx, int ty, TeamTypes team) {
     return create(block, tx, ty, 0, team);
   }
 
   public static Building create(Block block, int tx, int ty) {
-    return create(block, tx, ty, 0, null);
+    return create(block, tx, ty, 0);
   }
 }

@@ -69,6 +69,9 @@ public class Unit extends Entity {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
     u.team = team;
+    u.teamData = team.data();
+    u.teamData.updateChunk(u, -1, WorldData.getChunkIndex(x, y));
+    Teams.add(u);
     u.x = x;
     u.y = y;
     u.item = new ItemModule(type.itemCap);
@@ -83,6 +86,7 @@ public class Unit extends Entity {
   public static Unit create(UnitType type) {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
+    u.item = new ItemModule(type.itemCap);
     u.init();
     return u;
   }
@@ -112,8 +116,6 @@ public class Unit extends Entity {
       this.size = this.type.size;
     }
 
-    teamData = team.data();
-    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
     canShoot = true; // 单位一般情况都是可以射击的
 
     weapons.clear();
@@ -428,6 +430,11 @@ public class Unit extends Entity {
       this.team = TeamTypes.Abort;
     }
 
+    Teams.add(this);
+
+    teamData = team.data();
+    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
+
     this.speedX = 0;
     this.speedY = 0;
 
@@ -438,21 +445,16 @@ public class Unit extends Entity {
     this.pathed = false;
     this.velocityDirty = true;
     WorldData.moveunits.add(this);
-    
+    WorldData.units.add(this);
+
     updateHitbox();
-    
+
     updateChunkPosition();
   }
 
   public void updateTeamData() {
     if (this.team == null) this.team = TeamTypes.Abort;
     this.teamData = this.team.data();
-    Teams.add(this);
-  }
-
-  public void updateTeamData(TeamTypes newTeam) {
-    this.team = newTeam;
-    updateTeamData();
   }
 
   public void setTeam(TeamTypes newTeam) {

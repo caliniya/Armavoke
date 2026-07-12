@@ -21,7 +21,7 @@ public class Entities {
     }
     return ++lastEntityID;
   }
-
+  
   /** 回收一个实体ID，供后续实体重用。
    同时直接返回-1便于调用 */
   public static int freeID(int id) {
