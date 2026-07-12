@@ -160,7 +160,7 @@ public class Building extends Entity {
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];
-    this.id = r.s();
+    this.id = Entities.checkoutID(r.s());
 
     block.read(this, r);
 
@@ -183,8 +183,6 @@ public class Building extends Entity {
     Teams.add(this);
     teamData = team.data();
     teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
-
-    this.id = Entities.assignID();
   }
 
   // --- 静态工厂方法 ---

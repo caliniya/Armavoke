@@ -76,6 +76,7 @@ public class Unit extends Entity {
     u.y = y;
     u.item = new ItemModule(type.itemCap);
     u.init();
+    this.id = Entities.assignID();
     WorldData.units.add(u);
     u.updateChunkPosition();
     u.updateTeamData();
@@ -131,7 +132,6 @@ public class Unit extends Entity {
     this.rotation = 0f;
     this.speedX = 0f;
     this.speedY = 0f;
-    this.id = Entities.assignID();
 
     this.targetX = this.x;
     this.targetY = this.y;
@@ -411,6 +411,7 @@ public class Unit extends Entity {
     w.f(targetX);
     w.f(targetY);
     w.b(team.ordinal());
+    w.s(id);
   }
 
   @Override
@@ -423,6 +424,7 @@ public class Unit extends Entity {
     this.targetX = r.f();
     this.targetY = r.f();
     byte teamId = r.b();
+    this.id = Entities.checkoutID(r.s());
 
     if (teamId >= 0 && teamId < TeamTypes.values().length) {
       this.team = TeamTypes.values()[teamId];
