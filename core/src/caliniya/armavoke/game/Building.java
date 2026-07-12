@@ -111,15 +111,17 @@ public class Building extends Entity {
   public void remove() {
     // 从团队空间网格注销
     Teams.remove(this);
+    this.team = null;
+    this.teamData = null;
     if (this.team != null && currentChunkIndex != -1) {
       TeamData td = Teams.get(this.team);
       if (td != null && td.entityGrid != null && currentChunkIndex < td.entityGrid.length) {
         td.entityGrid[currentChunkIndex].remove(this);
       }
     }
-
-    WorldData.buildings.remove(this);
+    currentChunkIndex = -1;
     WorldData.world.removeBuilding(tx, ty);
+
     // 归还 ID
     id = Entities.freeID(id);
 
@@ -129,10 +131,13 @@ public class Building extends Entity {
   @Override
   public void reset() {
     super.reset();
-    block = null;
+    // block = null;
+    health = 0;
     shapeOffsets = null;
     tx = 0;
     ty = 0;
+    x = 0;
+    y = 0;
     angle = 0;
     rotation = 0;
     reload = 0;

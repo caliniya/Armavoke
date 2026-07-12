@@ -4,6 +4,8 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.util.ArcRuntimeException;
+import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.type.Bullet;
@@ -52,7 +54,7 @@ public class UnitRender extends System<UnitRender> {
     for (int i = 0; i < temp.size; ++i) {
       Bullet b = temp.get(i);
       if (shouldDraw(b.x, b.y, 64f)) {
-        drawBullet(b);
+        b.type.draw(b);
       }
     }
   }
@@ -66,12 +68,4 @@ public class UnitRender extends System<UnitRender> {
     float h = Core.camera.height / 2f + buffer;
     return x > viewX - w && x < viewX + w && y > viewY - h && y < viewY + h;
   }
-
-  // 子弹绘制逻辑
-  private void drawBullet(Bullet b) {
-    if (b.type == null) return;
-    b.type.draw(b);
-  }
-
-  // 移除了旧的 drawDebug(Unit u) 方法
 }

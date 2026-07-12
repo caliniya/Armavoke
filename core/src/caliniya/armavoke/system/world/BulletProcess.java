@@ -1,8 +1,12 @@
 package caliniya.armavoke.system.world;
 
+import arc.Core;
+import arc.util.ArcRuntimeException;
 import arc.util.Log;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Building;
+import caliniya.armavoke.game.Entities;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.Bullet;
@@ -17,9 +21,9 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   /**
    * 子弹双缓冲的专用锁对象。
    *
-   * <p><b>关键：</b>逻辑线程会交换 {@link WorldData#bullets} 与 {@link #renderBuffer} 的引用，
-   * 所以绝对不能用 {@code synchronized(WorldData.bullets)} 加锁——那样锁的是"当前指向的对象实例"，
-   * 交换后两个线程会锁在不同实例上，互斥失效，导致渲染读到正在被清空/重填的缓冲 → 子弹闪烁。
+   * <p><b>关键：</b>逻辑线程会交换 {@link WorldData#bullets} 与 {@link #renderBuffer} 的引用， 所以绝对不能用 {@code
+   * synchronized(WorldData.bullets)} 加锁——那样锁的是"当前指向的对象实例"， 交换后两个线程会锁在不同实例上，互斥失效，导致渲染读到正在被清空/重填的缓冲 →
+   * 子弹闪烁。
    *
    * <p>因此这里用一个永不变化的 final 锁对象，逻辑线程（swap / clearAll）与渲染线程 都统一锁它。
    */
@@ -118,138 +122,28 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   public void update(float detla) {
     // 1. 合并待处理子弹
     synchronized (pendingBullets) {
-      int pSize = pendingBullets.size;
-      if (pSize > 0) {
-        Object[] pItems = pendingBullets.items;
-        for (int i = 0; i < pSize; i++) {
-          activeBullets.add((Bullet) pItems[i]);
-          pItems[i] = null;
-        }
-        pendingBullets.size = 0;
-      }
+      activeBullets.addAll(pendingBullets);
+      pendingBullets.clear();
     }
-
-    int gridW = WorldData.gridW;
-    int gridH = WorldData.gridH;
-    Ar<Unit>[] grid = WorldData.unitGrid;
-    float chunkSize = WorldData.CHUNK_PIXEL_SIZE;
-
-    Object[] activeItems = activeBullets.items;
-    renderBuffer.clear();
-
-    // 2. 遍历更新所有活跃子弹
-    for (int i = 0; i < activeBullets.size; i++) {
-      Bullet b = (Bullet) activeItems[i];
-
-      if (b == null || b.type == null) {
-        activeItems[i] = activeItems[--activeBullets.size];
-        activeItems[activeBullets.size] = null;
-        i--;
-        continue;
-      }
-
-      b.time += 1f;
-      if (b.time >= b.type.lifetime) {
-        b.type.despawn(b);
-        activeItems[i] = activeItems[--activeBullets.size];
-        activeItems[activeBullets.size] = null;
-        i--;
-        continue;
-      }
-
-      float nextX = b.x + b.velX * detla;
-      float nextY = b.y + b.velY * detla;
-
-      // --- 碰撞检测 --
-
-      Building buildTarget = null;
-      int tileX = (int) (nextX / WorldData.TILE_SIZE);
-      int tileY = (int) (nextY / WorldData.TILE_SIZE);
-
-      if (WorldData.world.isValidCoord(tileX, tileY)) {
-        Building building = WorldData.world.getBuilding(tileX, tileY);
-        if (building != null
-            && building.health > 0
-            && building.team != b.team
-            && building.block.solid) {
-          buildTarget = building;
-        }
-      }
-
-      if (buildTarget != null) {
-        // 命中建筑
-        b.x = nextX;
-        b.y = nextY;
-        b.type.hit(b, buildTarget);
-
-        activeItems[i] = activeItems[--activeBullets.size];
-        activeItems[activeBullets.size] = null;
-        i--;
-        continue; // 子弹已销毁，跳过后续检测
-      }
-
-      // 检测单位碰撞
-      Unit hitTarget = null;
-      float bHalf = b.type.size / 2f;
-      int cx = (int) (nextX / chunkSize);
-      int cy = (int) (nextY / chunkSize);
-
-      collisionBlock:
-      for (int dy = -1; dy <= 1; dy++) {
-        int ncy = cy + dy;
-        if (ncy < 0 || ncy >= gridH) continue;
-        int rowOffset = ncy * gridW;
-
-        for (int dx = -1; dx <= 1; dx++) {
-          int ncx = cx + dx;
-          if (ncx < 0 || ncx >= gridW) continue;
-
-          Ar<Unit> units = grid[rowOffset + ncx];
-          if (units == null || units.size == 0) continue;
-
-          Object[] uItems = units.items;
-          int uSize = units.size;
-
-          for (int j = 0; j < uSize; j++) {
-            Unit u = (Unit) uItems[j];
-
-            if (u == null || u.team == b.team || u.health <= 0) continue;
-
-            float unitRad = u.size / 2f;
-            float combRad = bHalf + unitRad;
-
-            float diffX = nextX - u.x;
-            float diffY = nextY - u.y;
-
-            if (diffX * diffX + diffY * diffY > combRad * combRad) {
-              continue;
-            }
-
-            if (u.contains(nextX, nextY) || (diffX * diffX + diffY * diffY < bHalf * bHalf)) {
-              hitTarget = u;
-              break collisionBlock;
-            }
+    activeBullets.each(
+        b -> {
+          b.time += 1f;
+          if (b.time >= b.type.lifetime) {
+            b.type.despawn(b);
+            activeBullets.remove(b);
+            return;
           }
-        }
-      }
-
-      // --- 处理结果 ---
-      if (hitTarget != null) {
-        b.x = nextX;
-        b.y = nextY;
-        b.type.hit(b, hitTarget);
-
-        activeItems[i] = activeItems[--activeBullets.size];
-        activeItems[activeBullets.size] = null;
-        i--;
-      } else {
-        b.x = nextX;
-        b.y = nextY;
-        b.type.update(b);
-
-        renderBuffer.add(b);
-      }
-    }
+          float nextX = b.x + b.velX * detla;
+          float nextY = b.y + b.velY * detla;
+          Entities.nearbyEnemies(b.team, nextX, nextY, b.type.size, e -> {
+            if(e == null) {
+              b.type.update(b);
+              renderBuffer.add(b);
+              return;
+            };
+            b.type.hit(b,e);
+          });
+        });
 
     // 5. 交换渲染缓冲区（用固定锁对象，保证与渲染线程互斥）
     synchronized (BULLET_LOCK) {

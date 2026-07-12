@@ -198,10 +198,11 @@ public class Unit extends Entity {
     Teams.remove(this);
     this.team = null;
     this.teamData = null;
-    if (currentChunkIndex != -1
-        && WorldData.unitGrid != null
-        && currentChunkIndex < WorldData.unitGrid.length) {
-      WorldData.unitGrid[currentChunkIndex].remove(this);
+    if (this.team != null && currentChunkIndex != -1) {
+      TeamData td = Teams.get(this.team);
+      if (td != null && td.entityGrid != null && currentChunkIndex < td.entityGrid.length) {
+        td.entityGrid[currentChunkIndex].remove(this);
+      }
     }
     isSelected = false;
     currentChunkIndex = -1;
@@ -379,20 +380,12 @@ public class Unit extends Entity {
   }
 
   private void updateChunkPosition() {
-    if (WorldData.unitGrid == null) return;
     int newIndex = WorldData.getChunkIndex(x, y);
-    if (newIndex < 0 || newIndex >= WorldData.unitGrid.length) return;
 
     if (newIndex != currentChunkIndex) {
-      if (currentChunkIndex != -1 && currentChunkIndex < WorldData.unitGrid.length) {
-        WorldData.unitGrid[currentChunkIndex].remove(this);
-        if (teamData != null) {
-          teamData.updateChunk(this, currentChunkIndex, newIndex);
-        }
-      }
-      WorldData.unitGrid[newIndex].add(this);
-      currentChunkIndex = newIndex;
+      teamData.updateChunk(this, currentChunkIndex, newIndex);
     }
+    currentChunkIndex = newIndex;
   }
 
   public void impuse(float knockX, float knockY) {
@@ -435,12 +428,9 @@ public class Unit extends Entity {
     Teams.add(this);
 
     teamData = team.data();
-    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
-
+    
     this.speedX = 0;
     this.speedY = 0;
-
-    updateTeamData();
 
     this.path = null;
     this.pathIndex = 0;
@@ -450,7 +440,6 @@ public class Unit extends Entity {
     WorldData.units.add(this);
 
     updateHitbox();
-
     updateChunkPosition();
   }
 

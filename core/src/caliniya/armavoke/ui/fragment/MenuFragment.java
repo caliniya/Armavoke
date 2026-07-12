@@ -14,6 +14,7 @@ import caliniya.armavoke.game.Building;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
+import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
@@ -112,6 +113,7 @@ public class MenuFragment {
                   new Button(
                       "test3",
                       () -> {
+                        Game.team = TeamTypes.Evoke;
                         Data.load(Core.settings.getDataDirectory().child("map/space.aevs"));
                       }));
               menu.row();

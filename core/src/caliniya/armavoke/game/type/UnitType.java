@@ -17,7 +17,7 @@ import caliniya.armavoke.type.type.*;
 
 public class UnitType extends ContentType {
 
-  public float speed = 6f, // 格每秒
+  public float speed = 60f, // 格每秒
       health = 100f,
       speedt, // 像素每帧
       rotationSpeend = 1f // 旋转速度(单位帧每度？)

@@ -37,9 +37,6 @@ public class WorldData {
   // 网格的宽和高 (以区块为单位)
   public static int gridW, gridH;
 
-  // 存储分区的数组，每个元素是一个单位列表
-  public static Ar<Unit>[] unitGrid;
-
   private WorldData() {}
 
   @SuppressWarnings("unchecked")
@@ -61,13 +58,6 @@ public class WorldData {
 
     Teams.init();
     RouteData.init();
-
-    // 2. 初始化网格数组
-    int totalChunks = gridW * gridH;
-    unitGrid = new Ar[totalChunks];
-    for (int i = 0; i < totalChunks; i++) {
-      unitGrid[i] = new Ar<>(8); // 预设每个格子大概有8个单位，减少扩容开销
-    }
   }
 
   public static void clear() {
@@ -84,13 +74,6 @@ public class WorldData {
       buildings.each(b -> b.remove()); // 使用 remove 归还对象池,kill会有回调
       buildings.clear();
     }
-
-    // 清理网格中的残留引用
-    if (unitGrid != null) {
-      for (Ar<Unit> list : unitGrid) {
-        list.clear();
-      }
-    }
   }
 
   /** 根据像素坐标计算网格索引 */
@@ -104,12 +87,5 @@ public class WorldData {
     cy = Mathf.clamp(cy, 0, gridH - 1);
 
     return cy * gridW + cx;
-  }
-
-  /** 获取指定像素位置所在网格的单位列表 */
-  public static Ar<Unit> getUnitsAtChunk(float x, float y) {
-    if (unitGrid == null) return null;
-    int index = getChunkIndex(x, y);
-    return unitGrid[index];
   }
 }

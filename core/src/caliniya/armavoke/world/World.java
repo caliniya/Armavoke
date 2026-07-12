@@ -102,12 +102,13 @@ public class World {
     Building build = getBuilding(x, y);
     if (build == null) return;
 
+    WorldData.buildings.remove(build);
+
     // 通知导航数据：先取消实心标记（必须在清除区块前调用）
     if (build.block.solid) {
       RouteData.updateBlock(x, y);
     }
 
-    WorldData.buildings.remove(build);
     build.getOccupiedCoords(
         (tx, ty) -> {
           if (isValidCoord(tx, ty)) {

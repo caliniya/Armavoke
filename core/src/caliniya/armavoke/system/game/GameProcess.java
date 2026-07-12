@@ -30,7 +30,7 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
         });
     WorldData.buildings.each(
         b -> {
-          if (b != null || b.health <= 0) {
+          if (b != null || b.block != null || b.health <= 0) {
             b.update(Time.delta);
           }
         });

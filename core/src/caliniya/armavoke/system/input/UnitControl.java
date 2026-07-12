@@ -6,6 +6,7 @@ import arc.input.KeyCode;
 import arc.input.InputProcessor;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.*;
@@ -15,7 +16,9 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.*;
 
 public class UnitControl implements InputProcessor, GestureListener {
-
+  
+  public boolean b = false;
+    
   public UnitControl init() {
     // 状态现在由 CommandData.commanding 全局管理，无需本地监听器
     return this;
@@ -30,16 +33,19 @@ public class UnitControl implements InputProcessor, GestureListener {
     Vec2 worldPos = Core.camera.unproject(x, y);
     float wx = worldPos.x;
     float wy = worldPos.y;
+    
+    b = false;
 
-    // 1. 尝试查找单位 (使用专用的选择判定逻辑)
-    Unit target = findUnitForSelection(wx, wy);
-
-    if (target != null) {
-      if (target.team == Game.team) {
-        toggleUnitSelection(target);
-        return true;
-      }
-      // 如果点到了敌人，且当前有选中单位，可以视为攻击指令（此处暂略，执行移动逻辑）
+    CommandData.findUnit(
+        wx,
+        wy,
+        t -> {
+          if (t == null) return;
+          toggleUnitSelection(t);
+        });
+    
+    if(b) {
+    	return true;
     }
 
     // 2. 点击空地或敌人：尝试移动
@@ -60,6 +66,7 @@ public class UnitControl implements InputProcessor, GestureListener {
       u.isSelected = true;
       CommandData.checkedUnits.add(u);
     }
+    b = true;
   }
 
   /** 下达移动指令 */
@@ -90,42 +97,6 @@ public class UnitControl implements InputProcessor, GestureListener {
     int gx = (int) (wx / WorldData.TILE_SIZE);
     int gy = (int) (wy / WorldData.TILE_SIZE);
     return WorldData.world.isSolid(gx, gy);
-  }
-
-  /** 专门用于选择单位的查找逻辑。 将单位视作圆形，且直径为 size 的一半（半径为 size / 4）。 这样做是为了在点击复杂形状单位的边缘时，不会意外选中，体验更符合直觉。 */
-  private Unit findUnitForSelection(float wx, float wy) {
-    int cx = (int) (wx / WorldData.CHUNK_PIXEL_SIZE);
-    int cy = (int) (wy / WorldData.CHUNK_PIXEL_SIZE);
-
-    // 仅检查当前区块和周围 3x3 (简化版，足够覆盖选择半径)
-    for (int dy = -1; dy <= 1; dy++) {
-      int ncy = cy + dy;
-      if (ncy < 0 || ncy >= WorldData.gridH) continue;
-      int rowOffset = ncy * WorldData.gridW;
-
-      for (int dx = -1; dx <= 1; dx++) {
-        int ncx = cx + dx;
-        if (ncx < 0 || ncx >= WorldData.gridW) continue;
-
-        Ar<Unit> units = WorldData.unitGrid[rowOffset + ncx];
-        if (units == null || units.isEmpty()) continue;
-
-        // 倒序遍历，优先选中渲染在上层（列表靠后）的单位
-        for (int i = units.size - 1; i >= 0; i--) {
-          Unit u = units.get(i);
-          if (u == null || u.health <= 0) continue;
-
-          // 选择判定：半径 = size / 4.0f
-          float radius = u.size / 4.0f;
-          float dst2 = Mathf.dst2(wx, wy, u.x, u.y);
-
-          if (dst2 <= radius * radius) {
-            return u;
-          }
-        }
-      }
-    }
-    return null;
   }
 
   // InputProcessor 接口的空实现...
