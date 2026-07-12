@@ -136,17 +136,19 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
           float nextX = b.x + b.velX * detla;
           float nextY = b.y + b.velY * detla;
           b.x = nextX;
-                b.y = nextY;
+          b.y = nextY;
           Entities.nearbyEnemies(
               b.team,
               nextX,
               nextY,
               b.type.size,
               e -> {
-                b.type.hit(b, e);;
+                b.type.hit(b, e);
+                ;
                 activeBullets.remove(b);
               });
         });
+    renderBuffer.clear();
     renderBuffer.addAll(activeBullets);
 
     // 5. 交换渲染缓冲区（用固定锁对象，保证与渲染线程互斥）
