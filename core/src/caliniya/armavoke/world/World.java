@@ -73,32 +73,6 @@ public class World {
     return getBuilding(x, y) != null;
   }
 
-  public Building setBuilding(int x, int y, Block block) {
-    if (!isValidCoord(x, y) || block == null) return null;
-
-    Building newBuild = block.create(x, y);
-    WorldData.buildings.add(newBuild);
-
-    newBuild.getOccupiedCoords(
-        (tx, ty) -> {
-          if (isValidCoord(tx, ty)) {
-            Building existing = getBuilding(tx, ty);
-            if (existing != null && existing != newBuild) {
-              removeBuilding(existing.tx, existing.ty);
-            }
-            WorldChunk chunk = getOrCreateChunk(tx, ty);
-            chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, newBuild);
-          }
-        });
-
-    // 通知导航数据：标记建筑占据的格子为实心
-    if (block.solid) {
-      RouteData.updateBlock(x, y, block);
-    }
-
-    return newBuild;
-  }
-
   public Building setBuilding(int x, int y, Block block, TeamTypes team) {
     if (!isValidCoord(x, y) || block == null) return null;
 

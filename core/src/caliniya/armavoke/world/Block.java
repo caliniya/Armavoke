@@ -37,7 +37,7 @@ public class Block extends ContentType {
     super(name, CType.Block);
   }
 
-  public Building create(int tx, int ty) {
+  public Building create() {
     psize = size * WorldData.TILE_SIZE;
     return Building.create(this);
   }

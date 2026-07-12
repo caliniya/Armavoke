@@ -158,11 +158,10 @@ public class DataIO {
       String typeName = r.str();
       Block type = Contents.get(typeName, Block.class);
       if (type != null) {
-        Building b = type.create(0, 0);
+        Building b = type.create();
         b.read(r);
         skipToEndMarker(r); // 校验结束标记
-        WorldData.buildings.add(b);
-        b.getOccupiedCoords((tx, ty) -> WorldData.world.setBuilding(tx, ty, b.block));
+        WorldData.world.setBuilding(b.tx, b.ty, b.block, b.team);
       } else {
         Log.warn("Unknown block type in save: @, skipping...", typeName);
         skipToEndMarker(r);

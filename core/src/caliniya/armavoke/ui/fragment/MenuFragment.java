@@ -75,7 +75,7 @@ public class MenuFragment {
 
                         // 生成随机测试建筑
                         int padding = 0;
-                        int buildingCount = 300;
+                        int buildingCount = 30;
                         for (int i = 0; i < buildingCount; i++) {
                           int bx =
                               padding + (int) (Math.random() * (WorldData.world.W - padding * 2));

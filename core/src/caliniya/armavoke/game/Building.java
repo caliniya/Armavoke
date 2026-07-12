@@ -149,7 +149,7 @@ public class Building extends Entity {
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
     w.s(id);
-    
+
     block.write(this, w);
     item.write(w);
   }
@@ -158,11 +158,11 @@ public class Building extends Entity {
   @Override
   public void read(Reads r) {
     this.angle = r.b();
-    
+
     this.tx = r.i();
     this.ty = r.i();
     this.angle = r.i();
-    
+
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];
@@ -177,8 +177,8 @@ public class Building extends Entity {
 
     item.read(r);
 
-    this.x = tx * WorldData.TILE_SIZE;
-    this.y = ty * WorldData.TILE_SIZE;
+    this.x = tx * WorldData.TILE_SIZE + block.psize / 2;
+    this.y = ty * WorldData.TILE_SIZE + block.psize / 2;
     if (block != null) {
       this.maxHealth = block.health;
       if (block.shapeOffsets != null) {
@@ -204,6 +204,7 @@ public class Building extends Entity {
     building.teamData.updateChunk(building, -1, WorldData.getChunkIndex(building.x, building.y));
     building.init();
     building.id = Entities.assignID();
+    WorldData.buildings.add(building);
     return building;
   }
 
