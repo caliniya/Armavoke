@@ -104,7 +104,7 @@ public class MenuFragment {
                         DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
-                      UI.Game();
+                      //UI.Game();
                       }));
               menu.row();
 

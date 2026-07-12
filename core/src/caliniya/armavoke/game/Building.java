@@ -145,6 +145,7 @@ public class Building extends Entity {
     w.b((byte) angle); // 0-3 只需要一个字节
     w.i(tx);
     w.i(ty);
+    w.i(angle);
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
     w.s(id);
@@ -160,6 +161,7 @@ public class Building extends Entity {
     
     this.tx = r.i();
     this.ty = r.i();
+    this.angle = r.i();
     
     this.health = r.f();
     byte teamID = r.b();
@@ -205,21 +207,14 @@ public class Building extends Entity {
     return building;
   }
 
-  public static Building create(Block block, int tx, int ty, int angle) {
-    Building building = Pools.obtain(Building.class, Building::new);
-    building.block = block;
-    building.tx = tx;
-    building.ty = ty;
-    building.angle = angle;
-    building.init();
-    return building;
-  }
-
   public static Building create(Block block, int tx, int ty, TeamTypes team) {
     return create(block, tx, ty, 0, team);
   }
 
-  public static Building create(Block block, int tx, int ty) {
-    return create(block, tx, ty, 0);
+  public static Building create(Block block) {
+    Building building = Pools.obtain(Building.class, Building::new);
+    building.block = block;
+    building.init();
+    return building;
   }
 }

@@ -39,7 +39,7 @@ public class Block extends ContentType {
 
   public Building create(int tx, int ty) {
     psize = size * WorldData.TILE_SIZE;
-    return Building.create(this, tx, ty);
+    return Building.create(this);
   }
 
   public Building create(int tx, int ty, TeamTypes team) {
