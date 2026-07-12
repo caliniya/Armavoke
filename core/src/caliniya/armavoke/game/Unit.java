@@ -76,7 +76,7 @@ public class Unit extends Entity {
     u.y = y;
     u.item = new ItemModule(type.itemCap);
     u.init();
-    this.id = Entities.assignID();
+    u.id = Entities.assignID();
     WorldData.units.add(u);
     u.updateChunkPosition();
     u.updateTeamData();
