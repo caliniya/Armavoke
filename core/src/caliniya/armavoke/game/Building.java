@@ -143,7 +143,8 @@ public class Building extends Entity {
   @Override
   public void write(Writes w) {
     w.b((byte) angle); // 0-3 只需要一个字节
-
+    w.i(tx);
+    w.i(ty);
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
     w.s(id);
@@ -156,7 +157,10 @@ public class Building extends Entity {
   @Override
   public void read(Reads r) {
     this.angle = r.b();
-
+    
+    this.tx = r.i();
+    this.ty = r.i();
+    
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];

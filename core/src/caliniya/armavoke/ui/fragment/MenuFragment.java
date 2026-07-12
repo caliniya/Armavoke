@@ -15,6 +15,7 @@ import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.DataIO;
 import caliniya.armavoke.io.GameIO;
@@ -73,8 +74,8 @@ public class MenuFragment {
                         Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
 
                         // 生成随机测试建筑
-                        int padding = 100;
-                        int buildingCount = 3;
+                        int padding = 0;
+                        int buildingCount = 300;
                         for (int i = 0; i < buildingCount; i++) {
                           int bx =
                               padding + (int) (Math.random() * (WorldData.world.W - padding * 2));
@@ -94,6 +95,8 @@ public class MenuFragment {
                         Building enemyTurret =
                             WorldData.world.setBuilding(
                                 centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
+
+                        RouteData.init();
                         ObjectMap<String, String> tag = new ObjectMap<String, String>();
                         tag.put("author", "calinya");
                         tag.put("name", "spaceTest");
@@ -101,6 +104,7 @@ public class MenuFragment {
                         DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
+                      UI.Game();
                       }));
               menu.row();
 

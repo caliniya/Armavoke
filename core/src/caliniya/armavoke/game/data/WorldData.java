@@ -60,6 +60,7 @@ public class WorldData {
     gridH = Mathf.ceil((float) world.H / CHUNK_SIZE);
 
     Teams.init();
+    RouteData.init();
 
     // 2. 初始化网格数组
     int totalChunks = gridW * gridH;
