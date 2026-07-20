@@ -3,11 +3,11 @@ package caliniya.armavoke.world;
 import arc.math.Mathf;
 import arc.func.Intc2;
 import arc.util.Log;
-import caliniya.armavoke.content.Blocks; // 确保导入
+import caliniya.armavoke.content.Blocks;
 import caliniya.armavoke.content.ENVBlocks;
 import caliniya.armavoke.content.Floors;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.base.type.TeamTypes; // 导入阵营
+import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
@@ -103,8 +103,6 @@ public class World {
     Building build = getBuilding(x, y);
     if (build == null) return;
 
-    WorldData.buildings.remove(build);
-
     // 通知导航数据：先取消实心标记（必须在清除区块前调用）
     if (build.block.solid) {
       RouteData.updateBlock(x, y);
@@ -120,8 +118,7 @@ public class World {
             }
           }
         });
-
-    build.remove();
+        WorldData.buildings.remove(build);
   }
 
   public boolean isSolid(int x, int y) {

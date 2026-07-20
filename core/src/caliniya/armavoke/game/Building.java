@@ -109,12 +109,9 @@ public class Building extends Entity {
 
   @Override
   public void remove() {
-    Teams.remove(this);
     WorldData.world.removeBuilding(tx, ty);
-
-    // 归还 ID
+    Teams.remove(this);
     id = Entities.freeID(id);
-
     Pools.free(this);
   }
 
