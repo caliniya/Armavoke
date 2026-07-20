@@ -17,7 +17,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float x, y ;
 
   // --- 公共状态 ---
-  public float health;
+  public volatile float health;
   public float maxHealth;
   public int id;
   public TeamTypes team;

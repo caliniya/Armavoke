@@ -28,7 +28,7 @@ public class BlockRender extends System<BlockRender> {
     if (UniverseFragment.showing) return;
     // 遍历所有建筑
     for (Building b : WorldData.buildings) {
-      if (b == null || b.block == null) continue;
+      if (b == null || b.block == null || b.health <= 0f) continue;
 
       // 剔除检测：如果不在视野内则跳过
       if (shouldDraw(b.x, b.y, b.block.psize)) {
@@ -62,7 +62,7 @@ public class BlockRender extends System<BlockRender> {
     Draw.color(Color.green);
     Lines.stroke(4f);
     // 绘制基于 size 的包围盒
-    Lines.rect(pixelX - b.block.psize /2, pixelY - b.block.psize /2 , drawSize, drawSize);
+    Lines.rect(pixelX - b.block.psize / 2, pixelY - b.block.psize / 2, drawSize, drawSize);
 
     // 3. 绘制占据的实际格子 (黄色细线)
     // 对于异形建筑，这比包围盒更准确
