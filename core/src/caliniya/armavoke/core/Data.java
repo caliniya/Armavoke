@@ -48,7 +48,7 @@ public class Data {
     Systems.GP = new GameProcess();
     Systems.UV = new UniverseRender();
     Systems.UI = new UniverseInput();
-    Systems.DE = new DebugRender();
+    //Systems.DE = new DebugRender();
     Systems.addSystem(
         Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, Systems.UI, new Render());
     Systems.BP = new BulletProcess();

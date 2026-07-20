@@ -22,7 +22,11 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
   public void update() {
     WorldData.units.each(
         u -> {
-          if (u != null || u.health <= 0) {
+          if (u == null) return;
+          if (u.health <= 0) {
+            u.kill();
+            return;
+          }else{
             u.update(Time.delta);
             u.canShoot = true;
             u.updateWeapons(Time.delta);
@@ -30,7 +34,11 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
         });
     WorldData.buildings.each(
         b -> {
-          if (b != null || b.block != null || b.health <= 0) {
+          if (b == null) return;
+          if (b.health <= 0) {
+            b.kill();
+            return;
+          }else {
             b.update(Time.delta);
           }
         });

@@ -53,10 +53,7 @@ public class BulletType {
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
-    if (target != null) {
       target.health -= this.damage;
-      // TODO: 播放命中特效
-    }
     b.remove(); // 销毁子弹
   }
 

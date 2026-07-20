@@ -109,17 +109,7 @@ public class Building extends Entity {
 
   @Override
   public void remove() {
-    // 从团队空间网格注销
     Teams.remove(this);
-    this.team = null;
-    this.teamData = null;
-    if (this.team != null && currentChunkIndex != -1) {
-      TeamData td = Teams.get(this.team);
-      if (td != null && td.entityGrid != null && currentChunkIndex < td.entityGrid.length) {
-        td.entityGrid[currentChunkIndex].remove(this);
-      }
-    }
-    currentChunkIndex = -1;
     WorldData.world.removeBuilding(tx, ty);
 
     // 归还 ID
@@ -129,11 +119,18 @@ public class Building extends Entity {
   }
 
   @Override
+  public float hitboxSize() {
+    return block != null ? block.psize : 8f;
+  }
+
+  @Override
   public void reset() {
     super.reset();
     // block = null;
     health = 0;
     shapeOffsets = null;
+    this.team = null;
+    this.teamData = null;
     tx = 0;
     ty = 0;
     x = 0;
@@ -193,7 +190,6 @@ public class Building extends Entity {
 
     Teams.add(this);
     teamData = team.data();
-    teamData.updateChunk(this, -1, WorldData.getChunkIndex(x, y));
   }
 
   // --- 静态工厂方法 ---
@@ -206,10 +202,8 @@ public class Building extends Entity {
     building.team = team;
     Teams.add(building);
     building.teamData = team.data();
-    building.teamData.updateChunk(building, -1, WorldData.getChunkIndex(building.x, building.y));
     building.init();
     building.id = Entities.assignID();
-    WorldData.buildings.add(building);
     return building;
   }
 

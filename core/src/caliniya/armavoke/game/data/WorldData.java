@@ -26,16 +26,13 @@ public class WorldData {
   // 子弹
   public static Ar<Bullet> bullets;
 
-  // --- 空间划分网格相关 ---
+  // --- 空间划分相关 ---
   // 每个区块包含的瓦片数量 (32x32个地块)
   public static final int CHUNK_SIZE = 32;
   // 单个地块的像素大小
   public static final int TILE_SIZE = 32;
   // 单个区块的像素大小 (32 * 32 = 1024)
   public static final int CHUNK_PIXEL_SIZE = CHUNK_SIZE * TILE_SIZE;
-
-  // 网格的宽和高 (以区块为单位)
-  public static int gridW, gridH;
 
   private WorldData() {}
 
@@ -51,13 +48,13 @@ public class WorldData {
     world = new World(w, h, space);
     world.init();
 
-    // 1. 初始化网格尺寸
-    // 即使地图大小不能整除32，也要向上取整多算一个格子，防止越界
-    gridW = Mathf.ceil((float) world.W / CHUNK_SIZE);
-    gridH = Mathf.ceil((float) world.H / CHUNK_SIZE);
-
     Teams.init();
     RouteData.init();
+
+    // 初始化四叉树覆盖范围（世界像素尺寸）
+    float worldPixelW = world.W * TILE_SIZE;
+    float worldPixelH = world.H * TILE_SIZE;
+    Teams.initAllTrees(worldPixelW, worldPixelH);
   }
 
   public static void clear() {
@@ -76,16 +73,5 @@ public class WorldData {
     }
   }
 
-  /** 根据像素坐标计算网格索引 */
-  public static int getChunkIndex(float x, float y) {
-    // 将像素坐标转换为区块坐标
-    int cx = (int) (x / CHUNK_PIXEL_SIZE);
-    int cy = (int) (y / CHUNK_PIXEL_SIZE);
 
-    // 边界限制，防止单位跑出地图外导致数组越界
-    cx = Mathf.clamp(cx, 0, gridW - 1);
-    cy = Mathf.clamp(cy, 0, gridH - 1);
-
-    return cy * gridW + cx;
-  }
 }

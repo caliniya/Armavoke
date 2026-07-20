@@ -10,7 +10,7 @@ import arc.util.io.Writes;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.game.type.UnitType;
+import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.map.Map;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.base.game.WorldChunk;

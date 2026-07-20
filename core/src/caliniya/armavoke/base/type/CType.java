@@ -1,7 +1,6 @@
 package caliniya.armavoke.base.type;
 
 import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.game.type.*;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.type.type.*;
 

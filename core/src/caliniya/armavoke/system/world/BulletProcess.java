@@ -144,7 +144,6 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
               b.type.size,
               e -> {
                 b.type.hit(b, e);
-                ;
                 activeBullets.remove(b);
               });
         });

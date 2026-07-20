@@ -49,10 +49,6 @@ public class EntityProces extends System<EntityProces> {
     WorldData.units.each(
         u -> {
           if (u == null) return;
-          if (u.health <= 0) {
-            u.kill();
-            return;
-          }
 
           for (Weapon w : u.weapons) {
 
@@ -78,10 +74,6 @@ public class EntityProces extends System<EntityProces> {
     WorldData.buildings.each(
         b -> {
           if (b == null) return;
-          if (b.health <= 0) {
-            b.kill();
-            return;
-          }
 
           if (b.target == null || b.target.health <= 0) {
             b.target = b.block.findTarget(b);

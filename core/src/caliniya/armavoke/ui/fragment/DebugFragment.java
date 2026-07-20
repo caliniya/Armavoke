@@ -11,17 +11,17 @@ import caliniya.armavoke.game.data.WorldData;
 
 public class DebugFragment {
 
-  private Table table;
+  private Table root;
 
   public void add() {
-    if (table != null && table.parent != null) return;
+    if (root != null && root.parent != null) return;
 
-    table = new Table();
-    table.setFillParent(true);
-    table.touchable = Touchable.disabled;
-    table.top().right();
+    root = new Table();
+    root.setFillParent(true);
+    root.touchable = Touchable.disabled;
+    root.top().right();
 
-    table
+    root
         .table(
             t -> {
               t.label(
@@ -67,13 +67,13 @@ public class DebugFragment {
             })
         .margin(10f);
 
-    Core.scene.add(table);
+    Core.scene.add(root);
   }
 
   public void remove() {
-    if (table != null) {
-      table.remove();
-      table = null;
+    if (root != null) {
+      root.remove();
+      root = null;
     }
   }
 }

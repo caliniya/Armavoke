@@ -1,4 +1,4 @@
-package caliniya.armavoke.game.type;
+package caliniya.armavoke.type.type;
 
 import arc.Core;
 import arc.graphics.Color;
@@ -30,6 +30,7 @@ public class UnitType extends ContentType {
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
   
+  //单位的物品容量，使用通用的物品模块规则
   public int itemCap = 50;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();

@@ -11,6 +11,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.Rand;
 import arc.math.geom.Point2;
+import arc.math.geom.QuadTree;
 import arc.math.geom.Vec2;
 import arc.util.Log;
 import arc.util.Tmp;
@@ -21,10 +22,9 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.game.type.UnitType;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.module.ItemModule;
+import caliniya.armavoke.type.module.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.ui.Fonts;
@@ -70,7 +70,6 @@ public class Unit extends Entity {
     u.type = type;
     u.team = team;
     u.teamData = team.data();
-    u.teamData.updateChunk(u, -1, WorldData.getChunkIndex(x, y));
     Teams.add(u);
     u.x = x;
     u.y = y;
@@ -78,7 +77,6 @@ public class Unit extends Entity {
     u.init();
     u.id = Entities.assignID();
     WorldData.units.add(u);
-    u.updateChunkPosition();
     u.updateTeamData();
     u.updateHitbox();
     return u;
@@ -198,15 +196,13 @@ public class Unit extends Entity {
     Teams.remove(this);
     this.team = null;
     this.teamData = null;
-    if (this.team != null && currentChunkIndex != -1) {
-      TeamData td = Teams.get(this.team);
-      if (td != null && td.entityGrid != null && currentChunkIndex < td.entityGrid.length) {
-        td.entityGrid[currentChunkIndex].remove(this);
-      }
-    }
     isSelected = false;
-    currentChunkIndex = -1;
     Pools.free(this);
+  }
+
+  @Override
+  public float hitboxSize() {
+    return this.size;
   }
 
   @Override
@@ -379,13 +375,13 @@ public class Unit extends Entity {
     }
   }
 
+  /** 通知 TeamData 更新该实体在四叉树中的位置（移动后调用） */
   private void updateChunkPosition() {
-    int newIndex = WorldData.getChunkIndex(x, y);
-
-    if (newIndex != currentChunkIndex) {
-      teamData.updateChunk(this, currentChunkIndex, newIndex);
+    if (teamData != null && teamData.entityGroup != null && teamData.entityGroup.useTree()) {
+      QuadTree<Entity> tree = teamData.entityGroup.tree();
+      tree.remove(this);
+      tree.insert(this);
     }
-    currentChunkIndex = newIndex;
   }
 
   public void impuse(float knockX, float knockY) {

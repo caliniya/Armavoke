@@ -17,27 +17,36 @@ public class Teams {
     }
   }
 
+  /** 初始化所有团队的四叉树范围 */
+  public static void initAllTrees(float worldPixelW, float worldPixelH) {
+    for (TeamData data : datas) {
+      data.initTree(worldPixelW, worldPixelH);
+    }
+  }
+
   public static TeamData get(TeamTypes team) {
     if (datas == null || team == null) return null;
     return datas[team.ordinal()];
   }
 
-  /** 注册实体到团队 */
+  /** 注册实体到团队（同时加入 EntityGroup 和全局列表） */
   public static void add(Entity e) {
     if (e.team != null) {
       TeamData data = get(e.team);
       if (data != null && !data.entities.contains(e)) {
         data.entities.add(e);
+        data.entityGroup.add(e);
       }
     }
   }
 
-  /** 从团队注销实体 */
+  /** 从团队注销实体（同时从 EntityGroup 和全局列表移除） */
   public static void remove(Entity e) {
     if (e.team != null) {
       TeamData data = get(e.team);
       if (data != null) {
         data.entities.remove(e);
+        data.entityGroup.remove(e);
       }
     }
   }
