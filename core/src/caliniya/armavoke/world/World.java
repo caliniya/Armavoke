@@ -78,7 +78,6 @@ public class World {
     if (!isValidCoord(x, y) || block == null) return null;
 
     Building newBuild = block.create(x, y, team);
-    WorldData.buildings.add(newBuild);
 
     newBuild.getOccupiedCoords(
         (tx, ty) -> {
@@ -95,7 +94,7 @@ public class World {
     if (block.solid) {
       RouteData.updateBlock(x, y, block);
     }
-
+    Entities.add(newBuild);
     return newBuild;
   }
 
@@ -118,7 +117,8 @@ public class World {
             }
           }
         });
-        WorldData.buildings.remove(build);
+
+    Entities.remove(build);
   }
 
   public boolean isSolid(int x, int y) {

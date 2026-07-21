@@ -18,7 +18,7 @@ public class Bullet implements Poolable, QuadTreeObject {
   public float velX, velY;
   public float rotation;
   public float time = 0f;
-  
+
   public int id;
 
   protected Bullet() {}

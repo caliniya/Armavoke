@@ -6,6 +6,7 @@ import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
 
 import arc.struct.*;
+import arc.util.Log;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -131,7 +132,11 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
         int idx = array.indexOf(entity, true);
         if (idx == -1) continue;
 
-        array.remove(idx);
+        array.remove(entity);
+        if(array.contains(entity)) {
+        	Log.info("啊啊啊");
+        }
+               
         tree.remove(entity);
 
         int id = idGetter.get(entity);

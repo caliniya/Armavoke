@@ -110,7 +110,6 @@ public class Building extends Entity {
   @Override
   public void remove() {
     WorldData.world.removeBuilding(tx, ty);
-    Entities.remove(this);
     id = Entities.freeID(id);
     Pools.free(this);
   }
@@ -123,7 +122,7 @@ public class Building extends Entity {
   @Override
   public void reset() {
     // block = null;
-    //health = 0;
+    health = 0;
     shapeOffsets = null;
     this.team = null;
     this.teamData = null;

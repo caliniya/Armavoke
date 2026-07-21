@@ -623,7 +623,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
    *
    * @param value May be null.
    * @param identity If true, == comparison will be used. If false, .equals() comparison will be
-   *     used.
+   *     used.Identity如果为true，将使用==比较。如果为false，.equals（）比较将为*已使用。
    * @return An index of first occurrence of value in array or -1 if no such value exists
    */
   public int indexOf(T value, boolean identity) {
