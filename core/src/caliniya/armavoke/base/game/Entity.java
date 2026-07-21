@@ -3,6 +3,7 @@ package caliniya.armavoke.base.game;
 import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
+import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
@@ -36,6 +37,9 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public abstract void kill();
   public abstract void write(Writes w);
   public abstract void read(Reads r);
+  public void hit(Bullet b){
+    health -= b.type.damage;
+  }
 
   /**
    * 返回实体的碰撞盒尺寸（直径）。

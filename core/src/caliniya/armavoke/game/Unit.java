@@ -70,15 +70,14 @@ public class Unit extends Entity {
     u.type = type;
     u.team = team;
     u.teamData = team.data();
-    Teams.add(u);
     u.x = x;
     u.y = y;
     u.item = new ItemModule(type.itemCap);
     u.init();
     u.id = Entities.assignID();
-    WorldData.units.add(u);
     u.updateTeamData();
     u.updateHitbox();
+    Entities.add(u);
     return u;
   }
 
@@ -193,7 +192,7 @@ public class Unit extends Entity {
   @Override
   public void remove() {
     WorldData.units.remove(this);
-    Teams.remove(this);
+    Entities.remove(this);
     this.team = null;
     this.teamData = null;
     isSelected = false;
@@ -251,9 +250,8 @@ public class Unit extends Entity {
     if (moving || rotated) {
       updateHitbox();
     }
-
-    if (moving) {
-      updateChunkPosition();
+    if(moving) {
+    	WorldData.units.move(this , x , y);
     }
   }
 
@@ -375,15 +373,6 @@ public class Unit extends Entity {
     }
   }
 
-  /** 通知 TeamData 更新该实体在四叉树中的位置（移动后调用） */
-  private void updateChunkPosition() {
-    if (teamData != null && teamData.entityGroup != null && teamData.entityGroup.useTree()) {
-      QuadTree<Entity> tree = teamData.entityGroup.tree();
-      tree.remove(this);
-      tree.insert(this);
-    }
-  }
-
   public void impuse(float knockX, float knockY) {
     this.x += knockX;
     this.y += knockY;
@@ -421,8 +410,6 @@ public class Unit extends Entity {
       this.team = TeamTypes.Abort;
     }
 
-    Teams.add(this);
-
     teamData = team.data();
     
     this.speedX = 0;
@@ -432,11 +419,10 @@ public class Unit extends Entity {
     this.pathIndex = 0;
     this.pathed = false;
     this.velocityDirty = true;
+    Entities.add(this);
     WorldData.moveunits.add(this);
-    WorldData.units.add(this);
-
+    WorldData.units.move(this , x ,y);
     updateHitbox();
-    updateChunkPosition();
   }
 
   public void updateTeamData() {
@@ -446,7 +432,7 @@ public class Unit extends Entity {
 
   public void setTeam(TeamTypes newTeam) {
     if (this.team == newTeam) return;
-    Teams.remove(this);
+    Entities.remove(this);
     this.team = newTeam;
     updateTeamData();
   }

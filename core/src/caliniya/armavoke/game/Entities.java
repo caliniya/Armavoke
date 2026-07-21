@@ -4,6 +4,7 @@ import arc.func.Boolf;
 import arc.func.Cons;
 import arc.math.Mathf;
 import arc.struct.IntQueue;
+import arc.math.geom.QuadTree.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.data.*;
@@ -57,20 +58,54 @@ public class Entities {
     freeIDs.clear();
   }
 
-  // --- 索敌逻辑（以实体为基础） ---
+  /** 注册实体 */
+  public static void add(Building... entities) {
+    if (entities == null || entities.length == 0) return;
+    WorldData.buildings.add(entities);
+  }
+
+  // 处理 Unit
+  public static void add(Unit... entities) {
+    if (entities == null || entities.length == 0) return;
+    WorldData.units.add(entities);
+  }
+
+  /** 注销实体 */
+  public static void remove(Unit... units) {
+    if (units == null || units.length == 0) return;
+
+    WorldData.units.remove(units);
+  }
+
+  public static void remove(Building... bs) {
+    if (bs == null || bs.length == 0) return;
+
+    WorldData.buildings.remove(bs);
+  }
 
   /** 在指定范围内查找所有敌人实体 */
   public static void nearbyEnemies(
-      TeamTypes sourceTeam, float x, float y, float radius, Cons<Entity> consumer) {
-    for (TeamTypes otherTeam : TeamTypes.values()) {
-      if (otherTeam == sourceTeam) continue;
-      if (otherTeam == TeamTypes.Abort) continue;
-
-      TeamData data = Teams.get(otherTeam);
-      if (data == null) continue;
-
-      data.find(x, y, radius, u -> consumer.get(u));
-    }
+      TeamTypes sourceTeam, float x, float y, float r, Cons<Entity> consumer) {
+    WorldData.units.intersect(
+        x,
+        y,
+        r * 2,
+        r * 2,
+        u -> {
+          if (u.team != sourceTeam && Mathf.dst2(x, y, u.x, u.y) <= r * r) {
+            consumer.get(u);
+          }
+        });
+    WorldData.buildings.intersect(
+        x,
+        y,
+        r * 2,
+        r * 2,
+        u -> {
+          if (u.team != sourceTeam && Mathf.dst2(x, y, u.x, u.y) <= r * r) {
+            consumer.get(u);
+          }
+        });
   }
 
   /** 查找最近的敌人实体 */
@@ -112,7 +147,10 @@ public class Entities {
             result[0] = enemy;
           }
         });
-    con.get((Entity) result[0]);
+    if (result[0] != null) {
+
+      con.get((Entity) result[0]);
+    }
   }
 
   /**

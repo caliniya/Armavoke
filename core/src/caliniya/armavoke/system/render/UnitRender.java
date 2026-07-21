@@ -32,16 +32,16 @@ public class UnitRender extends System<UnitRender> {
   public void update() {
     if (UniverseFragment.showing) return;
     // 绘制单位
-    for (int i = 0; i < WorldData.units.size; i++) {
-      Unit u = WorldData.units.get(i);
-      if (shouldDraw(u.x, u.y, u.size * 2)) {
-        u.draw();
-        // 调用单位内部的调试绘制方法
-        if (debug) {
-          u.drawDebug();
-        }
-      }
-    }
+    WorldData.units.each(
+        u -> {
+          if (shouldDraw(u.x, u.y, u.size * 2)) {
+            u.draw();
+            // 调用单位内部的调试绘制方法
+            if (debug) {
+              u.drawDebug();
+            }
+          }
+        });
 
     // 绘制子弹
     // 用与 BulletProcess 相同的固定锁对象，确保与逻辑线程的缓冲交换互斥，
@@ -50,11 +50,12 @@ public class UnitRender extends System<UnitRender> {
     synchronized (BulletProcess.BULLET_LOCK) {
       temp.addAll(WorldData.bullets);
     }
-    temp.each(b ->{
-      if(shouldDraw(b.x ,b.y ,b.type.size)) {
-      	b.type.draw(b);
-      }
-    });
+    temp.each(
+        b -> {
+          if (shouldDraw(b.x, b.y, b.type.size)) {
+            b.type.draw(b);
+          }
+        });
   }
 
   // 通用的剔除方法

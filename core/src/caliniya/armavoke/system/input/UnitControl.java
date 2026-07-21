@@ -85,7 +85,7 @@ public class UnitControl implements InputProcessor, GestureListener {
         u.targetX = tx;
         u.targetY = ty;
 
-        if (!WorldData.moveunits.contains(u)) {
+        if (!WorldData.moveunits.array.contains(u)) {
           WorldData.moveunits.add(u);
         }
         u.pathed = false;

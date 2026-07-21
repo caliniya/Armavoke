@@ -5,6 +5,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.Core;
+import arc.util.Log;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.game.Unit;
@@ -13,28 +14,26 @@ import caliniya.armavoke.ui.Fonts;
 public class BulletType {
 
   public float speed = 6f;
-  public float damage = 10000f;
+  public float damage = 50f;
   public float lifetime = 600f;
   public float size = 60f;
-  
+
   // 渲染相关
   public float drawSize = 1f; // 整体缩放比例
   public Color frontColor = Color.white; // 子弹前景色
-  public Color backColor = Color.gray;   // 子弹背景色
+  public Color backColor = Color.gray; // 子弹背景色
 
   public TextureRegion region;
-  
-  public BulletType() {
-  }
+
+  public BulletType() {}
 
   public void load() {
     this.region = Core.atlas.find("bullet");
   }
 
   /** 子弹更新逻辑 (每帧调用) */
-  //基础的子弹运动目前在子弹处理中进行，未来整合进这里
-  public void update(Bullet b) {
-  }
+  // 基础的子弹运动目前在子弹处理中进行，未来整合进这里
+  public void update(Bullet b) {}
 
   /** 子弹绘制逻辑 */
   public void draw(Bullet b) {
@@ -47,13 +46,13 @@ public class BulletType {
     // 2. 绘制前层 (核心)
     Draw.color(frontColor);
     Draw.rect(region, b.x, b.y, size, size, b.rotation - 90);
-    
+
     Draw.color(); // 重置
   }
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
-      target.health -= this.damage;
+    target.hit(b);
     b.remove(); // 销毁子弹
   }
 

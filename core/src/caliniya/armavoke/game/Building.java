@@ -39,7 +39,7 @@ public class Building extends Entity {
     // 初始化坐标
     this.x = (tx * WorldData.TILE_SIZE) + block.psize / 2;
     this.y = (ty * WorldData.TILE_SIZE) + block.psize / 2;
-
+    
     // 初始化血量
     this.maxHealth = block.health;
     // 只有当血量为0时才初始化为满血(防止覆盖读取存档后的数据)
@@ -110,7 +110,7 @@ public class Building extends Entity {
   @Override
   public void remove() {
     WorldData.world.removeBuilding(tx, ty);
-    Teams.remove(this);
+    Entities.remove(this);
     id = Entities.freeID(id);
     Pools.free(this);
   }
@@ -122,9 +122,8 @@ public class Building extends Entity {
 
   @Override
   public void reset() {
-    super.reset();
     // block = null;
-    health = 0;
+    //health = 0;
     shapeOffsets = null;
     this.team = null;
     this.teamData = null;
@@ -185,7 +184,7 @@ public class Building extends Entity {
       }
     }
 
-    Teams.add(this);
+    Entities.add(this);
     teamData = team.data();
   }
 
@@ -197,7 +196,7 @@ public class Building extends Entity {
     building.ty = ty;
     building.angle = angle;
     building.team = team;
-    Teams.add(building);
+    Entities.add(building);
     building.teamData = team.data();
     building.init();
     building.id = Entities.assignID();

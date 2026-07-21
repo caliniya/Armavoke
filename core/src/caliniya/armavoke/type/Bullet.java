@@ -1,13 +1,15 @@
 package caliniya.armavoke.type;
 
+import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
 import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.base.game.Entity; // 导入 Entity
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.type.type.BulletType;
+import arc.math.geom.QuadTree.QuadTreeObject;
 
-public class Bullet implements Poolable {
+public class Bullet implements Poolable, QuadTreeObject {
   public BulletType type;
   public Entity owner;
   public TeamTypes team; // 所属团队
@@ -16,6 +18,8 @@ public class Bullet implements Poolable {
   public float velX, velY;
   public float rotation;
   public float time = 0f;
+  
+  public int id;
 
   protected Bullet() {}
 
@@ -60,6 +64,11 @@ public class Bullet implements Poolable {
 
     // 自动添加到处理系统
     Systems.BP.addBullet(this);
+  }
+
+  @Override
+  public void hitbox(Rect out) {
+    out.set(x - type.size / 2f, y - type.size / 2f, type.size, type.size);
   }
 
   @Override

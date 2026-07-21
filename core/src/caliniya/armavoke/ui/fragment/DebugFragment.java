@@ -43,9 +43,9 @@ public class DebugFragment {
                           sb.append("World Data: null\n");
                         } else {
 
-                          int unitCount = (WorldData.units != null) ? WorldData.units.size : 0;
+                          int unitCount = (WorldData.units != null) ? WorldData.units.size() : 0;
                           int moveUnitCount =
-                              (WorldData.moveunits != null) ? WorldData.moveunits.size : 0;
+                              (WorldData.moveunits != null) ? WorldData.moveunits.size() : 0;
 
                           sb.append("Units: ").append(unitCount).append("\n");
                           sb.append("Moving: ").append(moveUnitCount).append("\n");

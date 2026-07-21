@@ -1,21 +1,18 @@
 package caliniya.armavoke.system.render;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.util.Align;
-import arc.graphics.g2d.Lines;
-import arc.util.Log;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.game.Building;
-import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.System;
-import caliniya.armavoke.world.Block;
+import arc.*;
+import arc.util.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import caliniya.armavoke.ui.*;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
+import caliniya.armavoke.game.*;
+import caliniya.armavoke.world.*;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.ui.fragment.*;
 
-public class BlockRender extends System<BlockRender> {
+public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
 
   @Override
   public BlockRender init() {
@@ -34,7 +31,6 @@ public class BlockRender extends System<BlockRender> {
       if (shouldDraw(b.x, b.y, b.block.psize)) {
         // 绘制建筑 (调用 Building 内部的 draw 逻辑，会处理旋转)
         b.draw();
-
         // 调试绘制
         if (UnitRender.debug) { // 复用 UnitRender 的 debug 开关
           drawDebug(b, b.x, b.y, b.block.psize);
@@ -77,8 +73,12 @@ public class BlockRender extends System<BlockRender> {
     }
 
     // 4. 绘制旋转角度 (青色文字)
-    Fonts.def.draw("R:" + b.angle, pixelX + drawSize / 2f, pixelY + drawSize + 10f, Align.center);
-
+    Fonts.def.draw(b.x + "   "+b.y, pixelX + drawSize / 2f, pixelY + drawSize + 10f, Align.center);
+    Fonts.def.draw(
+        Strings.format("" + b.health),
+        b.x - b.block.size,
+        b.y - b.block.size + b.block.size + 8f,
+        Align.center);
     Draw.color(); // 重置颜色
   }
 }

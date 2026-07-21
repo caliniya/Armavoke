@@ -69,14 +69,14 @@ public class MenuFragment {
                   new Button(
                       "test2",
                       () -> {
-                        WorldData.initWorld(400, 400, true);
+                        WorldData.initWorld(100, 100, true);
                         Data.loadSystems();
                         Systems.EP.init();
                         Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
 
                         // 生成随机测试建筑
                         int padding = 0;
-                        int buildingCount = 30;
+                        int buildingCount = 1;
                         for (int i = 0; i < buildingCount; i++) {
                           int bx =
                               padding + (int) (Math.random() * (WorldData.world.W - padding * 2));
