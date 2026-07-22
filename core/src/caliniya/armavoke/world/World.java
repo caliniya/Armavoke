@@ -99,6 +99,7 @@ public class World {
   }
 
   public void setBuilding(Building b) {
+    if (!isValidCoord((int)b.x, (int)b.y) || b.block == null) return;
     b.getOccupiedCoords(
         (tx, ty) -> {
           if (isValidCoord(tx, ty)) {
