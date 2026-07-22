@@ -83,7 +83,7 @@ public class Bullet implements Poolable, QuadTreeObject {
     velY = 0;
     time = 0;
   }
-
+  
   public void remove() {
     Pools.free(this);
   }

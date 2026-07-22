@@ -52,14 +52,11 @@ public class BulletType {
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
-    
     target.hit(b);
-    b.remove(); // 销毁子弹
   }
-
+  
   /** 命中墙壁/消失时的回调 */
   public void despawn(Bullet b) {
     // TODO: 播放消失特效
-    b.remove();
   }
 }
