@@ -16,7 +16,7 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
 
   @Override
   public BlockRender init() {
-    this.index = 6; // 渲染层级，确保在地图之上、单位之下（根据你的 System 排序逻辑）
+    this.index = 6;
     return super.init(false);
   }
 

@@ -38,7 +38,7 @@ public class Unit extends Entity {
   public Weapon mainFixedWeapon = null;
 
   // --- 物理属性 ---
-  public float speedX, speedY, angle;
+  public volatile float speedX, speedY, angle;
   public float rotationSpeed;
   public float rotation;
   public float angleToTarget, distToTarget;

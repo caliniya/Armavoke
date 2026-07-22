@@ -35,7 +35,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
   private static final int DEFAULT_CAPACITY = 32;
 
   /** 平铺数组 —— 无序，支持 O(1) 尾删 */
-  public final Ar<T> array;
+  public Ar<T> array;
 
   /** 四叉树 —— 用于空间查询 */
   private QuadTree<T> tree;
@@ -133,10 +133,6 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
         if (idx == -1) continue;
 
         array.remove(entity);
-        if(array.contains(entity)) {
-        	Log.info("啊啊啊");
-        }
-               
         tree.remove(entity);
 
         int id = idGetter.get(entity);

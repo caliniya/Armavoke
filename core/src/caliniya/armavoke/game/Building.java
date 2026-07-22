@@ -182,8 +182,6 @@ public class Building extends Entity {
         this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
       }
     }
-
-    Entities.add(this);
     teamData = team.data();
   }
 
@@ -195,7 +193,7 @@ public class Building extends Entity {
     building.ty = ty;
     building.angle = angle;
     building.team = team;
-    Entities.add(building);
+    //Entities.add(building);
     building.teamData = team.data();
     building.init();
     building.id = Entities.assignID();

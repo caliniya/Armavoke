@@ -98,6 +98,24 @@ public class World {
     return newBuild;
   }
 
+  public void setBuilding(Building b) {
+    b.getOccupiedCoords(
+        (tx, ty) -> {
+          if (isValidCoord(tx, ty)) {
+            Building existing = getBuilding(tx, ty);
+            if (existing != null && existing != b) {
+              removeBuilding(existing.tx, existing.ty);
+            }
+            WorldChunk chunk = getOrCreateChunk(tx, ty);
+            chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, b);
+          }
+        });
+    if (b.block.solid) {
+      RouteData.updateBlock((int) b.x, (int) b.y, b.block);
+    }
+    Entities.add(b);
+  }
+
   public void removeBuilding(int x, int y) {
     Building build = getBuilding(x, y);
     if (build == null) return;

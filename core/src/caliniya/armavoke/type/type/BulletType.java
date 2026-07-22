@@ -52,10 +52,8 @@ public class BulletType {
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
-    Log.info(b.type.damage + "  " + target.health);
+    
     target.hit(b);
-    new Throwable("追踪变量修改").printStackTrace();
-    Log.info(target.health);
     b.remove(); // 销毁子弹
   }
 

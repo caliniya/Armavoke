@@ -157,7 +157,7 @@ public class DataIO {
         Building b = type.create();
         b.read(r);
         skipToEndMarker(r); // 校验结束标记
-        WorldData.world.setBuilding(b.tx, b.ty, b.block, b.team);
+        WorldData.world.setBuilding(b);
       } else {
         Log.warn("Unknown block type in save: @, skipping...", typeName);
         skipToEndMarker(r);

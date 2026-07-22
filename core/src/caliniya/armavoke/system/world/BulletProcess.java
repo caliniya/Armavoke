@@ -16,7 +16,7 @@ import caliniya.armavoke.type.Bullet;
 public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess> {
 
   /** 双缓冲专用锁。 逻辑线程交换 WorldData.bullets 与 renderBuffer 引用时， 必须用此固定锁对象，避免锁在不同实例上导致互斥失效。 */
-  public static final Object BULLET_LOCK = new Object();
+  public final Object BULLET_LOCK = new Object();
 
   // ==================== ID 生成系统 ====================
 
@@ -24,14 +24,14 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   private static volatile int nextBulletId = 1;
 
   /** 空闲ID池（用于回收复用） 存储被销毁子弹的ID，供新子弹复用 */
-  private static final Ar<Integer> freeIds = new Ar<>(false, 256);
+  private final Ar<Integer> freeIds = new Ar<>(false, 256);
 
   /**
    * 为子弹分配唯一ID（线程安全）
    *
    * @return 新的唯一ID
    */
-  private static synchronized int allocateBulletId() {
+  private synchronized int allocateBulletId() {
     // 优先从空闲池取
     if (!freeIds.isEmpty()) {
       return freeIds.remove(freeIds.size - 1);
@@ -45,7 +45,7 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
    *
    * @param id 需要回收的ID
    */
-  private static synchronized void recycleBulletId(int id) {
+  private synchronized void recycleBulletId(int id) {
     if (id > 0) {
       freeIds.add(id);
     }
@@ -64,6 +64,10 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
 
   /** 待删除列表（避免遍历时修改） */
   private final Ar<Bullet> toRemove = new Ar<>(false, 256);
+
+  /** 本帧刚被击杀的实体（由 BulletProcess 写入，GameProcess 读出） */
+  private final Ar<Entity> freshKills = new Ar<>(false, 64);
+  private final Object KILL_LOCK = new Object();
 
   @Override
   public BulletProcess init() {
@@ -142,23 +146,17 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       pendingBullets.each(
           b -> {
             if (b != null) {
-              // 确保子弹有ID（如果外部没有分配）
-              if (b.id <= 0) {
-                b.id = allocateBulletId();
-              }
               activeBullets.add(b);
             }
           });
-
       pendingBullets.clear();
     }
-
     toRemove.clear();
 
     // 更新所有子弹
     activeBullets.each(
         b -> {
-          b.time += 1f;
+          b.time += delta;
           if (b.time >= b.type.lifetime) {
             b.type.despawn(b);
             toRemove.add(b);
@@ -170,23 +168,31 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
           b.x = nextX;
           b.y = nextY;
           activeBullets.move(b, nextX, nextY);
-
+          Log.info(activeBullets.array.count(t -> b == t));
           Entities.closestEnemy(
               b.team,
               nextX,
               nextY,
               b.type.size,
               e -> {
+                float prevHealth = e.health;
                 b.type.hit(b, e);
                 toRemove.add(b);
+                // 目标刚被击杀，立即入队，避免 GameProcess 错过 health=0 的瞬间
+                if (prevHealth > 0 && e.health <= 0) {
+                  synchronized (KILL_LOCK) {
+                    freshKills.add(e);
+                  }
+                }
               });
         });
 
-    // 批量删除（回收ID）
+    // 批量删除：归还对象池 → 从 EntityAr 注销 → 回收 ID
     toRemove.each(
         b -> {
+          b.remove(); // Pools.free
           activeBullets.remove(b);
-          recycleBulletId(b.id); // 回收ID供复用
+          recycleBulletId(b.id);
         });
     toRemove.clear();
 
@@ -199,6 +205,14 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       EntityAr<Bullet> temp = WorldData.bullets;
       WorldData.bullets = renderBuffer;
       renderBuffer = temp;
+    }
+  }
+
+  /** 清空新鲜死亡队列，返回本帧新增的死亡实体列表（由 GameProcess 调用） */
+  public void drainFreshKills(Ar<Entity> out) {
+    synchronized (KILL_LOCK) {
+      out.add(freshKills);
+      freshKills.clear();
     }
   }
 

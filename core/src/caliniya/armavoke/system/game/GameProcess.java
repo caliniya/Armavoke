@@ -1,31 +1,41 @@
 package caliniya.armavoke.system.game;
 
 import arc.util.*;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
+import caliniya.armavoke.system.world.BulletProcess;
 
 // 在这里进行主线程游戏内容的更新
 public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   public Ar<Unit> deadUnits;
   public Ar<Building> deadBuildings;
+  public Ar<Entity> freshKilled; // 接收 BulletProcess 的即时击杀通知
 
   @Override
   public GameProcess init() {
     index = 2;
     deadUnits = new Ar<>();
     deadBuildings = new Ar<>();
+    freshKilled = new Ar<>();
     return super.init(false);
   }
 
   @Override
   public void update() {
-    // 先收集所有待击杀的实体，统一在迭代结束后处理
-    // 避免 each() 迭代中 swap-with-last 删除导致元素被跳过
+    // 先处理 BulletProcess 线程刚击杀的实体（延迟最小化，防止血量变负才死）
+    Systems.BP.drainFreshKills(freshKilled);
+    for (Entity e : freshKilled) {
+      e.kill();
+    }
+    freshKilled.clear();
+    
+    // 不能在迭代器中进行写操作，因为这样会死锁
     WorldData.units.each(
         u -> {
           if (u == null) return;

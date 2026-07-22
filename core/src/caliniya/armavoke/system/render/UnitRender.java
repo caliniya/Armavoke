@@ -8,6 +8,7 @@ import arc.util.ArcRuntimeException;
 import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.game.data.WorldData;
@@ -47,7 +48,7 @@ public class UnitRender extends System<UnitRender> {
     // 用与 BulletProcess 相同的固定锁对象，确保与逻辑线程的缓冲交换互斥，
     // 避免拷到正在被清空/重填的缓冲导致子弹闪烁。
     temp.clear();
-    synchronized (BulletProcess.BULLET_LOCK) {
+    synchronized (Systems.BP.BULLET_LOCK) {
       temp.addAll(WorldData.bullets);
     }
     temp.each(
