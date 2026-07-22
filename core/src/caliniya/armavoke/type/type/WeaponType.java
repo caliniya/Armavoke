@@ -48,6 +48,8 @@ public class WeaponType implements Cloneable {
 
   /** 默认查找目标实现，使用武器射程进行索敌。 特殊武器（如导弹、激光）可覆写此方法实现自定义索敌逻辑。 */
   public void findTarget(Weapon w, float wx, float wy) {
+    w.target = null;
+    // 因为lamba不可能会赋值出一个null，那么没有敌人的时候 下面这行代码实际上就会完全没有进行任何操作
     Entities.closestEnemy(w.owner.team, wx, wy, range, e -> w.target = e);
   }
 

@@ -52,44 +52,47 @@ public class Weapon {
     wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
 
     // 旋转逻辑
-    if (rotate && (target != null)) {
-      // 炮塔：尝试旋转以对准相对角度
-      // 计算目标绝对角度 (从武器位置指向目标位置)
-      targetAngle = Angles.angle(wx, wy, target.x, target.y);
-      // 计算目标相对角度 (目标相对于单位朝向的角度)
-      mountAngle = targetAngle - owner.rotation - 90;
-      this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
+    if (rotate) {
+      if (target != null) {
+        // 炮塔：尝试旋转以对准目标
+        // 计算目标绝对角度 (从武器位置指向目标位置)
+        targetAngle = Angles.angle(wx, wy, target.x, target.y);
+        // 计算目标相对角度 (目标相对于单位朝向的角度)
+        mountAngle = targetAngle - owner.rotation - 90;
+        this.rotation = Angles.moveToward(this.rotation, mountAngle, type.rotateSpeed * dt);
+      } else {
+        // 没有目标：平滑旋转归位到正前方
+        this.rotation = Angles.moveToward(this.rotation, 0f, type.rotateSpeed * dt);
+      }
     } else {
       // 固定武器：强制锁定为 0 (永远指向单位正前方)
       this.rotation = 0f;
     }
 
-    // 射击判定
-    if ((target != null) && (target.health >= 0f)&& reloadTimer <= 0) {
+    // 射击判定 - 提前检查目标有效性
+    if (target == null || target.health < 0f || reloadTimer > 0) {
+      return;
+    }
 
-      boolean canShoot;
-      float shootAngle; // 最终的射击绝对角度
+    boolean canShoot;
+    float shootAngle; // 最终的射击绝对角度
 
-      if (rotate) {
-        // 判定标准：炮塔自身的旋转角是否对准了理想挂载角
-        canShoot = Angles.within(this.rotation, mountAngle, 2f);
+    if (rotate) {
+      // 判定标准：炮塔自身的旋转角是否对准了理想挂载角
+      canShoot = Angles.within(this.rotation, mountAngle, 2f);
+      // 射击角度 = 单位朝向 + 90 + 炮塔偏转角
+      shootAngle = owner.rotation + 90 + this.rotation;
+    } else {
+      // 判定标准：单位的绝对朝向是否对准了目标的绝对角度
+      // owner.rotation + 90 代表单位正前方的绝对角度
+      float unitFacing = owner.rotation + 90;
+      canShoot = Angles.within(unitFacing, owner.angleToTarget, type.shootCone);
+      // 射击角度 = 单位正前方
+      shootAngle = unitFacing;
+    }
 
-        // 射击角度 = 单位朝向 + 90 + 炮塔偏转角
-        shootAngle = owner.rotation + 90 + this.rotation;
-      } else {
-        // 判定标准：单位的绝对朝向是否对准了目标的绝对角度
-        // owner.rotation + 90 代表单位正前方的绝对角度
-        float unitFacing = owner.rotation + 90;
-
-        canShoot = Angles.within(unitFacing, owner.angleToTarget, type.shootCone);
-
-        // 射击角度 = 单位正前方
-        shootAngle = unitFacing;
-      }
-
-      if (canShoot) {
-        shoot(wx, wy, shootAngle);
-      }
+    if (canShoot) {
+      shoot(wx, wy, shootAngle);
     }
   }
 

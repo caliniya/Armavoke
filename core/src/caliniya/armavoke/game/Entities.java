@@ -130,6 +130,7 @@ public class Entities {
   }
 
   /** 查找最近的敌人实体 */
+  /** 这个方法不会获得null值，如果没有敌人的话 就不会执行任何操作 */
   public static void closestEnemy(
       TeamTypes sourceTeam, float x, float y, float radius, Cons<Entity> con) {
     final Object[] result = {null};
@@ -148,7 +149,6 @@ public class Entities {
           }
         });
     if (result[0] != null) {
-
       con.get((Entity) result[0]);
     }
   }
