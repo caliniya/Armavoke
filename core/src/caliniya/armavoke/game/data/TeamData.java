@@ -15,12 +15,12 @@ public class TeamData {
   public TeamData(TeamTypes team) {
     this.team = team;
   }
-  
-  //查找此阵营中指定半径的实体
+
+  // 查找此阵营中指定半径的实体
   public void find(float x, float y, float r, Cons<Entity> con) {
     WorldData.units.intersect(
-        x,
-        y,
+        x - r,
+        y - r,
         r * 2,
         r * 2,
         u -> {
@@ -29,8 +29,8 @@ public class TeamData {
           }
         });
     WorldData.buildings.intersect(
-        x,
-        y,
+        x - r,
+        y - r,
         r * 2,
         r * 2,
         b -> {

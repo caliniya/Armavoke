@@ -87,8 +87,8 @@ public class Entities {
   public static void nearbyEnemies(
       TeamTypes sourceTeam, float x, float y, float r, Cons<Entity> consumer) {
     WorldData.units.intersect(
-        x,
-        y,
+        x - r,
+        y - r,
         r * 2,
         r * 2,
         u -> {
@@ -97,8 +97,8 @@ public class Entities {
           }
         });
     WorldData.buildings.intersect(
-        x,
-        y,
+        x - r,
+        y - r,
         r * 2,
         r * 2,
         u -> {
@@ -110,7 +110,7 @@ public class Entities {
 
   /** 查找最近的敌人实体 */
   public static Entity closestEnemy(TeamTypes sourceTeam, float x, float y, float radius) {
-    final Object[] result = {null};
+    final Entity[] result = {null};
     final float[] minDst2 = {radius * radius};
 
     nearbyEnemies(
@@ -126,14 +126,14 @@ public class Entities {
           }
         });
 
-    return (Entity) result[0];
+    return result[0];
   }
 
   /** 查找最近的敌人实体 */
-  /** 这个方法不会获得null值，如果没有敌人的话 就不会执行任何操作 */
+  /** 这个方法不会获得null值，如果没有敌人的话 就不会执行任何操作，所以不建议用这一个进行赋值 */
   public static void closestEnemy(
       TeamTypes sourceTeam, float x, float y, float radius, Cons<Entity> con) {
-    final Object[] result = {null};
+    final Entity[] result = {null};
     final float[] minDst2 = {radius * radius};
 
     nearbyEnemies(
@@ -149,7 +149,7 @@ public class Entities {
           }
         });
     if (result[0] != null) {
-      con.get((Entity) result[0]);
+      con.get(result[0]);
     }
   }
 

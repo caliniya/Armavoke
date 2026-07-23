@@ -76,8 +76,7 @@ public class UnitType extends ContentType {
 
     // 绘制武器
     for (Weapon weapon : u.weapons) {
-      float wRot = u.rotation + weapon.rotation;
-      Draw.rect(weapon.type.region, weapon.wx, weapon.wy, wRot);
+      weapon.type.draw(weapon);
     }
   }
 

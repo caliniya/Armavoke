@@ -33,14 +33,6 @@ public class UnitTypes {
                 new WeaponType("aa") {
                   {
                     mirror = true;
-                    x = 100;
-                    bullet = new BulletType();
-                    rotate = false;
-                  }
-                },
-                new WeaponType("aa") {
-                  {
-                    mirror = true;
                     x = 50;
                     bullet = new BulletType();
                     rotate = true;

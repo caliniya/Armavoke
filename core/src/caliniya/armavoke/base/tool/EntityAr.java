@@ -189,7 +189,6 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
 
     // 如果还在同一个节点范围内，只更新位置不重建树
     if (rect.contains(newX, newY)) {
-      rect.setPosition(newX, newY);
       return;
     }
 
@@ -197,7 +196,6 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     writeLock.lock();
     try {
       tree.remove(entity);
-      rect.setPosition(newX, newY);
       tree.insert(entity);
     } finally {
       writeLock.unlock();

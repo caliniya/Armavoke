@@ -1,12 +1,13 @@
 package caliniya.armavoke.type.type;
 
 import arc.Core;
-import arc.graphics.g2d.TextureRegion;
-import caliniya.armavoke.base.game.Entity;
+import arc.graphics.g2d.*;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.core.meta.ui.*;
 import caliniya.armavoke.game.Building;
 import caliniya.armavoke.game.Entities;
-import caliniya.armavoke.game.Unit;
-import caliniya.armavoke.type.Weapon;
+import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 
 public class WeaponType implements Cloneable {
 
@@ -69,4 +70,13 @@ public class WeaponType implements Cloneable {
       throw new RuntimeException(e);
     }
   }
+  
+  public void draw(Weapon w){
+    float wRot = w.owner.rotation + w.rotation;
+    Draw.rect(region, w.wx, w.wy, wRot);
+    Draw.color(Pal.light);
+    Lines.circle(w.wx,w.wy,range);
+    Draw.color();
+  }
+  
 }
