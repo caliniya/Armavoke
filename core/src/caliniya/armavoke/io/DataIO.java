@@ -131,8 +131,6 @@ public class DataIO {
       }
     }
 
-    RouteData.init();
-
     // --- Units ---
     int unitCount = r.i();
     for (int i = 0; i < unitCount; i++) {

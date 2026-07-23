@@ -39,7 +39,7 @@ public class Building extends Entity {
     // 初始化坐标
     this.x = (tx * WorldData.TILE_SIZE) + block.psize / 2;
     this.y = (ty * WorldData.TILE_SIZE) + block.psize / 2;
-    
+
     // 初始化血量
     this.maxHealth = block.health;
     // 只有当血量为0时才初始化为满血(防止覆盖读取存档后的数据)
@@ -70,7 +70,7 @@ public class Building extends Entity {
       for (int i = 0; i < shapeOffsets.length; i += 2) {
         consumer.get(tx + shapeOffsets[i], ty + shapeOffsets[i + 1]);
       }
-    } else if (block != null) {
+    } else {
       int s = block.size;
       for (int dx = 0; dx < s; dx++) {
         for (int dy = 0; dy < s; dy++) {
@@ -193,7 +193,7 @@ public class Building extends Entity {
     building.ty = ty;
     building.angle = angle;
     building.team = team;
-    //Entities.add(building);
+    // Entities.add(building);
     building.teamData = team.data();
     building.init();
     building.id = Entities.assignID();

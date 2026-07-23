@@ -82,7 +82,7 @@ public class Block extends ContentType {
    * @return 旋转后的新偏移量数组
    */
   public static int[] getRotatedOffsets(int angle, int[] baseOffsets) {
-    if (baseOffsets == null) return new int[] {0, 0};
+    if (baseOffsets == null) return (int[])null;
 
     int[] rotated = baseOffsets.clone();
 

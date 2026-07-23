@@ -2,6 +2,7 @@ package caliniya.armavoke.world;
 
 import arc.math.Mathf;
 import arc.func.Intc2;
+import arc.util.ArcRuntimeException;
 import arc.util.Log;
 import caliniya.armavoke.content.Blocks;
 import caliniya.armavoke.content.ENVBlocks;
@@ -88,18 +89,17 @@ public class World {
             }
             WorldChunk chunk = getOrCreateChunk(tx, ty);
             chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, newBuild);
+            RouteData.updateBlock(tx, ty, newBuild.block.solid);
           }
         });
-
-    if (block.solid) {
-      RouteData.updateBlock(x, y, block);
-    }
     Entities.add(newBuild);
     return newBuild;
   }
 
   public void setBuilding(Building b) {
-    if (!isValidCoord((int)b.x, (int)b.y) || b.block == null) return;
+    Log.info(b);
+    if (!isValidCoord(b.tx, b.ty) || b.block == null) return;
+    Log.info("呃啊");
     b.getOccupiedCoords(
         (tx, ty) -> {
           if (isValidCoord(tx, ty)) {
@@ -109,11 +109,9 @@ public class World {
             }
             WorldChunk chunk = getOrCreateChunk(tx, ty);
             chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, b);
+            RouteData.updateBlock(tx, ty, b.block.solid);
           }
         });
-    if (b.block.solid) {
-      RouteData.updateBlock((int) b.x, (int) b.y, b.block);
-    }
     Entities.add(b);
   }
 
@@ -211,6 +209,7 @@ public class World {
     return Contents.getByID(CType.Floor, id);
   }
 
+  // 如果true表示在范围内
   public boolean isValidCoord(int x, int y) {
     return x >= 0 && x < W && y >= 0 && y < H;
   }

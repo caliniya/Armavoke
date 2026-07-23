@@ -186,8 +186,6 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
   public void move(T entity, float newX, float newY) {
     Rect rect = new Rect();
     entity.hitbox(rect);
-    
-    
 
     // 如果还在同一个节点范围内，只更新位置不重建树
     if (rect.contains(newX, newY)) {

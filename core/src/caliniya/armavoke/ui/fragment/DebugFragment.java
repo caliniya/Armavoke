@@ -21,8 +21,7 @@ public class DebugFragment {
     root.touchable = Touchable.disabled;
     root.top().right();
 
-    root
-        .table(
+    root.table(
             t -> {
               t.label(
                       () -> {
@@ -54,12 +53,13 @@ public class DebugFragment {
                               .append("x")
                               .append(WorldData.world.H)
                               .append("\n");
+                          //sb.append(WorldData.buildings.isEmpty());
                         }
 
                         // sb.append("timedelta").append(Time.delta);
 
                         sb.append("Java: ").append(OS.javaVersion);
-                        sb.append("Android: ").append(Core.app.getVersion());
+                        sb.append("Android: ").append(Core.app.getVersion()).append("\n");
 
                         return sb.toString();
                       })
