@@ -300,6 +300,18 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
       readLock.unlock();
     }
   }
+  
+  // 但有写操作的遍历
+  public void eachWrited(Cons<? super T> cons) {
+    writeLock.lock();
+    try {
+      for (int i = 0; i < array.size; i++) {
+        cons.get(array.get(i));
+      }
+    } finally {
+      writeLock.unlock();
+    }
+  }
 
   /** 遍历满足谓词的实体 */
   public void each(Boolf<T> filter, Cons<? super T> cons) {

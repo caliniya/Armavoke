@@ -75,7 +75,7 @@ public class MenuFragment {
                         Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
 
                         // 生成随机测试建筑
-                        int padding = 0;
+                        int padding = 5;
                         int buildingCount = 10;
                         for (int i = 0; i < buildingCount; i++) {
                           int bx =
