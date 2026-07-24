@@ -1,6 +1,6 @@
 package caliniya.armavoke.content;
 
-import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.type.type.ItemType;
 
 public class Items {
 

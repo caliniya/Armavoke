@@ -2,16 +2,16 @@ package caliniya.armavoke;
 
 import static arc.Core.*;
 
-import android.os.*;
+import android.os.Bundle;
 import arc.*;
-import arc.*;
-import arc.backend.android.*;
-import arc.backend.android.*;
-import arc.files.*;
-import arc.util.*;
+import arc.ApplicationListener;
+import arc.backend.android.AndroidApplication;
+import arc.backend.android.AndroidApplicationConfiguration;
+import arc.files.Fi;
+import arc.util.Log;
 import arc.util.Log.*;
-import cat.ereza.customactivityoncrash.config.*;
-import java.io.*;
+import cat.ereza.customactivityoncrash.config.CaocConfig;
+import java.io.Writer;
 
 public class AndroidLauncher extends AndroidApplication {
   @Override

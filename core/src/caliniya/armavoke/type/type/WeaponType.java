@@ -1,6 +1,6 @@
 package caliniya.armavoke.type.type;
 
-import arc.*;
+import arc.Core;
 import arc.graphics.g2d.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.core.meta.ui.*;

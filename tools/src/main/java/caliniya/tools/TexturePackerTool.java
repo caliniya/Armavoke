@@ -1,9 +1,9 @@
 package caliniya.tools;
 
-import arc.packer.*;
-import arc.packer.TexturePacker.*;
+import arc.packer.TexturePacker;
+import arc.packer.TexturePacker.Settings;
 
-import java.io.*;
+import java.io.File;
 
 public class TexturePackerTool {
   public static void main(String[] args) {

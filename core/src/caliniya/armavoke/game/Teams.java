@@ -1,8 +1,8 @@
 package caliniya.armavoke.game;
 
-import arc.util.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.base.game.*;
+import arc.util.Log;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.game.data.*;
 
 public class Teams {

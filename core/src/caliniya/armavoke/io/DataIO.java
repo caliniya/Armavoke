@@ -1,8 +1,8 @@
 package caliniya.armavoke.io;
 
-import arc.*;
-import arc.files.*;
-import arc.struct.*;
+import arc.Core;
+import arc.files.Fi;
+import arc.struct.StringMap;
 import arc.util.io.*;
 import arc.util.*;
 import caliniya.armavoke.system.*;

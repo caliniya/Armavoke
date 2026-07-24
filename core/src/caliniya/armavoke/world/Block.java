@@ -1,9 +1,9 @@
 package caliniya.armavoke.world;
 
-import arc.*;
-import arc.func.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
+import arc.Core;
+import arc.func.Intc2;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.util.*;
 import arc.util.io.*;
 import caliniya.armavoke.base.game.*;
@@ -13,7 +13,7 @@ import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.type.type.ItemType;
 
 public class Block extends ContentType {
 

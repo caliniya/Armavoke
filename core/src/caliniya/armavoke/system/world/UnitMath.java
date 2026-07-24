@@ -1,13 +1,13 @@
 package caliniya.armavoke.system.world;
 
-import arc.math.*;
-import arc.math.*;
-import arc.math.geom.*;
-import caliniya.armavoke.base.tool.*;
+import arc.math.Angles;
+import arc.math.Mathf;
+import arc.math.geom.Point2;
+import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.system.*;
+import caliniya.armavoke.game.data.RouteData;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.system.System;
 
 public class UnitMath extends caliniya.armavoke.system.System<UnitMath> {
 

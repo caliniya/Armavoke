@@ -1,8 +1,8 @@
 package caliniya.armavoke.type;
 
 import arc.math.geom.*;
-import arc.util.pooling.Pool.*;
-import arc.util.pooling.*;
+import arc.util.pooling.Pool.Poolable;
+import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.system.*;

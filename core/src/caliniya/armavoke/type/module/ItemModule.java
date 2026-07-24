@@ -1,10 +1,10 @@
 package caliniya.armavoke.type.module;
 
-import arc.util.io.*;
-import arc.util.io.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
+import caliniya.armavoke.game.Contents;
+import caliniya.armavoke.type.Item;
+import caliniya.armavoke.type.type.ItemType;
 
 /**
  * 物品存储模块，管理物品存储、容量及过滤规则。

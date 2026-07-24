@@ -1,10 +1,10 @@
 package caliniya.armavoke.map;
 
-import arc.*;
-import arc.files.*;
-import arc.graphics.*;
-import arc.struct.*;
-import arc.util.*;
+import arc.Core;
+import arc.files.Fi;
+import arc.graphics.Texture;
+import arc.struct.StringMap;
+import arc.util.Strings;
 
 /** 代表一个游戏地图或存档的元数据对象。 不包含实际的游戏网格数据，只包含描述信息。 */
 public class Map implements Comparable<Map> {

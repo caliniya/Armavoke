@@ -1,16 +1,16 @@
 package caliniya.armavoke.system.world;
 
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.world.*;
-import arc.struct.*;
-import caliniya.armavoke.world.*;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.world.Floor;
+import arc.struct.ObjectIntMap;
+import caliniya.armavoke.world.ENVBlock;
 import caliniya.armavoke.io.*;
-import arc.math.*;
-import arc.util.*;
+import arc.math.Mathf;
+import arc.util.Log;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.type.*;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.system.System;
+import caliniya.armavoke.type.Weapon;
 
 /**
  * 实体处理系统，运行在独立线程（60TPS）。

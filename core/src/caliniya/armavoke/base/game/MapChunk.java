@@ -1,16 +1,16 @@
 package caliniya.armavoke.base.game;
 
-import arc.*;
-import arc.graphics.*;
-import arc.graphics.*;
-import arc.graphics.gl.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
-import arc.util.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.world.*;
-import caliniya.armavoke.world.*;
+import arc.Core;
+import arc.graphics.Camera;
+import arc.graphics.Color;
+import arc.graphics.gl.FrameBuffer;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
+import arc.util.Disposable;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.system.render.MapRender;
+import caliniya.armavoke.world.ENVBlock;
+import caliniya.armavoke.world.Floor;
 
 public class MapChunk implements Disposable {
   public static final int SIZE = 32;

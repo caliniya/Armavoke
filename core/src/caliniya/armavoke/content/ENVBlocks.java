@@ -1,6 +1,6 @@
 package caliniya.armavoke.content;
 
-import arc.math.geom.*;
+import arc.math.geom.Path;
 import caliniya.armavoke.world.*;
 
 public class ENVBlocks {

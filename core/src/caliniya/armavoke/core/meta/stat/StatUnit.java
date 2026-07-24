@@ -1,9 +1,9 @@
 package caliniya.armavoke.core.meta.stat;
 
-import arc.*;
-import arc.util.*;
-import arc.util.*;
-import java.util.*;
+import arc.Core;
+import arc.util.Nullable;
+import arc.util.Strings;
+import java.util.Locale;
 
 /** 数值单位定义。控制统计信息中数字的显示格式。 */
 public enum StatUnit {

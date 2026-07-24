@@ -1,27 +1,27 @@
 package caliniya.armavoke;
 
 import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.*;
-import arc.files.*;
-import arc.graphics.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.scene.*;
-import java.io.*;
+import arc.assets.AssetManager;
+import arc.assets.loaders.I18NBundleLoader;
+import arc.files.Fi;
+import arc.graphics.Camera;
+import arc.graphics.Texture;
+import arc.graphics.g2d.SpriteBatch;
+import arc.graphics.g2d.TextureAtlas;
+import arc.graphics.g2d.TextureRegion;
+import arc.math.Scaled;
+import arc.scene.Scene;
+import java.io.Writer;
 import arc.util.Log.*;
-import arc.util.*;
-import java.text.*;
-import arc.util.viewport.*;
+import arc.util.Log;
+import java.text.SimpleDateFormat;
+import arc.util.viewport.ScreenViewport;
 import arc.util.*;
 
 import caliniya.armavoke.core.*;
 import java.util.*;
 
-import caliniya.armavoke.core.*;
+import caliniya.armavoke.core.UI;
 import caliniya.armavoke.ui.*;
 
 import static arc.Core.*;

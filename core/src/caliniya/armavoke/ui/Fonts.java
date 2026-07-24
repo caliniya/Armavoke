@@ -11,7 +11,7 @@ import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.scene.style.*;
-import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Scl;
 import arc.struct.*;
 import arc.util.*;
 

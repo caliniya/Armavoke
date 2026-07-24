@@ -1,11 +1,11 @@
 package caliniya.armavoke.game.data;
 
-import arc.func.*;
-import arc.func.*;
-import arc.func.*;
-import arc.func.*;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.base.type.*;
+import arc.func.Boolc;
+import arc.func.Boolf;
+import arc.func.Boolp;
+import arc.func.Cons;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 

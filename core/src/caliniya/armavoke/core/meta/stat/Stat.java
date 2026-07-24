@@ -1,7 +1,7 @@
 package caliniya.armavoke.core.meta.stat;
 
-import arc.*;
-import caliniya.armavoke.base.tool.*;
+import arc.Core;
+import caliniya.armavoke.base.tool.Ar;
 
 public enum Stat {
   health("health", StatType.general);

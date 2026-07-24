@@ -1,14 +1,14 @@
 package caliniya.armavoke.system.input;
 
-import arc.*;
-import arc.input.*;
-import arc.input.*;
-import arc.math.geom.*;
-import caliniya.armavoke.core.*;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.ui.fragment.*;
-import caliniya.armavoke.world.stars.*;
+import arc.Core;
+import arc.input.InputProcessor;
+import arc.input.KeyCode;
+import arc.math.geom.Vec2;
+import caliniya.armavoke.core.Render;
+import caliniya.armavoke.system.System;
+import caliniya.armavoke.system.render.UniverseRender;
+import caliniya.armavoke.ui.fragment.UniverseFragment;
+import caliniya.armavoke.world.stars.Universe;
 
 /**
  * 宇宙视图网格选择器<br>

@@ -1,13 +1,13 @@
 package caliniya.armavoke.ui.windows;
 
-import arc.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.scene.*;
-import arc.scene.style.*;
-import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
+import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.math.Mathf;
+import arc.scene.Element;
+import arc.scene.style.Drawable;
+import arc.scene.ui.Label;
+import arc.scene.ui.layout.Table;
 
 /**
  * 进度窗口。

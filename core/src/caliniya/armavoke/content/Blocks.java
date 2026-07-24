@@ -1,8 +1,8 @@
 package caliniya.armavoke.content;
 
-import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.world.*;
-import caliniya.armavoke.world.defence.turret.*;
+import caliniya.armavoke.world.defence.turret.Turret;
 
 public class Blocks {
 

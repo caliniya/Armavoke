@@ -1,18 +1,18 @@
 package caliniya.armavoke.world.defence.turret;
 
-import arc.math.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
-import arc.*;
-import arc.math.*;
-import arc.util.*;
-import arc.util.io.*;
-import arc.util.io.*;
-import caliniya.armavoke.base.game.*;
+import arc.math.Angles;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
+import arc.Core;
+import arc.math.Mathf;
+import arc.util.Log;
+import arc.util.io.Writes;
+import arc.util.io.Reads;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
-import caliniya.armavoke.world.*;
+import caliniya.armavoke.type.type.BulletType;
+import caliniya.armavoke.world.Block;
 
 public class Turret extends Block {
 

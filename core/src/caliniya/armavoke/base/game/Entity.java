@@ -1,11 +1,11 @@
 package caliniya.armavoke.base.game;
 
-import arc.math.geom.QuadTree.*;
-import arc.math.geom.*;
-import arc.util.pooling.Pool.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.module.*;
-import caliniya.armavoke.base.type.*;
+import arc.math.geom.QuadTree.QuadTreeObject;
+import arc.math.geom.Rect;
+import arc.util.pooling.Pool.Poolable;
+import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.module.ItemModule;
+import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
 
 /**

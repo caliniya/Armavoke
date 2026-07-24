@@ -1,15 +1,15 @@
 package caliniya.armavoke.system.world;
 
-import arc.*;
-import arc.util.*;
-import arc.util.*;
-import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.base.tool.*;
+import arc.Core;
+import arc.util.ArcRuntimeException;
+import arc.util.Log;
+import caliniya.armavoke.base.game.Entity;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.base.tool.EntityAr;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.type.*;
+import caliniya.armavoke.game.Entities;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.type.Bullet;
 
 /** 子弹处理系统。 管理子弹生命周期、移动、碰撞及渲染数据同步，后台线程运行，双缓冲保证线程安全。 */
 public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess> {

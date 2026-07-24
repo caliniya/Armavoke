@@ -1,13 +1,13 @@
 package caliniya.armavoke.ui.fragment;
 
-import arc.*;
-import arc.graphics.*;
-import arc.scene.event.*;
-import arc.scene.ui.layout.*;
-import arc.util.*;
-import arc.util.*;
-import caliniya.armavoke.*;
-import caliniya.armavoke.game.data.*;
+import arc.Core;
+import arc.graphics.Color;
+import arc.scene.event.Touchable;
+import arc.scene.ui.layout.Table;
+import arc.util.OS;
+import arc.util.Time;
+import caliniya.armavoke.Init;
+import caliniya.armavoke.game.data.WorldData;
 
 public class DebugFragment {
 

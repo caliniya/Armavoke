@@ -1,6 +1,6 @@
 package caliniya.armavoke.content;
 
-import caliniya.armavoke.world.*;
+import caliniya.armavoke.world.Floor;
 
 public class Floors {
 

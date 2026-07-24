@@ -1,7 +1,7 @@
 package caliniya.armavoke.system.game;
 
 import arc.util.*;
-import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
@@ -9,7 +9,7 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
-import caliniya.armavoke.system.world.*;
+import caliniya.armavoke.system.world.BulletProcess;
 
 // 在这里进行主线程游戏内容的更新
 public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {

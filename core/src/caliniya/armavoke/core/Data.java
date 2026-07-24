@@ -1,28 +1,28 @@
 package caliniya.armavoke.core;
 
-import arc.*;
-import arc.*;
-import arc.files.*;
-import arc.math.*;
-import arc.math.*;
-import arc.util.*;
-import caliniya.armavoke.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.content.*;
+import arc.Core;
+import arc.Events;
+import arc.files.Fi;
+import arc.math.Mathf;
+import arc.math.Rand;
+import arc.util.Log;
+import caliniya.armavoke.Armavoke;
+import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.content.Blocks;
 
-import caliniya.armavoke.content.*;
+import caliniya.armavoke.content.UnitTypes;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.io.*;
-import caliniya.armavoke.io.*;
-import caliniya.armavoke.map.*;
-import caliniya.armavoke.system.game.*;
-import caliniya.armavoke.system.input.*;
+import caliniya.armavoke.io.DataIO;
+import caliniya.armavoke.io.GameIO;
+import caliniya.armavoke.map.Maps;
+import caliniya.armavoke.system.game.GameProcess;
+import caliniya.armavoke.system.input.UniverseInput;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
-import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.Weapon;
 import caliniya.armavoke.system.*;
 
 import static caliniya.armavoke.game.data.WorldData.*;

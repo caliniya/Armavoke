@@ -1,20 +1,20 @@
 package caliniya.armavoke.system.render;
 
-import arc.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.graphics.g2d.*;
-import arc.util.*;
-import arc.util.*;
-import caliniya.armavoke.base.tool.*;
+import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.util.ArcRuntimeException;
+import arc.util.Log;
+import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.system.world.*;
-import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.system.Systems;
+import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.type.BulletType;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.system.System;
+import caliniya.armavoke.system.world.BulletProcess;
+import caliniya.armavoke.ui.fragment.UniverseFragment;
 
 public class UnitRender extends System<UnitRender> {
 
