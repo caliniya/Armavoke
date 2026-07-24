@@ -1,6 +1,6 @@
 package caliniya.armavoke.content;
 
-import caliniya.armavoke.map.Map;
+import caliniya.armavoke.map.*;
 
 public class Maps {
   

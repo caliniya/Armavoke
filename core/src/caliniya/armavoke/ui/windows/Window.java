@@ -1,19 +1,19 @@
 package caliniya.armavoke.ui.windows;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.scene.event.InputEvent;
-import arc.scene.event.InputListener;
-import arc.scene.event.Touchable;
-import arc.scene.style.NinePatchDrawable;
-import arc.scene.ui.Label;
-import arc.scene.ui.ScrollPane;
-import arc.scene.ui.layout.Table;
-import arc.util.Align;
-import caliniya.armavoke.ui.Button;
+import arc.*;
+import arc.graphics.*;
+import arc.math.*;
+import arc.scene.event.*;
+import arc.scene.event.*;
+import arc.scene.event.*;
+import arc.scene.style.*;
+import arc.scene.ui.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import caliniya.armavoke.ui.*;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class Window {
 

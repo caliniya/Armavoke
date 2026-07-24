@@ -1,10 +1,10 @@
 package caliniya.armavoke.core.meta.stat;
 
-import arc.func.Cons;
-import arc.struct.ObjectIntMap;
-import arc.struct.ObjectMap;
-import arc.struct.OrderedMap;
-import caliniya.armavoke.base.tool.Ar;
+import arc.func.*;
+import arc.struct.*;
+import arc.struct.*;
+import arc.struct.*;
+import caliniya.armavoke.base.tool.*;
 
 /** 表示一组统计数据 */
 public class StatStack {

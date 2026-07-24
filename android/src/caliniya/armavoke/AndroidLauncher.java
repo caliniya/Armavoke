@@ -1,28 +1,28 @@
 package caliniya.armavoke;
 
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.view.DisplayCutout;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.graphics.drawable.*;
+import android.os.*;
+import android.view.*;
+import android.view.*;
+import android.view.*;
+import android.view.*;
 import static arc.Core.*;
 
-import android.os.Bundle;
+import android.os.*;
 import arc.*;
-import arc.ApplicationListener;
-import arc.backend.android.AndroidApplication;
-import arc.backend.android.AndroidApplicationConfiguration;
-import arc.files.Fi;
-import arc.graphics.Color;
-import arc.util.Log;
+import arc.*;
+import arc.backend.android.*;
+import arc.backend.android.*;
+import arc.files.*;
+import arc.graphics.*;
+import arc.util.*;
 import arc.util.Log.*;
-import caliniya.armavoke.core.UI;
-import cat.ereza.customactivityoncrash.config.CaocConfig;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import caliniya.armavoke.core.*;
+import cat.ereza.customactivityoncrash.config.*;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import java.util.*;
 
 public class AndroidLauncher extends AndroidApplication {
 

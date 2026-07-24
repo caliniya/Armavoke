@@ -1,9 +1,9 @@
 package caliniya.armavoke.world;
 
-import arc.Core;
-import arc.graphics.g2d.TextureRegion;
-import caliniya.armavoke.base.game.ContentType;
-import caliniya.armavoke.base.type.CType;
+import arc.*;
+import arc.graphics.g2d.*;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.type.*;
 
 public class Floor extends ContentType {
 

@@ -1,15 +1,15 @@
 package caliniya.tools;
 
-import arc.files.Fi;
-import arc.graphics.Pixmap;
-import arc.struct.Seq;
-import arc.util.Log;
-import arc.util.Time;
+import arc.files.*;
+import arc.graphics.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.*;
 
-import java.awt.geom.Area;
-import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
+import java.awt.geom.*;
+import java.awt.geom.*;
+import java.awt.geom.*;
 
 public class IconGen {
     float width, height;

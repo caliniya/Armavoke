@@ -1,9 +1,9 @@
 package caliniya.armavoke.map;
 
-import arc.Core;
-import arc.files.Fi;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.io.GameIO;
+import arc.*;
+import arc.files.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.io.*;
 
 public class Maps {
     // 所有的地图列表

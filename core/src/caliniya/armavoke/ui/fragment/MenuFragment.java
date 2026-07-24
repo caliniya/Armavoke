@@ -1,30 +1,30 @@
 package caliniya.armavoke.ui.fragment;
 
-import arc.Core;
-import arc.Events;
-import arc.files.Fi;
-import arc.scene.Group;
-import arc.scene.ui.layout.Table;
-import arc.struct.ObjectMap;
-import arc.struct.StringMap;
-import arc.util.Log;
-import caliniya.armavoke.base.type.TeamTypes;
+import arc.*;
+import arc.*;
+import arc.files.*;
+import arc.scene.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.struct.*;
+import arc.util.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.RouteData;
-import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.io.DataIO;
-import caliniya.armavoke.io.GameIO;
-import caliniya.armavoke.map.Map;
-import caliniya.armavoke.map.Maps;
-import caliniya.armavoke.system.Systems;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.io.*;
+import caliniya.armavoke.io.*;
+import caliniya.armavoke.map.*;
+import caliniya.armavoke.map.*;
+import caliniya.armavoke.system.*;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
-import caliniya.armavoke.ui.windows.DataWindow;
+import caliniya.armavoke.ui.windows.*;
 
 public class MenuFragment {
 

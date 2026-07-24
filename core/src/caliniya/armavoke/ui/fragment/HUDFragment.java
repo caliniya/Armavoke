@@ -1,22 +1,22 @@
 package caliniya.armavoke.ui.fragment;
 
-import arc.Core;
-import arc.Events;
-import arc.math.Interp;
-import arc.scene.actions.Actions;
-import arc.scene.event.Touchable;
-import arc.scene.ui.layout.Table;
-import arc.util.Align;
-import arc.util.Log;
-import caliniya.armavoke.base.type.EventType;
-import caliniya.armavoke.core.Render;
-import caliniya.armavoke.core.UI;
-import caliniya.armavoke.game.data.CommandData;
-import caliniya.armavoke.game.data.WorldData;
+import arc.*;
+import arc.*;
+import arc.math.*;
+import arc.scene.actions.*;
+import arc.scene.event.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.*;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.io.*;
-import caliniya.armavoke.ui.Button;
-import caliniya.armavoke.ui.Styles;
-import arc.files.Fi;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.ui.*;
+import arc.files.*;
 
 public class HUDFragment {
 

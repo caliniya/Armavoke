@@ -1,13 +1,13 @@
 package caliniya.armavoke.system.render;
 
 import static arc.Core.*;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.math.geom.Vec2;
-import arc.scene.Element;
-import arc.scene.Group;
-import caliniya.armavoke.core.meta.ui.Pal;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.math.geom.*;
+import arc.scene.*;
+import arc.scene.*;
+import caliniya.armavoke.core.meta.ui.*;
 
 /**
  * 调试渲染器：给 scene 中每一个 UI 元素绘制边框，便于制作 UI 时定位。

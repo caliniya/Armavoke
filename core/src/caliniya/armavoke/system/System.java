@@ -1,10 +1,10 @@
 package caliniya.armavoke.system;
 
-import arc.Core;
-import arc.Events;
-import arc.util.Log;
-import arc.util.Threads;
-import caliniya.armavoke.base.type.EventType;
+import arc.*;
+import arc.*;
+import arc.util.*;
+import arc.util.*;
+import caliniya.armavoke.base.type.*;
 
 /**
  * 代表游戏或应用中的一个独立逻辑模块。

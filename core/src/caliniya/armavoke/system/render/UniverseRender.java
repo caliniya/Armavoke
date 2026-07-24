@@ -1,17 +1,17 @@
 package caliniya.armavoke.system.render;
 
-import arc.Core;
-import arc.graphics.Camera;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import caliniya.armavoke.base.shaders.SpaceShader;
-import caliniya.armavoke.core.Render;
-import caliniya.armavoke.system.System;
-import caliniya.armavoke.system.input.UniverseCameraInput;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
-import caliniya.armavoke.world.stars.Universe;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import caliniya.armavoke.base.shaders.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.system.input.*;
+import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.world.stars.*;
 
 /**
  * 宇宙渲染 —— 参照 Godot 版世界.gd<br>

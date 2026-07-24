@@ -1,20 +1,20 @@
 package caliniya.armavoke.core;
 
-import arc.graphics.Camera;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.scene.ui.layout.Scl;
-import arc.scene.ui.layout.Table;
-import arc.util.viewport.Viewport;
-import caliniya.armavoke.core.meta.stat.StatStack;
-import caliniya.armavoke.map.Maps;
+import arc.graphics.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.*;
+import arc.util.viewport.*;
+import caliniya.armavoke.core.meta.stat.*;
+import caliniya.armavoke.map.*;
 import caliniya.armavoke.ui.fragment.*;
 import caliniya.armavoke.ui.windows.*;
 
-import static arc.Core.scene;
-import static arc.Core.graphics;
+import static arc.Core.*;
+import static arc.Core.*;
 
 public class UI {
 

@@ -1,6 +1,6 @@
 package caliniya.armavoke.game;
 
-import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.base.type.*;
 
 public class Game {
   //表示玩家队伍

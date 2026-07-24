@@ -3,7 +3,7 @@ package caliniya.armavoke.base.tool;
 import arc.func.*;
 import arc.math.*;
 import arc.util.*;
-import arc.assets.AssetDescriptor;
+import arc.assets.*;
 
 import java.util.*;
 

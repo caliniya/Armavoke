@@ -1,8 +1,8 @@
 package caliniya.armavoke.base.shader;
 
-import arc.Core;
-import arc.files.Fi;
-import arc.graphics.gl.Shader;
+import arc.*;
+import arc.files.*;
+import arc.graphics.gl.*;
 
 public class BlurShader extends Shader {
     // 这是一个简单的单次遍历模糊算法

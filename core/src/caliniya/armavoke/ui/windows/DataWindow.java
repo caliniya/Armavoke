@@ -1,8 +1,8 @@
 package caliniya.armavoke.ui.windows;
 
-import arc.scene.ui.layout.Table;
-import arc.util.Align;
-import caliniya.armavoke.base.tool.Ar;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.core.meta.stat.*;
 
 /**

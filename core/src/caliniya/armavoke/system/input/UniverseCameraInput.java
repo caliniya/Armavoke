@@ -1,14 +1,14 @@
 package caliniya.armavoke.system.input;
 
-import arc.Core;
-import arc.input.GestureDetector.GestureListener;
-import arc.input.InputProcessor;
-import arc.input.KeyCode;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import caliniya.armavoke.core.Render;
-import caliniya.armavoke.system.System;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
+import arc.*;
+import arc.input.GestureDetector.*;
+import arc.input.*;
+import arc.input.*;
+import arc.math.*;
+import arc.math.geom.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.ui.fragment.*;
 
 /**
  * 宇宙视图相机的输入控制。<br>

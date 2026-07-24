@@ -1,10 +1,10 @@
 package caliniya.armavoke.type;
 
-import arc.math.Angles;
-import arc.util.Time;
-import caliniya.armavoke.base.game.Entity;
+import arc.math.*;
+import arc.util.*;
+import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.type.WeaponType;
+import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.type.*;
 
 public class Weapon {

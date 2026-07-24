@@ -1,15 +1,15 @@
 package caliniya.armavoke.type.type;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.graphics.g2d.Draw;
-import arc.math.Angles;
-import arc.Core;
-import arc.util.Log;
-import caliniya.armavoke.base.game.Entity;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.*;
+import arc.util.*;
+import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.*;
-import caliniya.armavoke.ui.Fonts;
+import caliniya.armavoke.ui.*;
 
 public class BulletType {
 

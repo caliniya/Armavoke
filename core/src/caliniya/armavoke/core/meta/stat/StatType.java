@@ -1,6 +1,6 @@
 package caliniya.armavoke.core.meta.stat;
 
-import arc.Core;
+import arc.*;
 
 /** 统计信息的组，例如战斗 */
 public enum StatType {

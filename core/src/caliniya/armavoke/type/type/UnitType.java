@@ -1,17 +1,17 @@
 package caliniya.armavoke.type.type;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Log;
-import caliniya.armavoke.base.game.ContentType;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.base.type.TeamTypes;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.util.*;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.game.*;
-import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 

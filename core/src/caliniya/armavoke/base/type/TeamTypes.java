@@ -1,6 +1,6 @@
 package caliniya.armavoke.base.type;
 
-import caliniya.armavoke.game.data.TeamData;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
 

@@ -1,11 +1,11 @@
 package caliniya.armavoke.content;
 
-import arc.util.Log;
+import arc.util.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.Armavoke;
-import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.*;
+import caliniya.armavoke.game.data.*;
 
 public class UnitTypes {
 

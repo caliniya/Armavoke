@@ -1,11 +1,11 @@
 package caliniya.armavoke.ui.fragment;
 
-import arc.Core;
-import arc.scene.event.Touchable;
-import arc.scene.ui.layout.Table;
-import caliniya.armavoke.core.UI;
-import caliniya.armavoke.ui.Button;
-import caliniya.armavoke.ui.Styles;
+import arc.*;
+import arc.scene.event.*;
+import arc.scene.ui.layout.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.ui.*;
 
 /**
  * 宇宙界面菜单 — 切换到宇宙视图时显示<br>

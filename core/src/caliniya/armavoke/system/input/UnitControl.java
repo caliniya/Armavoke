@@ -1,19 +1,19 @@
 package caliniya.armavoke.system.input;
 
 import arc.*;
-import arc.input.GestureDetector.GestureListener;
-import arc.input.KeyCode;
-import arc.input.InputProcessor;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import arc.util.Log;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.type.EventType;
+import arc.input.GestureDetector.*;
+import arc.input.*;
+import arc.input.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.CommandData;
-import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 
 public class UnitControl implements InputProcessor, GestureListener {

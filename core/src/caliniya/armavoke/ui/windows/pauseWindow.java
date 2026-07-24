@@ -1,11 +1,11 @@
 package caliniya.armavoke.ui.windows;
-import arc.Core;
-import arc.scene.ui.layout.Table;
-import caliniya.armavoke.core.Render;
-import caliniya.armavoke.ui.Button;
-import caliniya.armavoke.ui.fragment.HUDFragment;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
-import caliniya.armavoke.core.UI;
+import arc.*;
+import arc.scene.ui.layout.*;
+import caliniya.armavoke.core.*;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.ui.fragment.*;
+import caliniya.armavoke.core.*;
 
 public class PauseWindow extends Window{
   /**

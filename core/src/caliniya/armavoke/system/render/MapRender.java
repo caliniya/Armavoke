@@ -1,23 +1,23 @@
 package caliniya.armavoke.system.render;
 
-import arc.Core;
-import arc.Events;
-import arc.graphics.Camera;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Font;
-import arc.graphics.g2d.GlyphLayout;
-import arc.graphics.g2d.Lines;
-import arc.math.Mathf;
-import arc.util.Align;
+import arc.*;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
 import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.base.type.EventType;
-import caliniya.armavoke.game.data.RouteData;
-import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.System;
-import caliniya.armavoke.ui.Fonts;
-import caliniya.armavoke.world.World;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.world.*;
 import caliniya.armavoke.base.shaders.*;
 
 public class MapRender extends caliniya.armavoke.system.System<MapRender> {

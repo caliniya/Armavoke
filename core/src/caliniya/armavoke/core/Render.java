@@ -1,14 +1,14 @@
 package caliniya.armavoke.core;
 
-import arc.Core;
-import arc.graphics.Camera;
-import arc.graphics.g2d.Draw;
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
-import caliniya.armavoke.game.data.WorldData;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
+import caliniya.armavoke.ui.fragment.*;
 
 /**
  * 全局渲染处理

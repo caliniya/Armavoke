@@ -1,16 +1,16 @@
 package caliniya.armavoke.ui.windows;
 
-import arc.graphics.Color;
-import arc.scene.ui.Image;
-import arc.scene.ui.Label;
-import arc.scene.ui.TextField;
-import arc.scene.ui.layout.Table;
-import arc.util.Scaling;
-import arc.util.Log;
-import caliniya.armavoke.map.Map;
-import caliniya.armavoke.map.Maps;
-import caliniya.armavoke.ui.Button;
-import caliniya.armavoke.ui.windows.Window;
+import arc.graphics.*;
+import arc.scene.ui.*;
+import arc.scene.ui.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import arc.util.*;
+import caliniya.armavoke.map.*;
+import caliniya.armavoke.map.*;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.ui.windows.*;
 
 public class MapsWindow extends Window {
 

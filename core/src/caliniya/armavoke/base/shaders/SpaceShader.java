@@ -1,17 +1,17 @@
 package caliniya.armavoke.base.shaders;
 
-import arc.Core;
-import arc.files.Fi;
-import arc.graphics.Camera;
-import arc.graphics.Gl;
-import arc.graphics.Texture;
-import arc.graphics.Texture.TextureWrap;
-import arc.graphics.g2d.Draw;
-import arc.graphics.gl.Shader;
-import arc.util.Disposable;
-import arc.util.Log;
-import arc.util.Time;
-import caliniya.armavoke.core.Render;
+import arc.*;
+import arc.files.*;
+import arc.graphics.*;
+import arc.graphics.*;
+import arc.graphics.*;
+import arc.graphics.Texture.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
+import arc.util.*;
+import arc.util.*;
+import arc.util.*;
+import caliniya.armavoke.core.*;
 
 public class SpaceShader implements Disposable {
 

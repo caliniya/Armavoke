@@ -1,12 +1,12 @@
 package caliniya.armavoke.game;
 
-import arc.func.Boolf;
-import arc.func.Cons;
-import arc.math.Mathf;
-import arc.struct.IntQueue;
+import arc.func.*;
+import arc.func.*;
+import arc.math.*;
+import arc.struct.*;
 import arc.math.geom.QuadTree.*;
-import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.*;
 

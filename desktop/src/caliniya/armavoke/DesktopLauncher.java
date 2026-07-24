@@ -1,9 +1,9 @@
 package caliniya.armavoke;
 
-import arc.backend.sdl.SdlApplication;
-import arc.backend.sdl.SdlConfig;
-import arc.graphics.gl.HdpiMode;
-import caliniya.armavoke.Armavoke;
+import arc.backend.sdl.*;
+import arc.backend.sdl.*;
+import arc.graphics.gl.*;
+import caliniya.armavoke.*;
 
 public class DesktopLauncher {
   public static void main(String[] arg) {

@@ -1,21 +1,21 @@
 package caliniya.armavoke.ui;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.scene.style.Drawable;
-import arc.scene.style.NinePatchDrawable;
-import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.ImageButton;
-import arc.scene.ui.ImageButton.ImageButtonStyle;
-import arc.scene.ui.Label.LabelStyle;
-import arc.scene.ui.ScrollPane;
-import arc.scene.ui.ScrollPane.ScrollPaneStyle;
-import arc.scene.ui.TextField;
-import arc.scene.ui.TextField.TextFieldStyle;
-import arc.scene.ui.TextButton.TextButtonStyle;
-import arc.scene.ui.Button.ButtonStyle;
-import arc.scene.ui.Dialog.DialogStyle;
-import caliniya.armavoke.ui.Fonts;
+import arc.*;
+import arc.graphics.*;
+import arc.scene.style.*;
+import arc.scene.style.*;
+import arc.scene.style.*;
+import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
+import arc.scene.ui.Label.*;
+import arc.scene.ui.*;
+import arc.scene.ui.ScrollPane.*;
+import arc.scene.ui.*;
+import arc.scene.ui.TextField.*;
+import arc.scene.ui.TextButton.*;
+import arc.scene.ui.Button.*;
+import arc.scene.ui.Dialog.*;
+import caliniya.armavoke.ui.*;
 
 public class Styles {
 

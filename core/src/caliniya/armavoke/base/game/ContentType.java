@@ -1,7 +1,7 @@
 package caliniya.armavoke.base.game;
 
-import arc.Core;
-import arc.util.Nullable;
+import arc.*;
+import arc.util.*;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;

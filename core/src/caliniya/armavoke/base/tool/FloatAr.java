@@ -1,9 +1,9 @@
 package caliniya.armavoke.base.tool;
 
-import arc.math.Mathf;
-import arc.math.geom.Vec2;
+import arc.math.*;
+import arc.math.geom.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * A resizable, ordered or unordered float array. Avoids the boxing that occurs with ArrayList<Float>. If unordered, this class

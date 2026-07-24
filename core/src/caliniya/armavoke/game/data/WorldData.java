@@ -1,7 +1,7 @@
 package caliniya.armavoke.game.data;
 
 import arc.*;
-import arc.util.Log;
+import arc.util.*;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;

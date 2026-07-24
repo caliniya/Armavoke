@@ -1,16 +1,16 @@
 package caliniya.armavoke;
 
-import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
+import android.app.*;
+import android.content.*;
+import android.content.*;
 import android.os.*;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import cat.ereza.customactivityoncrash.CustomActivityOnCrash;
-import cat.ereza.customactivityoncrash.config.CaocConfig;
+import android.widget.*;
+import android.widget.*;
+import android.widget.*;
+import cat.ereza.customactivityoncrash.*;
+import cat.ereza.customactivityoncrash.config.*;
 
-import caliniya.armavoke.R;
+import caliniya.armavoke.*;
 
 public class ErrorActivity extends Activity {
     @Override
