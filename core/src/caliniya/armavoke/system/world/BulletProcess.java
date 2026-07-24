@@ -6,9 +6,8 @@ import arc.util.Log;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.EntityAr;
-import caliniya.armavoke.game.Building;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.Entities;
-import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.Bullet;
 

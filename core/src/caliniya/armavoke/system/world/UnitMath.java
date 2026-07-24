@@ -4,7 +4,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Point2;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;

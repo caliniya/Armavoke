@@ -1,33 +1,23 @@
-package caliniya.armavoke.game;
+package caliniya.armavoke.type;
 
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.util.Align;
-import arc.util.Strings;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Angles;
-import arc.math.Mathf;
-import arc.math.Rand;
-import arc.math.geom.Point2;
-import arc.math.geom.QuadTree;
-import arc.math.geom.Vec2;
-import arc.util.Log;
-import arc.util.Tmp;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
-import arc.util.pooling.Pools;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.content.UnitTypes;
-import caliniya.armavoke.game.data.*;
+import arc.util.*;
+import arc.math.*;
+import arc.util.io.*;
+import arc.graphics.*;
+import arc.math.geom.*;
+import arc.graphics.g2d.*;
+import arc.util.pooling.*;
+import caliniya.armavoke.ui.*;
+import caliniya.armavoke.game.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.module.*;
+import caliniya.armavoke.content.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.type.*;
-import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.ui.Fonts;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.type.module.*;
 
 public class Unit extends Entity {
 

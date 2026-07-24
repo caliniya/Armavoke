@@ -11,6 +11,7 @@ import caliniya.armavoke.ui.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.type.ItemType;
 

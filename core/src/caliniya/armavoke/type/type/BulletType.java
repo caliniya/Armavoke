@@ -7,8 +7,8 @@ import arc.math.Angles;
 import arc.Core;
 import arc.util.Log;
 import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.type.Bullet;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.type.*;
+import caliniya.armavoke.game.*;
 import caliniya.armavoke.ui.Fonts;
 
 public class BulletType {

@@ -1,6 +1,6 @@
 package caliniya.armavoke.base.game;
 
-import caliniya.armavoke.game.Building;
+import caliniya.armavoke.type.*;
 
 public class WorldChunk {
   // 必须是 2 的 N 次幂

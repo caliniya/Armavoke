@@ -8,6 +8,7 @@ import arc.math.geom.QuadTree.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.type.*;
 
 public class Entities {
 

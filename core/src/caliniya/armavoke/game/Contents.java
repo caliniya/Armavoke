@@ -6,6 +6,7 @@ import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.IntAr;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.content.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.ItemType;
 
 /**

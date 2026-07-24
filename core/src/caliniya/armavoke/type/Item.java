@@ -3,15 +3,13 @@ package caliniya.armavoke.type;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.game.Contents;
+import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.type.ItemType;
 
 public class Item {
   
   public ItemType type;
   public int amount;
-  
-  public Item() {}
 
   public Item(ItemType type, int amount) {
     this.type = type;

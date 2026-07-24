@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.base.tool.*;

@@ -6,6 +6,7 @@ import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.world.BulletProcess;

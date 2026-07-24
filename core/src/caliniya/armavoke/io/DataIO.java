@@ -8,6 +8,7 @@ import arc.util.*;
 import caliniya.armavoke.system.*;
 import java.io.*;
 import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.world.*;

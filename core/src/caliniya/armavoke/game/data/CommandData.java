@@ -6,8 +6,8 @@ import arc.func.Boolp;
 import arc.func.Cons;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.game.Game;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.game.*;
+import caliniya.armavoke.type.*;
 
 public class CommandData {
   // 包括UI需要的建筑和单位，资源相关数据。

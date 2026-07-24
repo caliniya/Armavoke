@@ -1,15 +1,16 @@
-package caliniya.armavoke.game;
+package caliniya.armavoke.type;
 
-import arc.func.Intc2;
-import arc.util.Log;
+import arc.func.*;
+import arc.util.*;
 import arc.util.io.*;
-import arc.util.pooling.Pools;
-import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.base.type.CType;
+import arc.util.pooling.*;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.module.*;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.game.*;
 
 public class Building extends Entity {
 

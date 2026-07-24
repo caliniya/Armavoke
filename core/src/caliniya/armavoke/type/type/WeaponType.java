@@ -4,8 +4,6 @@ import arc.Core;
 import arc.graphics.g2d.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.core.meta.ui.*;
-import caliniya.armavoke.game.Building;
-import caliniya.armavoke.game.Entities;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 

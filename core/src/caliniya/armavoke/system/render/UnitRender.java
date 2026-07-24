@@ -7,7 +7,7 @@ import arc.graphics.g2d.Lines;
 import arc.util.ArcRuntimeException;
 import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.game.Unit;
+import caliniya.armavoke.type.*;
 import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.type.BulletType;

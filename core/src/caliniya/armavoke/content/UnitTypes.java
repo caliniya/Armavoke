@@ -5,7 +5,6 @@ import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.Armavoke;
-import caliniya.armavoke.game.Unit;
 import caliniya.armavoke.game.data.WorldData;
 
 public class UnitTypes {

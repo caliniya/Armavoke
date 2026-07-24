@@ -1,13 +1,13 @@
 package caliniya.armavoke.type;
 
-import arc.math.geom.Rect;
+import arc.math.geom.*;
 import arc.util.pooling.Pool.Poolable;
 import arc.util.pooling.Pools;
-import caliniya.armavoke.base.type.TeamTypes;
-import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.system.Systems;
-import caliniya.armavoke.type.type.BulletType;
-import arc.math.geom.QuadTree.QuadTreeObject;
+import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.system.*;
+import caliniya.armavoke.type.type.*;
+import arc.math.geom.QuadTree.*;
 
 public class Bullet implements Poolable, QuadTreeObject {
   public BulletType type;
