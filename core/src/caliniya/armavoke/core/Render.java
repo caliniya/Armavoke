@@ -50,7 +50,7 @@ public class Render extends caliniya.armavoke.system.System<Render> {
    */
   @Override
   public Render init() {
-    index = 3;
+    index = 9;
     
     // 重置状态
     currentZoom = 1.0f;

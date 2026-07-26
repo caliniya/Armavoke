@@ -294,61 +294,7 @@ public class Unit extends Entity {
   public void draw() {
     type.draw(this);
   }
-
-  public void drawDebug() {
-    Draw.color(Color.yellow);
-    Lines.stroke(2f);
-
-    if (hitboxData != null) {
-      for (int i = 0; i < hitboxData.length; i += 3) {
-        float cx = hitboxData[i];
-        float cy = hitboxData[i + 1];
-        float s = hitboxData[i + 2];
-        Lines.rect(cx - s / 2f, cy - s / 2f, s, s);
-      }
-    }
-
-    // 绘制计算出的外接圆 (新增，用于验证 size 计算是否正确)
-    Draw.color(Color.sky);
-    float radius = size / 2f;
-    Lines.circle(x, y, radius);
-    Draw.color(Color.yellow); // 还原颜色
-
-    if (Math.abs(speedX) > 0.001f || Math.abs(speedY) > 0.001f) {
-      Draw.color(Color.magenta);
-      float scale = 20f;
-      Lines.line(x, y, x + speedX * scale, y + speedY * scale);
-      Fonts.def.draw(Strings.format(speedX + " " + speedY), x, y + size + 8f, Align.center);
-    }
-
-    if (targetX != 0 || targetY != 0) {
-      Draw.color(Color.orange);
-      Lines.line(x, y, targetX, targetY);
-      float s = 8f;
-      Lines.line(targetX - s, targetY - s, targetX + s, targetY + s);
-      Lines.line(targetX - s, targetY + s, targetX + s, targetY - s);
-    }
-    if (path != null && !path.isEmpty()) {
-      Draw.color(Color.cyan);
-
-      float lastX = x;
-      float lastY = y;
-
-      for (int i = pathIndex; i < path.size; i++) {
-        Point2 p = path.get(i);
-        float wx = p.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-        float wy = p.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-
-        Lines.line(lastX, lastY, wx, wy);
-        Fill.square(wx, wy, 3f);
-        lastX = wx;
-        lastY = wy;
-      }
-    }
-
-    Draw.color();
-  }
-
+  
   public void updateWeapons(float dt) {
     float aimX = targetX;
     float aimY = targetY;

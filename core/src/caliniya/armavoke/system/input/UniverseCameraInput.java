@@ -29,7 +29,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public UniverseCameraInput init() {
-    this.index = 1;
+    this.index = 2;
     return super.init();
   }
 

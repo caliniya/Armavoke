@@ -47,10 +47,9 @@ public class Data {
     Systems.BR = new BlockRender();
     Systems.GP = new GameProcess();
     Systems.UV = new UniverseRender();
-    Systems.UI = new UniverseInput();
     //Systems.DE = new DebugRender();
     Systems.addSystem(
-        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, Systems.UI, new Render());
+        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render());
     Systems.BP = new BulletProcess();
     Systems.UM = new UnitMath();
     Systems.EP = new EntityProces();
@@ -62,6 +61,12 @@ public class Data {
     for (caliniya.armavoke.system.System sys : Systems.systems) {
       sys.init();
     }
+    
+    
+    for(caliniya.armavoke.system.System s : Systems.systems) {
+    	Log.info(s.index);
+    }
+    
     Systems.BP.init();
     Systems.UM.init();
     Systems.EP.init();

@@ -2,20 +2,23 @@ package caliniya.armavoke.world;
 
 import arc.Core;
 import arc.func.Intc2;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.*;
 import arc.util.io.*;
+import caliniya.armavoke.base.api.*;
 import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.ui.*;
-import caliniya.armavoke.core.*;
 import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.type.type.ItemType;
+import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.ui.*;
 
-public class Block extends ContentType {
+public class Block extends ContentType implements DrawType<Building> {
 
   // --- 基础属性 ---
   public float psize; // 大小，像素级
@@ -55,6 +58,34 @@ public class Block extends ContentType {
   public void draw(Building b) {
     float rotation = b.angle * 90f;
     Draw.rect(region, b.x, b.y, rotation);
+  }
+  
+  public void drawDebug(Building b){
+    Draw.color(Color.green);
+    Lines.stroke(4f);
+    // 绘制基于 size 的包围盒
+    Lines.rect(b.x - b.block.psize / 2, b.y - b.block.psize / 2, b.block.psize, b.block.psize);
+
+    // 3. 绘制占据的实际格子 (黄色细线)
+    // 对于异形建筑，这比包围盒更准确
+    if (b.shapeOffsets != null) {
+      Draw.color(Color.cyan);
+      Lines.stroke(1f);
+      for (int i = 0; i < b.shapeOffsets.length; i += 2) {
+        float tx = (b.tx + b.shapeOffsets[i]) * WorldData.TILE_SIZE;
+        float ty = (b.ty + b.shapeOffsets[i + 1]) * WorldData.TILE_SIZE;
+        Lines.rect(tx, ty, WorldData.TILE_SIZE, WorldData.TILE_SIZE);
+      }
+    }
+
+    // 4. 绘制旋转角度 (青色文字)
+    Fonts.def.draw(b.x + "   "+b.y, b.x + b.block.psize / 2f, b.y + b.block.psize + 10f, Align.center);
+    Fonts.def.draw(
+        Strings.format("" + b.health),
+        b.x - b.block.size,
+        b.y - b.block.size + b.block.size + 8f,
+        Align.center);
+    Draw.color(); // 重置颜色
   }
 
   public void write(Building b, Writes w) {}

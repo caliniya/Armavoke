@@ -20,7 +20,7 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override
   public GameProcess init() {
-    index = 2;
+    index = 5;
     deadUnits = new Ar<>();
     deadBuildings = new Ar<>();
     freshKilled = new Ar<>();

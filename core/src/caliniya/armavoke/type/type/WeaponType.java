@@ -6,8 +6,9 @@ import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.core.meta.ui.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.base.api.*;
 
-public class WeaponType implements Cloneable {
+public class WeaponType implements Cloneable , DrawType<Weapon> {
 
   public String name;
   public TextureRegion region;
@@ -72,11 +73,11 @@ public class WeaponType implements Cloneable {
   public void draw(Weapon w){
     float wRot = w.owner.rotation + w.rotation;
     Draw.rect(region, w.wx, w.wy, wRot);
-    Draw.color(Pal.light);
-    Lines.circle(w.wx,w.wy,range);
-    Draw.color();
   }
   
-  
+  public void drawDebug(Weapon w){
+    Draw.color(Pal.light);
+    Lines.circle(w.wx,w.wy,range);
+  }
   
 }

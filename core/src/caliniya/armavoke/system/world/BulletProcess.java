@@ -167,7 +167,6 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
           b.x = nextX;
           b.y = nextY;
           activeBullets.move(b, nextX, nextY);
-          Log.info(activeBullets.array.count(t -> b == t));
           Entities.closestEnemy(
               b.team,
               nextX,

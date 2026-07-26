@@ -1,5 +1,6 @@
 package caliniya.armavoke.world.defence.turret;
 
+import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
@@ -9,6 +10,7 @@ import arc.util.Log;
 import arc.util.io.Writes;
 import arc.util.io.Reads;
 import caliniya.armavoke.base.game.Entity;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.BulletType;
@@ -16,7 +18,7 @@ import caliniya.armavoke.world.Block;
 
 public class Turret extends Block {
 
-  public float range = 300f;
+  public float range = 400f;
   public float rotateSpeed = 500f;
   public float reloadTime = 10f;
   public BulletType bulletType;
@@ -62,10 +64,7 @@ public class Turret extends Block {
   @Override
   public void draw(Building b) {
     Draw.rect(baseRegion, b.x, b.y, b.angle * 90f);
-
-    if (region != null) {
-      Draw.rect(region, b.x, b.y, b.rotation - 90f);
-    }
+    Draw.rect(region, b.x, b.y, b.rotation - 90f);
   }
 
   private void shoot(Building b, float angle) {
@@ -90,5 +89,12 @@ public class Turret extends Block {
   public void read(Building b, Reads r) {
     b.rotation = r.f();
     b.reload = r.f();
+  }
+
+  @Override
+  public void drawDebug(Building b) {
+    super.drawDebug(b);
+    Draw.color(Pal.light);
+    Lines.circle(b.x,b.y,range);
   }
 }

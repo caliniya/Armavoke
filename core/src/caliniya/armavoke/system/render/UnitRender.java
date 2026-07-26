@@ -25,7 +25,7 @@ public class UnitRender extends System<UnitRender> {
 
   @Override
   public UnitRender init() {
-    this.index = 7;
+    this.index = 13;
     return super.init();
   }
 
@@ -39,7 +39,7 @@ public class UnitRender extends System<UnitRender> {
             u.draw();
             // 调用单位内部的调试绘制方法
             if (debug) {
-              u.drawDebug();
+              u.type.drawDebug(u);
             }
           }
         });

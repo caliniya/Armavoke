@@ -46,7 +46,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   /** 目标帧时间（纳秒），默认为 16.6ms（约 60 TPS）。 */
   protected long targetNs = 16_666_666L;
-  
+
   // 给一些特殊系统所使用的特殊标记
   public volatile boolean task = false;
 
@@ -100,7 +100,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
     if (isThreaded) {
       startThread();
       Events.run(EventType.events.ThreadedStop, () -> stopThread());
-      //Events.on(EventType.events.)
+      // Events.on(EventType.events.)
     }
 
     // 只有可暂停的系统才注册暂停事件监听
@@ -176,10 +176,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
         Threads.daemon(
             "System-" + this.getClass().getSimpleName(),
             () -> {
-              Log.info(
-                  "thread started: @ ",
-                  this.getClass().getSimpleName(),
-                  isPausable);
+              Log.info("thread started: @ ", this.getClass().getSimpleName(), isPausable);
 
               lastLoopTime = java.lang.System.nanoTime();
               lastTPSUpdate = lastLoopTime;
@@ -211,9 +208,8 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
                     update();
                     tickCounter++;
                   } catch (Exception e) {
-                    Log.err(
-                        "Error in thread: @", this.getClass().getSimpleName() + "  " + e);
-                       //Threads.throwAppException(e);
+                    Log.err("Error in thread: @", this.getClass().getSimpleName() + "  " + e);
+                    // Threads.throwAppException(e);
                   }
 
                   // --- TPS 统计 ---
@@ -274,6 +270,6 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   @Override
   public int compareTo(System<?> other) {
-    return this.index > other.index ? 1 : (this.index < other.index ? -1 : 0);
-}
+    return this.index > other.index ? -1 : (this.index < other.index ? 1 : 0);
+  }
 }

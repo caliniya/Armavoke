@@ -94,9 +94,7 @@ public class World {
   }
 
   public void setBuilding(Building b) {
-    Log.info(b);
     if (!isValidCoord(b.tx, b.ty) || b.block == null) return;
-    Log.info("呃啊");
     b.getOccupiedCoords(
         (tx, ty) -> {
           if (isValidCoord(tx, ty)) {

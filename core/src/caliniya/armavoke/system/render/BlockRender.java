@@ -17,7 +17,7 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
 
   @Override
   public BlockRender init() {
-    this.index = 6;
+    this.index = 12;
     return super.init(false);
   }
 
@@ -34,8 +34,9 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
         b.draw();
         // 调试绘制
         if (UnitRender.debug) { // 复用 UnitRender 的 debug 开关
-          drawDebug(b, b.x, b.y, b.block.psize);
+          b.block.drawDebug(b);
         }
+        Draw.color(); // 重置颜色
       }
     }
   }
@@ -50,36 +51,5 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
     float w = Core.camera.width / 2f + buffer;
     float h = Core.camera.height / 2f + buffer;
     return x > viewX - w && x < viewX + w && y > viewY - h && y < viewY + h;
-  }
-
-  // 调试绘制
-  private void drawDebug(Building b, float pixelX, float pixelY, float drawSize) {
-    // 1. 绘制包围盒 (绿色)
-
-    Draw.color(Color.green);
-    Lines.stroke(4f);
-    // 绘制基于 size 的包围盒
-    Lines.rect(pixelX - b.block.psize / 2, pixelY - b.block.psize / 2, drawSize, drawSize);
-
-    // 3. 绘制占据的实际格子 (黄色细线)
-    // 对于异形建筑，这比包围盒更准确
-    if (b.shapeOffsets != null) {
-      Draw.color(Color.cyan);
-      Lines.stroke(1f);
-      for (int i = 0; i < b.shapeOffsets.length; i += 2) {
-        float tx = (b.tx + b.shapeOffsets[i]) * WorldData.TILE_SIZE;
-        float ty = (b.ty + b.shapeOffsets[i + 1]) * WorldData.TILE_SIZE;
-        Lines.rect(tx, ty, WorldData.TILE_SIZE, WorldData.TILE_SIZE);
-      }
-    }
-
-    // 4. 绘制旋转角度 (青色文字)
-    Fonts.def.draw(b.x + "   "+b.y, pixelX + drawSize / 2f, pixelY + drawSize + 10f, Align.center);
-    Fonts.def.draw(
-        Strings.format("" + b.health),
-        b.x - b.block.size,
-        b.y - b.block.size + b.block.size + 8f,
-        Align.center);
-    Draw.color(); // 重置颜色
   }
 }

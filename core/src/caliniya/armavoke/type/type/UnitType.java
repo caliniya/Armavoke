@@ -1,9 +1,12 @@
 package caliniya.armavoke.type.type;
 
 import arc.*;
+
 import arc.util.*;
 import arc.graphics.*;
+import arc.math.geom.*;
 import arc.graphics.g2d.*;
+import caliniya.armavoke.ui.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
@@ -75,10 +78,65 @@ public class UnitType extends ContentType implements DrawType<Unit> {
     for (Weapon weapon : u.weapons) {
       weapon.type.draw(weapon);
     }
+    Draw.color();
   }
 
   public void drawDebug(Unit u) {
-    
+
+    Draw.color(Color.yellow);
+    Lines.stroke(2f);
+
+    if (u.hitboxData != null) {
+      for (int i = 0; i < u.hitboxData.length; i += 3) {
+        float cx = u.hitboxData[i];
+        float cy = u.hitboxData[i + 1];
+        float s = u.hitboxData[i + 2];
+        Lines.rect(cx - s / 2f, cy - s / 2f, s, s);
+      }
+    }
+
+    // 绘制计算出的外接圆 (新增，用于验证 size 计算是否正确)
+    Draw.color(Color.sky);
+    float radius = u.size / 2f;
+    Lines.circle(u.x, u.y, radius);
+    Draw.color(Color.yellow); // 还原颜色
+
+    if (Math.abs(u.speedX) > 0.001f || Math.abs(u.speedY) > 0.001f) {
+      Draw.color(Color.magenta);
+      float scale = 20f;
+      Lines.line(u.x, u.y, u.x + u.speedX * scale, u.y + u.speedY * scale);
+      Fonts.def.draw(Strings.format(u.speedX + " " + u.speedY), u.x, u.y + size + 8f, Align.center);
+    }
+
+    if (u.targetX != 0 || u.targetY != 0) {
+      Draw.color(Color.orange);
+      Lines.line(u.x, u.y, u.targetX, u.targetY);
+      float s = 8f;
+      Lines.line(u.targetX - s, u.targetY - s, u.targetX + s, u.targetY + s);
+      Lines.line(u.targetX - s, u.targetY + s, u.targetX + s, u.targetY - s);
+    }
+    if (u.path != null && !u.path.isEmpty()) {
+      Draw.color(Color.cyan);
+
+      float lastX = u.x;
+      float lastY = u.y;
+
+      for (int i = u.pathIndex; i < u.path.size; i++) {
+        Point2 p = u.path.get(i);
+        float wx = p.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
+        float wy = p.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
+
+        Lines.line(lastX, lastY, wx, wy);
+        Fill.square(wx, wy, 3f);
+        lastX = wx;
+        lastY = wy;
+      }
+    }
+
+    for (Weapon weapon : u.weapons) {
+      weapon.type.drawDebug(weapon);
+    }
+    Draw.color();
   }
 
   public void update(Unit u, float dt) {

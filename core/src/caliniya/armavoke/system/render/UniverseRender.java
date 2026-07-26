@@ -51,7 +51,7 @@ public class UniverseRender extends System<UniverseRender> {
 
     @Override
     public UniverseRender init() {
-        this.index = 3;
+        this.index = 11;
         background = new SpaceShader();
         background.parallaxScale = 0.05f;
         background.baseScale = 0.6f;

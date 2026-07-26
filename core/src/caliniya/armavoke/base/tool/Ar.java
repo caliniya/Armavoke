@@ -34,7 +34,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   private @Nullable ArIterable<T> iterable;
 
   public Seq<T> toSeq() {
-    Seq temp = new Seq(ordered,size);
+    Seq temp = new Seq(ordered, size);
     temp.items = items;
     return temp;
   }
@@ -902,7 +902,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
 
   /**
    * Sorts this array. The array elements must implement {@link Comparable}. This method is not
-   * thread safe (uses {@link Sort#instance()}).
+   * thread safe (uses {@link Sort#instance()}). 对此数组进行排序。数组元素必须实现{@link comparable}。这种方法不是*线程安全（使用{@link sort#instance（）}）。
    */
   public Ar<T> sort() {
     Sort.instance().sort(items, 0, size);

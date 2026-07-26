@@ -21,7 +21,6 @@ public class UnitControl implements InputProcessor, GestureListener {
   public boolean b = false;
     
   public UnitControl init() {
-    // 状态现在由 CommandData.commanding 全局管理，无需本地监听器
     return this;
   }
 

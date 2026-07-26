@@ -20,7 +20,7 @@ public class UniverseInput extends System<UniverseInput> implements InputProcess
 
   @Override
   public UniverseInput init() {
-    this.index = 2;
+    this.index = 3;
     return super.init(false);
   }
 

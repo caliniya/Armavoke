@@ -39,7 +39,7 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
     Events.run(EventType.events.Mapinit, () -> rebuildAll());
     // WorldData.initWorld();
     world = WorldData.world;
-    this.index = 5;
+    this.index = 10;
     spaceShader = Shaders.spaceShader;
     initChunks();
     return super.init();
