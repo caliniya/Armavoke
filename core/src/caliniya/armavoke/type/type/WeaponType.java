@@ -1,6 +1,6 @@
 package caliniya.armavoke.type.type;
 
-import arc.Core;
+import arc.*;
 import arc.graphics.g2d.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.core.meta.ui.*;
@@ -13,7 +13,7 @@ public class WeaponType implements Cloneable {
   public TextureRegion region;
 
   // 基础属性
-  public float range = 1000f;
+  public float range = 400f;
   public float rotateSpeed = 5f;
   public float reload = 60f;
   public float x = 0f, y = 0f;
@@ -63,7 +63,7 @@ public class WeaponType implements Cloneable {
 
   public WeaponType copy() {
     try {
-      return (WeaponType) super.clone();
+      return (WeaponType) this.clone();
     } catch (CloneNotSupportedException e) {
       throw new RuntimeException(e);
     }
@@ -76,5 +76,7 @@ public class WeaponType implements Cloneable {
     Lines.circle(w.wx,w.wy,range);
     Draw.color();
   }
+  
+  
   
 }

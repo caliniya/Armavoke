@@ -16,7 +16,7 @@ import caliniya.armavoke.world.Block;
 
 public class Turret extends Block {
 
-  public float range = 100f;
+  public float range = 300f;
   public float rotateSpeed = 500f;
   public float reloadTime = 10f;
   public BulletType bulletType;

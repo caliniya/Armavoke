@@ -5,6 +5,7 @@ import arc.graphics.g2d.TextureRegion;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 
+//这也要有绘制能力吗？应该会有吧
 public class ItemType extends ContentType {
   
   public TextureRegion icon;

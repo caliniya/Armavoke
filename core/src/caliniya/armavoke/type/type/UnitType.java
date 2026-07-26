@@ -1,21 +1,19 @@
 package caliniya.armavoke.type.type;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Log;
-import caliniya.armavoke.base.game.ContentType;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.type.CType;
-import caliniya.armavoke.base.type.TeamTypes;
+import arc.*;
+import arc.util.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import caliniya.armavoke.game.*;
-import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.base.api.*;
+import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 
-public class UnitType extends ContentType {
+public class UnitType extends ContentType implements DrawType<Unit> {
 
   public float speed = 60f, // 格每秒
       health = 100f,
@@ -29,8 +27,8 @@ public class UnitType extends ContentType {
 
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
-  
-  //单位的物品容量，使用通用的物品模块规则
+
+  // 单位的物品容量，使用通用的物品模块规则
   public int itemCap = 50;
 
   public Ar<WeaponType> weapons = new Ar<WeaponType>();
@@ -52,13 +50,12 @@ public class UnitType extends ContentType {
     }
   }
 
-
   public Unit create(TeamTypes team, float x, float y) {
     return Unit.create(team, this, x, y);
   }
-  
+
   // 用于存档读取的创建
-  public Unit create(){
+  public Unit create() {
     return Unit.create(this);
   }
 
@@ -80,6 +77,10 @@ public class UnitType extends ContentType {
     }
   }
 
+  public void drawDebug(Unit u) {
+    
+  }
+
   public void update(Unit u, float dt) {
     // TODO: 以后再说
   }
@@ -94,8 +95,6 @@ public class UnitType extends ContentType {
       if (weapon.mirror) {
         WeaponType copy = weapon.copy();
         copy.flip();
-        // 建立索引关联
-        // 主武器索引 = size-1, 镜像索引 = size
         weapon.otherSide = weapons.size;
         copy.otherSide = weapons.size - 1;
 

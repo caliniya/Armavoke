@@ -44,10 +44,10 @@ public class DebugFragment {
 
                           int unitCount = (WorldData.units != null) ? WorldData.units.size() : 0;
                           int moveUnitCount =
-                              (WorldData.moveunits != null) ? WorldData.moveunits.size() : 0;
+                              (WorldData.buildings != null) ? WorldData.buildings.size() : 0;
 
                           sb.append("Units: ").append(unitCount).append("\n");
-                          sb.append("Moving: ").append(moveUnitCount).append("\n");
+                          sb.append("Buinding: ").append(moveUnitCount).append("\n");
                           sb.append("Map: ")
                               .append(WorldData.world.W)
                               .append("x")
