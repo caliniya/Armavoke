@@ -270,6 +270,6 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
 
   @Override
   public int compareTo(System<?> other) {
-    return this.index > other.index ? -1 : (this.index < other.index ? 1 : 0);
+    return this.index - other.index;
   }
 }

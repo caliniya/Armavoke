@@ -62,6 +62,7 @@ public class Data {
       sys.init();
     }
     
+    Systems.systems.sort();
     
     for(caliniya.armavoke.system.System s : Systems.systems) {
     	Log.info(s.index);
