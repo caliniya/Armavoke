@@ -153,6 +153,8 @@ public class Window {
     window.add(top).growX().top();
     window.row();
     window.add(scrollPane).grow().pad(10f);
+    window.row();
+    window.add(low).growX().bottom();
 
     Core.scene.add(window);
 

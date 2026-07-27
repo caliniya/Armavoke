@@ -11,6 +11,7 @@ import arc.scene.Scene;
 import arc.scene.ui.layout.Scl;
 import arc.util.Log;
 import arc.util.viewport.ScreenViewport;
+import caliniya.armavoke.base.shaders.*;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.*;
@@ -22,10 +23,9 @@ import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.input.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
+import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.ui.fragment.*;
-import caliniya.armavoke.base.shaders.*;
-import caliniya.armavoke.type.type.*;
 
 public class Armavoke extends ApplicationCore {
 
