@@ -67,7 +67,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
     Render.zoom(amountY * zoomSpeed);
     return true;
   }
-  
+
   @Override
   public boolean keyDown(KeyCode key) {
     if (UniverseFragment.showing) return false;

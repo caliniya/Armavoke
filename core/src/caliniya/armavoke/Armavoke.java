@@ -81,7 +81,6 @@ public class Armavoke extends ApplicationCore {
       input.addProcessor(multiplexer);
       Systems.addSystem(camInput);
       Systems.addSystem(uniInput);
-      Systems.addSystem(universeInput);
       Contents.load();
       UI.camera.resize(graphics.getWidth(), graphics.getHeight());
       UI.camera.update();

@@ -6,6 +6,7 @@ import arc.scene.ui.layout.Table;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.Styles;
+import caliniya.armavoke.world.stars.Universe;
 
 /**
  * 宇宙界面菜单 — 切换到宇宙视图时显示<br>
@@ -33,6 +34,7 @@ public class UniverseFragment {
             // 返回地图
             menu.add(new Button("返回地图", () -> {
                 showing = false;
+                Universe.hasSelection = false;
                 root.remove();
                 // 恢复 HUD
                 if (UI.hud != null) {

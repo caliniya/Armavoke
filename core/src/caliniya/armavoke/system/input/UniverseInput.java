@@ -5,31 +5,22 @@ import arc.input.InputProcessor;
 import arc.input.KeyCode;
 import arc.math.geom.Vec2;
 import caliniya.armavoke.core.Render;
-import caliniya.armavoke.system.System;
 import caliniya.armavoke.system.render.UniverseRender;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.world.stars.Universe;
 
 /**
- * 宇宙视图网格选择器<br>
- * 实现 InputProcessor，通过多路复用器接收鼠标/触摸事件，更新 Universe 中的选中网格坐标。
+ * 宇宙视图网格选择器。<br>
+ * 纯事件驱动：通过输入多路复用器接收鼠标/触摸事件，实时更新选中的网格坐标。<br>
+ * 视图切换时的状态清理由 {@link UniverseFragment} 触发。<br>
+ * 不再继承 System，不需要 per-frame update。
  */
-public class UniverseInput extends System<UniverseInput> implements InputProcessor {
+public class UniverseInput implements InputProcessor {
 
   private final Vec2 world = new Vec2();
 
-  @Override
   public UniverseInput init() {
-    this.index = 3;
-    return super.init(false);
-  }
-
-  /** 仅处理视图切换时的状态清理 */
-  @Override
-  public void update() {
-    if (!UniverseFragment.showing) {
-      Universe.hasSelection = false;
-    }
+    return this;
   }
 
   /** 屏幕坐标 → 世界坐标 → 对齐网格 → 更新选中 */
@@ -70,9 +61,28 @@ public class UniverseInput extends System<UniverseInput> implements InputProcess
 
   // ====== 其余接口空实现 ======
 
-  @Override public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button) { return false; }
-  @Override public boolean keyDown(KeyCode key) { return false; }
-  @Override public boolean keyUp(KeyCode key) { return false; }
-  @Override public boolean keyTyped(char character) { return false; }
-  @Override public boolean scrolled(float amountX, float amountY) { return false; }
+  @Override
+  public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean keyDown(KeyCode key) {
+    return false;
+  }
+
+  @Override
+  public boolean keyUp(KeyCode key) {
+    return false;
+  }
+
+  @Override
+  public boolean keyTyped(char character) {
+    return false;
+  }
+
+  @Override
+  public boolean scrolled(float amountX, float amountY) {
+    return false;
+  }
 }
