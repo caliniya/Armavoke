@@ -30,7 +30,7 @@ public class UnitRender extends System<UnitRender> {
     this.index = 13;
     Events.run(EventType.events.EnterUV, () -> paused = true);
     Events.run(EventType.events.ExitUV, () -> paused = false);
-    return super.init();
+    return super.init(false,false);
   }
 
   @Override

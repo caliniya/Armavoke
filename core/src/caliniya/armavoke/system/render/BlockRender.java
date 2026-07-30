@@ -21,7 +21,7 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
     this.index = 12;
     Events.run(EventType.events.EnterUV, () -> paused = true);
     Events.run(EventType.events.ExitUV, ()->paused = false);
-    return super.init(false);
+    return super.init(false,false);
   }
 
   @Override

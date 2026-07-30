@@ -26,7 +26,7 @@ public class UniverseFragment {
   public void build() {
     root = new Table();
     root.setFillParent(true);
-    root.touchable = Touchable.enabled;
+    root.touchable = Touchable.childrenOnly;
 
     root.add(
         new Button(

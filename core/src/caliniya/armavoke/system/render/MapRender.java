@@ -44,7 +44,7 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
     this.index = 10;
     spaceShader = Shaders.spaceShader;
     initChunks();
-    return super.init();
+    return super.init(false,false);
   }
 
   private void initChunks() {

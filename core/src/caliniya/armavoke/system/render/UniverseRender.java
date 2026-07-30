@@ -57,7 +57,7 @@ public class UniverseRender extends System<UniverseRender> {
     Events.run(EventType.events.EnterUV, () -> paused = false);
     Events.run(EventType.events.ExitUV, () -> paused = true);
     paused = true;
-    return super.init(false);
+    return super.init(false,false);
   }
 
   @Override

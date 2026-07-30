@@ -23,7 +23,7 @@ public class DebugRender extends caliniya.armavoke.system.System<DebugRender> {
   @Override
   public DebugRender init() {
     index = 14;
-    return super.init(false);
+    return super.init(false,false);
   }
 
   @Override
