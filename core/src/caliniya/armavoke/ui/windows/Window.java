@@ -29,7 +29,7 @@ public class Window {
   public boolean modal = false;
 
   /** 模态遮罩层，仅 modal=true 时使用 */
-  protected Table modalOverlay;
+  public Table modalOverlay;
 
   /** 遮罩透明度，0=完全透明，1=完全不透明。默认 0.5 */
   public float modalAlpha = 0.5f;

@@ -1,9 +1,11 @@
 package caliniya.armavoke.ui.windows;
 
-import arc.Core;
+import arc.*;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.ui.Button;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.ui.fragment.HUDFragment;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.core.UI;
@@ -31,6 +33,7 @@ public class PauseWindow extends Window {
                   UI.universe.build();
                   UI.hud.hideHUD();
                   this.window.visible = false;
+                  this.modalOverlay.visible = false;
                 }))
         .size(120f, 50f)
         .left()

@@ -93,7 +93,6 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
 
   @Override
   public void update() {
-
     Draw.color();
     if (!inited || paused) return;
     if (chunks == null) return;

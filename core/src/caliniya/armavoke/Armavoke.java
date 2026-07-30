@@ -32,7 +32,7 @@ public class Armavoke extends ApplicationCore {
   public boolean assinited = false;
   public CameraInput camInput;
   public UniverseCameraInput uniInput;
-  public UniverseInput universeInput;
+  public UniverseInput unInput;
 
   // 用于记录开始时间
   private long startTime;
@@ -67,7 +67,7 @@ public class Armavoke extends ApplicationCore {
       UnitControl unitCtrl = new UnitControl().init();
       camInput = new CameraInput().init();
       uniInput = new UniverseCameraInput().init();
-      universeInput = new UniverseInput().init();
+      unInput = new UniverseInput();
       InputMultiplexer multiplexer =
           new InputMultiplexer(
               scene,
@@ -77,7 +77,7 @@ public class Armavoke extends ApplicationCore {
               unitCtrl,
               camInput,
               uniInput,
-              universeInput);
+              unInput);
       input.addProcessor(multiplexer);
       Systems.addSystem(camInput);
       Systems.addSystem(uniInput);
@@ -115,7 +115,7 @@ public class Armavoke extends ApplicationCore {
     }
     scene.act();
     scene.draw();
-    //Draw.flush();
+    // Draw.flush();
 
     if (Systems.DE != null) {
       Draw.proj(UI.camera);

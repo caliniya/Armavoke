@@ -1,30 +1,31 @@
 package caliniya.armavoke.system.input;
 
 import arc.Core;
+import arc.Events;
 import arc.input.InputProcessor;
 import arc.input.KeyCode;
 import arc.math.geom.Vec2;
+import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.system.render.UniverseRender;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.world.stars.Universe;
 
-/**
- * 宇宙视图网格选择器。<br>
- * 纯事件驱动：通过输入多路复用器接收鼠标/触摸事件，实时更新选中的网格坐标。<br>
- * 视图切换时的状态清理由 {@link UniverseFragment} 触发。<br>
- * 不再继承 System，不需要 per-frame update。
- */
+/** 宇宙视图网格选择器。<br> */
 public class UniverseInput implements InputProcessor {
 
   private final Vec2 world = new Vec2();
+  public boolean paused;
 
-  public UniverseInput init() {
-    return this;
+  public UniverseInput() {
+    Events.run(EventType.events.EnterUV, () -> paused = false);
+    Events.run(EventType.events.ExitUV, () -> paused = true);
   }
 
   /** 屏幕坐标 → 世界坐标 → 对齐网格 → 更新选中 */
   private void updateSelection(float screenX, float screenY) {
+
+    if (paused) return;
 
     world.set(screenX, screenY);
     Render.universeCamera.unproject(world);

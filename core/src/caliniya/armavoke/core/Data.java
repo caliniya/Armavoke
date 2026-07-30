@@ -19,7 +19,6 @@ import caliniya.armavoke.io.DataIO;
 import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.system.game.GameProcess;
-import caliniya.armavoke.system.input.UniverseInput;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.Weapon;
