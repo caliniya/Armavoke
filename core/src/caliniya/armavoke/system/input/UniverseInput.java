@@ -30,7 +30,7 @@ public class UniverseInput implements InputProcessor {
     world.set(screenX, screenY);
     Render.universeCamera.unproject(world);
 
-    float gs = UniverseRender.GRID_SIZE;
+    float gs = 32;
     Universe.selectedX = (float) Math.floor(world.x / gs) * gs;
     Universe.selectedY = (float) Math.floor(world.y / gs) * gs;
     Universe.hasSelection = true;

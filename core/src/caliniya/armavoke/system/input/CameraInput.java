@@ -1,11 +1,13 @@
 package caliniya.armavoke.system.input;
 
-import arc.Core;
+import arc.*;
 import arc.input.GestureDetector.GestureListener;
 import arc.input.InputProcessor;
 import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.system.System;
@@ -21,11 +23,15 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
   @Override
   public CameraInput init() {
     this.index = 1;
+    Events.run(EventType.events.EnterUV, () -> paused = true);
+    Events.run(EventType.events.ExitUV, () -> paused = false);
     return super.init();
   }
 
   @Override
   public void update() {
+
+    if (!inited || paused) return;
 
     float currentZoom = Render.currentZoom;
     float speed = keySpeed * currentZoom * (Core.input.keyDown(KeyCode.shiftLeft) ? 2f : 1f);
@@ -38,7 +44,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean pan(float x, float y, float deltaX, float deltaY) {
-
+    if (!inited || paused) return false;
     Core.camera.position.x -= deltaX * Render.currentZoom;
     Core.camera.position.y -= deltaY * Render.currentZoom;
     return false;
@@ -46,12 +52,14 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean touchDown(float x, float y, int pointer, KeyCode button) {
+    if (!inited || paused) return false;
     lastZoomSnapshot = Render.currentZoom;
     return false;
   }
 
   @Override
   public boolean zoom(float initialDistance, float distance) {
+    if (!inited || paused) return false;
     if (initialDistance == 0) return false;
     float ratio = initialDistance / distance;
     Render.setZoom(lastZoomSnapshot * ratio);
@@ -60,7 +68,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
-  
+if (!inited || paused) return false;
     float zoomSpeed = 0.1f * Render.currentZoom;
     Render.zoom(amountY * zoomSpeed);
     return true;
@@ -68,6 +76,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean keyDown(KeyCode key) {
+    if (!inited || paused) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = true;
     if (key == KeyCode.s || key == KeyCode.down) down = true;
     if (key == KeyCode.a || key == KeyCode.left) left = true;
@@ -77,6 +86,7 @@ public class CameraInput extends caliniya.armavoke.system.System<CameraInput>
 
   @Override
   public boolean keyUp(KeyCode key) {
+    if (!inited || paused) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = false;
     if (key == KeyCode.s || key == KeyCode.down) down = false;
     if (key == KeyCode.a || key == KeyCode.left) left = false;
