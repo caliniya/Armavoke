@@ -1,11 +1,13 @@
 package caliniya.armavoke.system.input;
 
 import arc.Core;
+import arc.Events;
 import arc.input.GestureDetector.GestureListener;
 import arc.input.InputProcessor;
 import arc.input.KeyCode;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.Render;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
@@ -24,18 +26,22 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   /** 宇宙相机自身缩放（供外部读取） */
   public static float zoom = 1f;
+
   private static final float MIN_ZOOM = 0.5f;
   private static final float MAX_ZOOM = 2f;
 
   @Override
   public UniverseCameraInput init() {
     this.index = 2;
+    Events.run(EventType.events.EnterUV, () -> paused = false);
+    Events.run(EventType.events.ExitUV, ()->paused = true);
+    paused = true;
     return super.init();
   }
 
   @Override
   public void update() {
-    if (!inited || !UniverseFragment.showing) return;
+    if (!inited || paused) return;
 
     float speed = keySpeed * zoom * (Core.input.keyDown(KeyCode.shiftLeft) ? 2f : 1f);
 
@@ -53,7 +59,6 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean pan(float x, float y, float deltaX, float deltaY) {
-    if (!UniverseFragment.showing) return false;
 
     Render.universeCamera.position.x -= deltaX * zoom;
     Render.universeCamera.position.y -= deltaY * zoom;
@@ -68,7 +73,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean zoom(float initialDistance, float distance) {
-    if (!UniverseFragment.showing || initialDistance == 0) return false;
+    if (initialDistance == 0) return false;
     float ratio = initialDistance / distance;
     zoom = Mathf.clamp(lastZoomSnapshot * ratio, MIN_ZOOM, MAX_ZOOM);
     return true;
@@ -76,7 +81,6 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
-    if (!UniverseFragment.showing) return false;
     float zoomSpeed = 0.1f * zoom;
     zoom = Mathf.clamp(zoom + amountY * zoomSpeed, MIN_ZOOM, MAX_ZOOM);
     return true;
@@ -102,14 +106,53 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   // ====== 其余接口空实现 ======
 
-  @Override public boolean pinch(Vec2 i1, Vec2 i2, Vec2 p1, Vec2 p2) { return false; }
-  @Override public boolean tap(float x, float y, int count, KeyCode button) { return false; }
-  @Override public boolean longPress(float x, float y) { return false; }
-  @Override public boolean fling(float velocityX, float velocityY, KeyCode button) { return false; }
-  @Override public boolean panStop(float x, float y, int pointer, KeyCode button) { return false; }
-  @Override public boolean keyTyped(char character) { return false; }
-  @Override public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button) { return false; }
-  @Override public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button) { return false; }
-  @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
-  @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
+  @Override
+  public boolean pinch(Vec2 i1, Vec2 i2, Vec2 p1, Vec2 p2) {
+    return false;
+  }
+
+  @Override
+  public boolean tap(float x, float y, int count, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean longPress(float x, float y) {
+    return false;
+  }
+
+  @Override
+  public boolean fling(float velocityX, float velocityY, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean panStop(float x, float y, int pointer, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean keyTyped(char character) {
+    return false;
+  }
+
+  @Override
+  public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button) {
+    return false;
+  }
+
+  @Override
+  public boolean touchDragged(int screenX, int screenY, int pointer) {
+    return false;
+  }
+
+  @Override
+  public boolean mouseMoved(int screenX, int screenY) {
+    return false;
+  }
 }

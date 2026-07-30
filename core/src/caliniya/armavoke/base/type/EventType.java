@@ -7,7 +7,9 @@ public class EventType {
     ThreadedStop, // 线程终止
     StartLoad, // 开始从存储中加载内容
     FinishLoad, // 完成加载，所有线程系统可以开始继续工作
-    StartSave // 开始保存，所有系统应立即暂停(？)
+    StartSave, // 开始保存，所有系统应立即暂停(？)
+    EnterUV,// 切换到宇宙视图
+    ExitUV// 退出
   ;
   }
 

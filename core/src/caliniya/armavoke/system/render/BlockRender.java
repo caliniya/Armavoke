@@ -10,6 +10,7 @@ import caliniya.armavoke.type.*;
 import caliniya.armavoke.world.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.ui.fragment.*;
 
@@ -18,12 +19,14 @@ public class BlockRender extends caliniya.armavoke.system.System<BlockRender> {
   @Override
   public BlockRender init() {
     this.index = 12;
+    Events.run(EventType.events.EnterUV, () -> paused = true);
+    Events.run(EventType.events.ExitUV, ()->paused = false);
     return super.init(false);
   }
 
   @Override
   public void update() {
-    if (UniverseFragment.showing) return;
+    if (!inited || paused) return;
     // 遍历所有建筑
     for (Building b : WorldData.buildings) {
       if (b == null || b.block == null || b.health <= 0f) continue;

@@ -115,12 +115,6 @@ public class Render extends caliniya.armavoke.system.System<Render> {
    */
   @Override
   public void update() {
-
-    // 宇宙视图：只更新宇宙相机，跳过游戏相机所有逻辑
-    if (UniverseFragment.showing) {
-      universeCamera.update();
-      return;
-    }
     
     // 1. 撤销上一帧的震动偏移，恢复相机逻辑位置
     Core.camera.position.sub(shakeOffset);

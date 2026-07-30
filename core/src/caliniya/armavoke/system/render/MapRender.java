@@ -37,6 +37,8 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
   @Override
   public MapRender init() {
     Events.run(EventType.events.Mapinit, () -> rebuildAll());
+    Events.run(EventType.events.EnterUV, () -> paused = true);
+    Events.run(EventType.events.ExitUV, () -> paused = false);
     // WorldData.initWorld();
     world = WorldData.world;
     this.index = 10;
@@ -91,11 +93,10 @@ public class MapRender extends caliniya.armavoke.system.System<MapRender> {
 
   @Override
   public void update() {
-    
+
     Draw.color();
-    
-    if (caliniya.armavoke.ui.fragment.UniverseFragment.showing) return;
-    if (!inited || chunks == null) return;
+    if (!inited || paused) return;
+    if (chunks == null) return;
 
     // 计算摄像机视野范围内的 区块索引
     float viewLeft = camera.position.x - camera.width / 2f;

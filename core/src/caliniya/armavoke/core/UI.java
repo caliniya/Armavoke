@@ -48,6 +48,7 @@ public class UI {
     menu = new MenuFragment();
     maps = new MapsWindow();
     pauseWindow = new PauseWindow();
+    universe = new UniverseFragment();
   }
 
   public static void Menu() {

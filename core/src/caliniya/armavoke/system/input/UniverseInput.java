@@ -25,10 +25,6 @@ public class UniverseInput implements InputProcessor {
 
   /** 屏幕坐标 → 世界坐标 → 对齐网格 → 更新选中 */
   private void updateSelection(float screenX, float screenY) {
-    if (!UniverseFragment.showing) {
-      Universe.hasSelection = false;
-      return;
-    }
 
     world.set(screenX, screenY);
     Render.universeCamera.unproject(world);

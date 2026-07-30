@@ -36,7 +36,7 @@ public abstract class System<T extends System<T>> implements Comparable<System<?
   private volatile boolean threadRunning = false;
 
   /** 暂停状态标志，使用 volatile 保证多线程可见性。 */
-  private volatile boolean paused = false;
+  protected volatile boolean paused = false;
 
   /** 暂停锁对象，用于线程的等待/唤醒机制。 */
   private final Object pauseLock = new Object();

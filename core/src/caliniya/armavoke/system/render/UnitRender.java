@@ -1,6 +1,6 @@
 package caliniya.armavoke.system.render;
 
-import arc.Core;
+import arc.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -9,6 +9,8 @@ import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.system.Systems;
+import caliniya.armavoke.base.tool.*;
+import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.game.data.WorldData;
@@ -26,12 +28,14 @@ public class UnitRender extends System<UnitRender> {
   @Override
   public UnitRender init() {
     this.index = 13;
+    Events.run(EventType.events.EnterUV, () -> paused = true);
+    Events.run(EventType.events.ExitUV, () -> paused = false);
     return super.init();
   }
 
   @Override
   public void update() {
-    if (UniverseFragment.showing) return;
+    if (!inited || paused) return;
     // 绘制单位
     WorldData.units.each(
         u -> {
