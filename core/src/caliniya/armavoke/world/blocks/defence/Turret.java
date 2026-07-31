@@ -73,7 +73,7 @@ public class Turret extends Block {
     Bullet.create(bulletType, b, x, y, angle, 0, 0);
   }
 
-  /** 覆写 Block 的空 findTarget，由 EntityProces 线程调用，线程安全。 */
+  /** 覆写 */
   @Override
   public Entity findTarget(Building b) {
     return Entities.closestEnemy(b.team, b.x, b.y, range);
