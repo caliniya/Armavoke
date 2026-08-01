@@ -73,7 +73,7 @@ public class Data {
 
     Random r = new Random();
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 10; ++i) {
       StarNode A, B;
       A = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
       B = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
