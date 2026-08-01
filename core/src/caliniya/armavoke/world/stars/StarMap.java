@@ -14,12 +14,16 @@ public class StarMap {
   public ObjectSet<StarNode> nodeSet;
 
   public QuadTree<StarRoad> tree;
-  
+
   public Rect tempR = new Rect();
+
+  public float w, h;
 
   public StarMap(float w, float h) {
     roadSet = new ObjectSet<StarRoad>();
     nodeSet = new ObjectSet<>();
+    this.w = w;
+    this.h = h;
     tree = new QuadTree<>(new Rect(0, 0, w, h));
   }
 
@@ -48,6 +52,15 @@ public class StarMap {
 
   public void get(Camera cam, Cons<StarRoad> out) {
     cam.bounds(tempR);
-    tree.intersect(tempR , out);
+    tree.intersect(tempR, out);
+  }
+
+  public void draw(Camera c) {
+    get(
+        c.position.x - (c.width / 2),
+        c.position.y - (c.height / 2),
+        c.width,
+        c.height,
+        road -> road.draw());
   }
 }

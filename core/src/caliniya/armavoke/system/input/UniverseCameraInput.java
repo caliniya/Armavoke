@@ -59,7 +59,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean pan(float x, float y, float deltaX, float deltaY) {
-
+    if (!inited || paused) return false;
     Render.universeCamera.position.x -= deltaX * zoom;
     Render.universeCamera.position.y -= deltaY * zoom;
     return false;
@@ -67,12 +67,14 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean touchDown(float x, float y, int pointer, KeyCode button) {
+    if (!inited || paused) return false;
     lastZoomSnapshot = zoom;
     return false;
   }
 
   @Override
   public boolean zoom(float initialDistance, float distance) {
+    if (!inited || paused) return false;
     if (initialDistance == 0) return false;
     float ratio = initialDistance / distance;
     zoom = Mathf.clamp(lastZoomSnapshot * ratio, MIN_ZOOM, MAX_ZOOM);
@@ -81,6 +83,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
+    if (!inited || paused) return false;
     float zoomSpeed = 0.1f * zoom;
     zoom = Mathf.clamp(zoom + amountY * zoomSpeed, MIN_ZOOM, MAX_ZOOM);
     return true;
@@ -88,6 +91,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean keyDown(KeyCode key) {
+    if (!inited || paused) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = true;
     if (key == KeyCode.s || key == KeyCode.down) down = true;
     if (key == KeyCode.a || key == KeyCode.left) left = true;
@@ -97,6 +101,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
 
   @Override
   public boolean keyUp(KeyCode key) {
+    if (!inited || paused) return false;
     if (key == KeyCode.w || key == KeyCode.up) up = false;
     if (key == KeyCode.s || key == KeyCode.down) down = false;
     if (key == KeyCode.a || key == KeyCode.left) left = false;

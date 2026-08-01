@@ -5,6 +5,7 @@ import arc.graphics.Camera;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.render.*;
@@ -166,6 +167,9 @@ public class Render extends caliniya.armavoke.system.System<Render> {
 
     Core.camera.position.x = Mathf.clamp(Core.camera.position.x, 0, mapW);
     Core.camera.position.y = Mathf.clamp(Core.camera.position.y, 0, mapH);
+    
+    universeCamera.position.x = Mathf.clamp(universeCamera.position.x,0,Game.starMap.w);
+    universeCamera.position.y = Mathf.clamp(universeCamera.position.y,0,Game.starMap.h);
   }
   
   public static void updateAll(){

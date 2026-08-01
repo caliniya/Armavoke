@@ -7,10 +7,11 @@ import arc.graphics.g2d.Draw;
 import caliniya.armavoke.base.shaders.SpaceShader;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.Render;
+import caliniya.armavoke.game.Game;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.system.input.UniverseCameraInput;
 
-/** 宇宙渲染 - 仅太空着色器背景 */
+/** 宇宙渲染 */
 public class UniverseRender extends System<UniverseRender> {
 
   /** 太空背景着色器 */
@@ -30,17 +31,13 @@ public class UniverseRender extends System<UniverseRender> {
 
   @Override
   public void update() {
-    if (paused) return;
-    
+    if (!inited || paused) return;
     Camera cam = Render.universeCamera;
     float zoom = UniverseCameraInput.zoom;
-
-    //Draw.proj(cam);
-
-    // 太空背景着色器
+    Draw.proj(cam);
     background.render(cam, zoom);
-
-    //Draw.proj(Core.camera);
+    Game.starMap.draw(cam);
+    Draw.proj(Core.camera);
   }
 
   @Override

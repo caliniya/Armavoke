@@ -20,6 +20,7 @@ public class UniverseInput implements InputProcessor {
   public UniverseInput() {
     Events.run(EventType.events.EnterUV, () -> paused = false);
     Events.run(EventType.events.ExitUV, () -> paused = true);
+    paused = true;
   }
 
   /** 屏幕坐标 → 世界坐标 → 对齐网格 → 更新选中 */

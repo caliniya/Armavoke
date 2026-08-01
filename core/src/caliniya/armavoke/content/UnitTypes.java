@@ -39,23 +39,12 @@ public class UnitTypes {
                 });
           }
         };
-    /*
+    
     test2 =
-        new UnitType("testunit") {
+        new UnitType("starNode") {
           {
-            // 你也可以在这里测试 L 形或 T 形
-            this.size = 60f;
-            // L 形示例
-            this.hitbox = new float[] {
-                 0f, 20f, 20f, // 竖直部分
-                 0f,  0f, 20f,
-                20f,  0f, 20f  // 横向突出部分
-            };
-
-            addWeapons( ... );
-            this.load();
+            this.size = 128f;
           }
         };
-        */
   }
 }

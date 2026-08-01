@@ -23,8 +23,11 @@ import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.Weapon;
 import caliniya.armavoke.system.*;
+import java.util.*;
 
 import static caliniya.armavoke.game.data.WorldData.*;
+import caliniya.armavoke.world.stars.StarMap;
+import caliniya.armavoke.world.stars.StarNode;
 
 public class Data {
 
@@ -46,9 +49,8 @@ public class Data {
     Systems.BR = new BlockRender();
     Systems.GP = new GameProcess();
     Systems.UV = new UniverseRender();
-    //Systems.DE = new DebugRender();
-    Systems.addSystem(
-        Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render());
+    // Systems.DE = new DebugRender();
+    Systems.addSystem(Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render());
     Systems.BP = new BulletProcess();
     Systems.UM = new UnitMath();
     Systems.EP = new EntityProces();
@@ -60,12 +62,25 @@ public class Data {
     for (caliniya.armavoke.system.System sys : Systems.systems) {
       sys.init();
     }
-    
+
     Systems.systems.sort();
-    
+
     Systems.BP.init();
     Systems.UM.init();
     Systems.EP.init();
+
+    Game.starMap = new StarMap(200, 200);
+
+    Random r = new Random();
+
+    for (int i = 0; i < 100; ++i) {
+      StarNode A, B;
+      A = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
+      B = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
+      Game.starMap.addNode(A);
+      Game.starMap.addNode(B);
+      Game.starMap.link(A, B);
+    }
 
     UI.Game();
   }

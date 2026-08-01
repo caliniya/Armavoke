@@ -1,24 +1,36 @@
 package caliniya.armavoke.world.stars;
 
-import arc.func.Cons;
+import arc.func.*;
+import arc.graphics.g2d.Lines;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.math.geom.QuadTree.QuadTreeObject;
+import arc.math.geom.QuadTree.*;
 import caliniya.armavoke.world.stars.StarNode;
 
 public class StarRoad implements QuadTreeObject {
 
   public StarNode A, B;
+  public float x1, y1, dx, dy;
 
-  // 通常不会主动使用它(好玩)
+  // 通常不会主动使用它
   protected StarRoad(StarNode A, StarNode B) {
     this.A = A;
     this.B = B;
+    x1 = Math.min(A.x, B.x);
+    y1 = Math.min(A.y, B.y);
+    dx = Math.abs(A.x - B.x);
+    dy = Math.abs(A.y - B.y);
   }
-  
-  //我是个天才
-  public static void with(StarNode A, StarNode B , Cons<StarRoad> use) {
+
+  // 我是个天才)
+  public static void with(StarNode A, StarNode B, Cons<StarRoad> use) {
     use.get(new StarRoad(A, B));
+  }
+
+  public void draw() {
+    Lines.line(x1, y1, x1 + dx, y1 + dy);
+    A.draw();
+    B.draw();
   }
 
   @Override
@@ -37,6 +49,6 @@ public class StarRoad implements QuadTreeObject {
 
   @Override
   public void hitbox(Rect box) {
-    box.set(Math.min(A.x, B.x), Math.min(A.y, B.y), Math.abs(A.x - B.x), Math.abs(A.y - B.y));
+    box.set(x1, y1, dx, dy);
   }
 }
