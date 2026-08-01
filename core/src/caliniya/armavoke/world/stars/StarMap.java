@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.Camera;
 import arc.math.geom.*;
 import arc.struct.*;
+import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.ObjectSet;
 
 // 表示一片星域？
@@ -38,6 +39,7 @@ public class StarMap {
   // 向图中添加一个节点
   public void addNode(StarNode node) {
     nodeSet.add(node);
+    Ar aa = new Ar();
   }
 
   public void get(float x, float y, float w, float h, Cons<StarRoad> out) {

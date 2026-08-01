@@ -10,4 +10,6 @@ public class Game {
   //表示当前处于的星域
   public static StarMap starMap;
   
+  
+  
 }
