@@ -2,9 +2,10 @@ package caliniya.armavoke.world.stars;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.QuadTreeObject;
 import caliniya.armavoke.world.stars.StarNode;
 
-public class StarRoad{
+public class StarRoad implements QuadTreeObject{
 
   public StarNode A, B;
 
@@ -25,5 +26,10 @@ public class StarRoad{
   @Override
   public int hashCode() {
     return (this.A == null ? 0 : this.A.hashCode()) + (this.B == null ? 0 : this.B.hashCode());
+  }
+  
+  @Override
+  public void hitbox(Rect box) {
+    box.set(Math.min(A.x,B.x),Math.min(A.y,B.y),Math.abs(A.x -B.x),Math.abs(A.y-B.y));
   }
 }
