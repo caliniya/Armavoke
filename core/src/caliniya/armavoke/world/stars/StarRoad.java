@@ -1,15 +1,17 @@
 package caliniya.armavoke.world.stars;
 
-import arc.math.geom.QuadTree.QuadTreeObject;
+import arc.math.*;
 import arc.math.geom.*;
 import caliniya.armavoke.world.stars.StarNode;
 
-public class StarRoad implements QuadTreeObject {
+public class StarRoad{
 
   public StarNode A, B;
 
-  @Override
-  public void hitbox(Rect box) {}
+  public StarRoad(StarNode A, StarNode B) {
+    this.A = A;
+    this.B = B;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -22,7 +24,6 @@ public class StarRoad implements QuadTreeObject {
 
   @Override
   public int hashCode() {
-    return (this.A == null ? 0 : this.A.hashCode())
-        + (this.B == null ? 0 : this.B.hashCode()); // A+B 和 B+A 结果相同
+    return (this.A == null ? 0 : this.A.hashCode()) + (this.B == null ? 0 : this.B.hashCode());
   }
 }
