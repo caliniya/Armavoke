@@ -34,10 +34,8 @@ public class UniverseRender extends System<UniverseRender> {
     if (!inited || paused) return;
     Camera cam = Render.universeCamera;
     float zoom = UniverseCameraInput.zoom;
-    Draw.proj(cam);
     background.render(cam, zoom);
     Game.starMap.draw(cam);
-    Draw.proj(Core.camera);
   }
 
   @Override

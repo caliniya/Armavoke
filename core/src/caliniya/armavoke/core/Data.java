@@ -69,14 +69,14 @@ public class Data {
     Systems.UM.init();
     Systems.EP.init();
 
-    Game.starMap = new StarMap(200, 200);
+    Game.starMap = new StarMap(2000, 2000);
 
     Random r = new Random();
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
       StarNode A, B;
-      A = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
-      B = new StarNode(r.nextFloat() * 200, r.nextFloat() * 200, "呃啊" + r.nextInt() * 2000);
+      A = new StarNode(r.nextFloat() * 2000, r.nextFloat() * 2000, "呃啊" + r.nextInt() * 2000);
+      B = new StarNode(r.nextFloat() * 2000, r.nextFloat() * 2000, "呃啊" + r.nextInt() * 2000);
       Game.starMap.addNode(A);
       Game.starMap.addNode(B);
       Game.starMap.link(A, B);

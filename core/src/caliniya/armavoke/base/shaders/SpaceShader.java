@@ -48,7 +48,7 @@ public class SpaceShader extends Shader {
     Draw.shader(this);
     setUniformf("u_camPos", cam.position.x, cam.position.y);
     setUniformf("u_zoom", z);
-    Draw.rect(Draw.wrap(texture), cam.position.x, cam.position.y, cam.width, cam.height);
+    Draw.blit(this);
     Draw.shader();
   }
 
