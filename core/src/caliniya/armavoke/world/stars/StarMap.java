@@ -56,13 +56,12 @@ public class StarMap {
   }
 
   public void draw(Camera c) {
-    get(
-        /*
+    get(/*
         c.position.x - (c.width / 2),
         c.position.y - (c.height / 2),
         c.width,
-        c.height,
-        */
-        c, road -> road.draw());
+        c.height,*/
+        0,0,w,h,
+        road -> road.draw());
   }
 }

@@ -299,7 +299,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     }
   }
   
-  // 但有写操作的遍历
+  // 有写操作的遍历
   public void eachWrited(Cons<? super T> cons) {
     writeLock.lock();
     try {
@@ -311,7 +311,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     }
   }
 
-  /** 遍历满足谓词的实体 */
+  /** 遍历满足谓词的实体 ，不能写*/
   public void each(Boolf<T> filter, Cons<? super T> cons) {
     readLock.lock();
     try {

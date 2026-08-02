@@ -71,16 +71,24 @@ public class Data {
 
     Game.starMap = new StarMap(2000, 2000);
 
-    Random r = new Random();
+    Rand r = new Rand();
 
     for (int i = 0; i < 100; ++i) {
       StarNode A, B;
-      A = new StarNode(r.nextFloat() * 2000, r.nextFloat() * 2000, "呃啊" + r.nextInt() * 2000);
-      B = new StarNode(r.nextFloat() * 2000, r.nextFloat() * 2000, "呃啊" + r.nextInt() * 2000);
+      A = new StarNode(r.random(0, 2000), r.random(0, 2000), "呃啊" + r.random(0, 2000));
+      B = new StarNode(r.random(0, 2000), r.random(0, 2000), "呃啊" + r.random(0, 2000));
       Game.starMap.addNode(A);
       Game.starMap.addNode(B);
       Game.starMap.link(A, B);
     }
+
+    Log.info(Render.universeCamera.position);
+    Log.info(Render.universeCamera.width + "  " + Render.universeCamera.height);
+    Log.info(Game.starMap.tree);
+    /*
+    Game.starMap.nodeSet.each(n->{
+      Log.info(n.x +"   "+n.y);
+    });*/
 
     UI.Game();
   }

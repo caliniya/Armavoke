@@ -37,14 +37,14 @@ public class UniverseRender extends System<UniverseRender> {
     float zoom = UniverseCameraInput.zoom;
     background.render();
     Draw.proj(cam);
-    Game.starMap.draw(cam);
-    Log.info(cam.mat);
+    // Game.starMap.draw(cam);
+    Game.starMap.roadSet.each(r -> r.draw());
     Draw.proj(Core.camera);
   }
 
   @Override
   public void dispose() {
-    if (background != null) background.dispose();
+    background.dispose();
     super.dispose();
   }
 }
