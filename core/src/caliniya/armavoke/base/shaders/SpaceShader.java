@@ -2,16 +2,19 @@ package caliniya.armavoke.base.shaders;
 
 import arc.Core;
 import arc.files.Fi;
+import arc.func.*;
 import arc.graphics.Camera;
 import arc.graphics.Texture;
 import arc.graphics.Texture.TextureWrap;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.ScreenQuad;
 import arc.graphics.g2d.TextureRegion;
 import arc.graphics.gl.Shader;
 import arc.util.Log;
 import arc.util.Time;
 import caliniya.armavoke.core.Render;
 
+//在绑定着色器之前任何的的setUniformf是无效的
 public class SpaceShader extends Shader {
 
   private Texture texture;
@@ -21,39 +24,51 @@ public class SpaceShader extends Shader {
   // 基础缩放
   public float baseScale = 0.7f;
 
+  public Camera cam;
+  public float zoom;
+  
+  public Floatp get;
+
   public SpaceShader() {
+    this(Core.camera, () -> Render.currentZoom);
+  }
+
+  public SpaceShader(Camera cam, Floatp get) {
     super(Core.files.internal("shaders/default.vert"), Core.files.internal("shaders/space.frag"));
 
     texture = new Texture(Core.files.internal("sprites/space.png"));
     texture.setWrap(TextureWrap.repeat, TextureWrap.repeat);
+    this.cam = cam;
+    this.zoom = get.get();
+    this.get = get;
   }
 
   @Override
   public void apply() {
-    float z = Render.currentZoom * baseScale;
+    zoom = get.get();
+    float z = zoom * baseScale;
 
     setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-    setUniformf("u_camPos", Core.camera.position.x, Core.camera.position.y);
+
+    setUniformf("u_camPos", cam.position.x, cam.position.y);
+
     setUniformf("u_zoom", z);
+
     setUniformf("u_texSize", (float) texture.width, (float) texture.height);
     setUniformf("u_parallax", parallaxScale);
 
     texture.bind(0);
     setUniformi("u_texture", 0);
   }
-
-  /** 使用指定相机和缩放渲染（用于宇宙视图等自定义相机） */
-  public void render(Camera cam, float zoom) {
-    float z = zoom * baseScale;
-    Draw.shader(this);
-    setUniformf("u_camPos", cam.position.x, cam.position.y);
-    setUniformf("u_zoom", z);
-    Draw.blit(this);
-    Draw.shader();
-  }
-
+  
+  //总之能用了
   public void render() {
-    render(Core.camera, Render.currentZoom);
+    float z = zoom * baseScale;
+    // Draw.shader(this);
+    Draw.blit(this);
+    // Draw.rect(Draw.wrap(texture),cam.position.x,cam.position.y);
+    // Draw.flush();
+    // Draw.shader();
   }
 
   @Override

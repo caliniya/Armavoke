@@ -50,7 +50,7 @@ public class Data {
     Systems.GP = new GameProcess();
     Systems.UV = new UniverseRender();
     // Systems.DE = new DebugRender();
-    Systems.addSystem(Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, new Render());
+    Systems.addSystem(new Render(), Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV);
     Systems.BP = new BulletProcess();
     Systems.UM = new UnitMath();
     Systems.EP = new EntityProces();

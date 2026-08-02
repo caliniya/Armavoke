@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.Camera;
 import arc.graphics.g2d.Draw;
+import arc.util.Log;
 import caliniya.armavoke.base.shaders.SpaceShader;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.Render;
@@ -20,7 +21,7 @@ public class UniverseRender extends System<UniverseRender> {
   @Override
   public UniverseRender init() {
     this.index = 16;
-    background = new SpaceShader();
+    background = new SpaceShader(Render.universeCamera, () -> UniverseCameraInput.zoom);
     background.parallaxScale = 0.5f;
     background.baseScale = 0.6f;
     Events.run(EventType.events.EnterUV, () -> paused = false);
@@ -34,8 +35,11 @@ public class UniverseRender extends System<UniverseRender> {
     if (!inited || paused) return;
     Camera cam = Render.universeCamera;
     float zoom = UniverseCameraInput.zoom;
-    background.render(cam, zoom);
+    background.render();
+    Draw.proj(cam);
     Game.starMap.draw(cam);
+    Log.info(cam.mat);
+    Draw.proj(Core.camera);
   }
 
   @Override
