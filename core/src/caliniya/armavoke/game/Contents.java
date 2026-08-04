@@ -47,6 +47,7 @@ public class Contents {
     items = getByType(CType.Item).toArray(ItemType.class);
     Blocks.load();
     UnitTypes.load();
+    Stars.load();
     for (Ar<ContentType> types : contentByTypes) {
       types.each(t -> t.load());
     }
@@ -70,12 +71,8 @@ public class Contents {
 
     Ar<ContentType> list = contentByTypes[content.type.ordinal()];
 
-    if (list.size >= Short.MAX_VALUE) {
-      throw new RuntimeException("Too many contents for type: " + content.type);
-    }
-
     // ID 从 1 开始
-    content.id = (short) (list.size + 1);
+    content.id = list.size + 1;
     list.add(content);
 
     if (content.type == CType.Item) {
@@ -131,7 +128,7 @@ public class Contents {
    * @return 对应的内容对象，ID无效则返回null
    */
   @SuppressWarnings("unchecked")
-  public static <T extends ContentType> T getByID(CType type, short id) {
+  public static <T extends ContentType> T getByID(CType type, int id) {
     if (id <= 0) return null;
 
     Ar<ContentType> list = contentByTypes[type.ordinal()];

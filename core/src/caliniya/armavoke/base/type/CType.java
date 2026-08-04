@@ -2,6 +2,7 @@ package caliniya.armavoke.base.type;
 
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.world.*;
+import caliniya.armavoke.world.stars.*;
 import caliniya.armavoke.type.type.*;
 
 public enum CType {
@@ -9,9 +10,10 @@ public enum CType {
   Floor(Floor.class),
   ENVBlock(ENVBlock.class),
   Unit(UnitType.class),
-  Item(ItemType.class);
-  
-  
+  Item(ItemType.class),
+  StarNode(StarNode.class);
+
+
   public final Class<? extends ContentType> type;
 
   CType(Class<? extends ContentType> contentClass) {

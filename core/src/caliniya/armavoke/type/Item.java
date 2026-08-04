@@ -17,12 +17,12 @@ public class Item {
   }
 
   public void write(Writes write) {
-    write.s(type == null ? -1 : type.id);
+    write.i(type == null ? -1 : type.id);
     write.i(amount);
   }
 
   public void read(Reads read) {
-    short id = read.s();
+    int id = read.i();
     this.type = Contents.getByID(CType.Item, id);
     this.amount = read.i();
   }

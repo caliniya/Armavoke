@@ -146,7 +146,7 @@ public class Building extends Entity {
     w.i(angle);
     w.f(health);
     w.b((byte) team.ordinal()); // 阵营序号
-    w.s(id);
+    w.i(id);
 
     block.write(this, w);
     item.write(w);
@@ -164,7 +164,7 @@ public class Building extends Entity {
     this.health = r.f();
     byte teamID = r.b();
     this.team = TeamTypes.values()[teamID];
-    this.id = Entities.checkoutID(r.s());
+    this.id = Entities.checkoutID(r.i());
 
     block.read(this, r);
 

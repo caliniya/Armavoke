@@ -325,7 +325,7 @@ public class Unit extends Entity {
     w.f(targetX);
     w.f(targetY);
     w.b(team.ordinal());
-    w.s(id);
+    w.i(id);
   }
 
   @Override
@@ -338,7 +338,7 @@ public class Unit extends Entity {
     this.targetX = r.f();
     this.targetY = r.f();
     byte teamId = r.b();
-    this.id = Entities.checkoutID(r.s());
+    this.id = Entities.checkoutID(r.i());
 
     if (teamId >= 0 && teamId < TeamTypes.values().length) {
       this.team = TeamTypes.values()[teamId];

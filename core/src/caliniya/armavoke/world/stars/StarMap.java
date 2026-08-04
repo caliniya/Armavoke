@@ -4,14 +4,18 @@ import arc.func.*;
 import arc.graphics.Camera;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.Log;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.ObjectSet;
+import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.game.Contents;
 
 // 表示一片星域？
 public class StarMap {
+
+  /** 星域内部名（与 campaign 目录中的星域文件夹名一致）。 */
+  public String name;
 
   public ObjectSet<StarRoad> roadSet;
   public ObjectSet<StarNode> nodeSet;
@@ -32,6 +36,19 @@ public class StarMap {
     nodeTree = new QuadTree<>(new Rect(0, 0, w, h));
   }
 
+  public StarMap(String name, float w, float h) {
+    this(w, h);
+    this.name = name;
+  }
+
+  /** 按节点原始名称查找节点。 */
+  public StarNode getNode(String name) {
+    for (StarNode n : nodeSet) {
+      if (n.name.equals(name)) return n;
+    }
+    return null;
+  }
+
   // 连接两点，路径在此过程中自动创建
   public void link(StarNode A, StarNode B) {
     A.add(B);
@@ -45,14 +62,18 @@ public class StarMap {
         });
   }
 
-  // 向图中添加一个节点
+  // 向图中添加节点
   public void addNode(StarNode node) {
-    // 没有 id 才自动分配（读档时 id 已从存档恢复，不能覆盖）
+    // 注册过的节点 id>0（内容 ID）直接用；未注册的临时节点才自动分配
     if (node.id <= 0) {
       node.id = nodeSet.size + 1;
     }
     nodeSet.add(node);
     nodeTree.insert(node);
+  }
+
+  public void addNode(StarNode... nodes) {
+    for (StarNode n : nodes) addNode(n);
   }
 
   public void get(float x, float y, float w, float h, Cons<StarRoad> out) {
@@ -84,7 +105,7 @@ public class StarMap {
     getNode(c, node -> node.draw());
   }
 
-  /** 序列化整片星域：尺寸 + 节点数 + 所有节点（含邻接表） */
+  /** 序列化整片星域：尺寸 + 节点数 + 所有节点（含邻接表）。 */
   public void write(Writes w) {
     w.f(this.w);
     w.f(this.h);
@@ -97,6 +118,8 @@ public class StarMap {
   /**
    * 从流中重建一片星域。读档流程： 1. 读尺寸，新建空 StarMap 2. 一遍完整读取所有节点（含邻接 id 表），保证流位置正确 3. 按内存中的邻接 id 建边：只由 id
    * 更小的一侧触发 link，防止同一条边重复创建
+   *
+   * <p>节点 ID 以存档为准（覆盖内容 ID），保证星图内邻接引用稳定。
    *
    * <p>注意：不能拆成"先读节点字段再读邻接"的两遍流式读取，那样会因跳过邻接数据 导致流位置错位。
    */
@@ -122,9 +145,16 @@ public class StarMap {
         ids[j] = r.i();
       }
 
-      StarNode node = new StarNode(x, y, name);
-      node.id = id;
-      node.size = size;
+      // 优先复用已注册的内容节点（保持本地化名/命名空间），否则新建注册
+      StarNode node = Contents.get(CType.StarNode.name() + "." + name, StarNode.class);
+      if (node == null) {
+        node = new StarNode(x, y, name);
+      } else {
+        node.x = x;
+        node.y = y;
+        node.size = size;
+      }
+      node.id = id; // 以存档 ID 为准（星图内引用用，覆盖内容表分配的 ID）
       nodes[i] = node;
       neiIds[i] = ids;
       byId.put(id, node);

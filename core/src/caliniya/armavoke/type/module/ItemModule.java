@@ -122,7 +122,7 @@ public class ItemModule extends Module {
             int count = 0;
             for (int i = 1; i < filter.length; i++) if (filter[i]) count++;
             write.s((short) count);
-            for (int i = 1; i < filter.length; i++) if (filter[i]) write.s((short) i);
+            for (int i = 1; i < filter.length; i++) if (filter[i]) write.i(i);
         } else {
             write.bool(false);
         }
@@ -132,7 +132,7 @@ public class ItemModule extends Module {
         write.s((short) count);
         for (int i = 1; i < items.length; i++) {
             if (items[i] > 0) {
-                write.s((short) i);
+                write.i(i);
                 write.i(items[i]);
             }
         }
@@ -150,7 +150,7 @@ public class ItemModule extends Module {
                 java.util.Arrays.fill(filter, false);
             }
             for (int i = 0; i < filterCount; i++) {
-                short id = read.s();
+                int id = read.i();
                 if (id < filter.length) filter[id] = true;
             }
         } else {
@@ -160,7 +160,7 @@ public class ItemModule extends Module {
         short itemCount = read.s();
         java.util.Arrays.fill(items, 0);
         for (int i = 0; i < itemCount; i++) {
-            short id = read.s();
+            int id = read.i();
             int amt = read.i();
             if (id < items.length) items[id] = amt;
         }

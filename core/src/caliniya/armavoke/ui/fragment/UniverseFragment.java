@@ -24,7 +24,8 @@ public class UniverseFragment {
     root = new Table();
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
-
+    root.align(Align.topLeft);
+    
     Table btnGroup = new Table();
     btnGroup.defaults().width(120f).height(50f).pad(4f);
     btnGroup.left().top().align(Align.topLeft);

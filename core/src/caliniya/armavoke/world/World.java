@@ -150,11 +150,11 @@ public class World {
 
   public void setENVBlock(int x, int y, ENVBlock block) {
     if (!isValidCoord(x, y)) return;
-    short id = (block == null) ? 0 : block.id;
+    int id = (block == null) ? 0 : block.id;
     if (id == 0) {
       WorldChunk chunk = getChunk(x, y);
       if (chunk == null) return;
-      chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, (short) 0);
+      chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, 0);
       // 通知导航数据：移除环境方块
       RouteData.updateBlock(x, y, false);
     } else {
@@ -165,7 +165,7 @@ public class World {
     }
   }
 
-  public short getENVBlockId(int x, int y) {
+  public int getENVBlockId(int x, int y) {
     if (!isValidCoord(x, y)) return 0;
     WorldChunk chunk = getChunk(x, y);
     if (chunk == null) return 0;
@@ -173,25 +173,25 @@ public class World {
   }
 
   public ENVBlock getENVBlock(int x, int y) {
-    short id = getENVBlockId(x, y);
+    int id = getENVBlockId(x, y);
     if (id == 0) return null;
     return Contents.getByID(CType.ENVBlock, id);
   }
 
   public void setFloor(int x, int y, Floor floor) {
     if (!isValidCoord(x, y)) return;
-    short id = (floor == null) ? 0 : floor.id;
+    int id = (floor == null) ? 0 : floor.id;
     if (id == 0) {
       WorldChunk chunk = getChunk(x, y);
       if (chunk == null) return;
-      chunk.setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, (short) 0);
+      chunk.setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, 0);
     } else {
       WorldChunk chunk = getOrCreateChunk(x, y);
       chunk.setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, id);
     }
   }
 
-  public short getFloorId(int x, int y) {
+  public int getFloorId(int x, int y) {
     if (!isValidCoord(x, y)) return 0;
     WorldChunk chunk = getChunk(x, y);
     if (chunk == null) return 0;
@@ -199,7 +199,7 @@ public class World {
   }
 
   public Floor getFloor(int x, int y) {
-    short id = getFloorId(x, y);
+    int id = getFloorId(x, y);
     if (id == 0) return null;
     return Contents.getByID(CType.Floor, id);
   }
@@ -215,7 +215,7 @@ public class World {
     setENVBlock(index % W, index / W, block);
   }
 
-  public short getENVBlockId(int index) {
+  public int getENVBlockId(int index) {
     return getENVBlockId(index % W, index / W);
   }
 
@@ -227,7 +227,7 @@ public class World {
     setFloor(index % W, index / W, floor);
   }
 
-  public short getFloorId(int index) {
+  public int getFloorId(int index) {
     return getFloorId(index % W, index / W);
   }
 
