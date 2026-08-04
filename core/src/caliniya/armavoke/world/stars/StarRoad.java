@@ -29,8 +29,6 @@ public class StarRoad implements QuadTreeObject {
 
   public void draw() {
     Lines.line(A.x, A.y, B.x, B.y);
-    A.draw();
-    B.draw();
   }
 
   @Override

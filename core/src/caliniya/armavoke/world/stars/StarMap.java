@@ -5,6 +5,8 @@ import arc.graphics.Camera;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.Log;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.ObjectSet;
 
@@ -15,6 +17,7 @@ public class StarMap {
   public ObjectSet<StarNode> nodeSet;
 
   public QuadTree<StarRoad> tree;
+  public QuadTree<StarNode> nodeTree;
 
   public Rect tempR = new Rect();
 
@@ -26,6 +29,7 @@ public class StarMap {
     this.w = w;
     this.h = h;
     tree = new QuadTree<>(new Rect(0, 0, w, h));
+    nodeTree = new QuadTree<>(new Rect(0, 0, w, h));
   }
 
   // 连接两点，路径在此过程中自动创建
@@ -43,8 +47,12 @@ public class StarMap {
 
   // 向图中添加一个节点
   public void addNode(StarNode node) {
+    // 没有 id 才自动分配（读档时 id 已从存档恢复，不能覆盖）
+    if (node.id <= 0) {
+      node.id = nodeSet.size + 1;
+    }
     nodeSet.add(node);
-    Ar aa = new Ar();
+    nodeTree.insert(node);
   }
 
   public void get(float x, float y, float w, float h, Cons<StarRoad> out) {
@@ -56,6 +64,16 @@ public class StarMap {
     tree.intersect(tempR, out);
   }
 
+  // 节点查询
+  public void getNode(float x, float y, float w, float h, Cons<StarNode> out) {
+    nodeTree.intersect(x, y, w, h, out);
+  }
+
+  public void getNode(Camera cam, Cons<StarNode> out) {
+    cam.bounds(tempR);
+    nodeTree.intersect(tempR, out);
+  }
+
   public void draw(Camera c) {
     get(
         c.position.x - (c.width / 2),
@@ -63,6 +81,67 @@ public class StarMap {
         c.width,
         c.height,
         road -> road.draw());
-    // Log.info(tree.any(0,0,w,h));
+    getNode(c, node -> node.draw());
+  }
+
+  /** 序列化整片星域：尺寸 + 节点数 + 所有节点（含邻接表） */
+  public void write(Writes w) {
+    w.f(this.w);
+    w.f(this.h);
+    w.i(nodeSet.size);
+    for (StarNode n : nodeSet) {
+      n.write(w);
+    }
+  }
+
+  /**
+   * 从流中重建一片星域。读档流程： 1. 读尺寸，新建空 StarMap 2. 一遍完整读取所有节点（含邻接 id 表），保证流位置正确 3. 按内存中的邻接 id 建边：只由 id
+   * 更小的一侧触发 link，防止同一条边重复创建
+   *
+   * <p>注意：不能拆成"先读节点字段再读邻接"的两遍流式读取，那样会因跳过邻接数据 导致流位置错位。
+   */
+  public static StarMap read(Reads r) {
+    float w = r.f();
+    float h = r.f();
+    StarMap map = new StarMap(w, h);
+
+    int starCount = r.i();
+    StarNode[] nodes = new StarNode[starCount];
+    int[][] neiIds = new int[starCount][];
+    IntMap<StarNode> byId = new IntMap<>();
+
+    for (int i = 0; i < starCount; i++) {
+      int id = r.i();
+      float x = r.f();
+      float y = r.f();
+      float size = r.f();
+      String name = r.str();
+      int n = r.s();
+      int[] ids = new int[n];
+      for (int j = 0; j < n; j++) {
+        ids[j] = r.i();
+      }
+
+      StarNode node = new StarNode(x, y, name);
+      node.id = id;
+      node.size = size;
+      nodes[i] = node;
+      neiIds[i] = ids;
+      byId.put(id, node);
+      map.addNode(node);
+    }
+
+    for (int i = 0; i < starCount; i++) {
+      StarNode a = nodes[i];
+      for (int nid : neiIds[i]) {
+        if (nid > a.id) {
+          StarNode b = byId.get(nid);
+          if (b != null) {
+            map.link(a, b);
+          }
+        }
+      }
+    }
+    return map;
   }
 }
