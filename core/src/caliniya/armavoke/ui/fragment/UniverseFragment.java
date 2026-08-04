@@ -6,6 +6,7 @@ import arc.files.Fi;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Table;
 import arc.struct.StringMap;
+import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.core.UI;
@@ -26,6 +27,7 @@ public class UniverseFragment {
 
     Table btnGroup = new Table();
     btnGroup.defaults().width(120f).height(50f).pad(4f);
+    btnGroup.left().top().align(Align.topLeft);
 
     btnGroup.add(new Button("保存星域", () -> saveCurrent()));
     btnGroup.row();
@@ -33,8 +35,7 @@ public class UniverseFragment {
     btnGroup.row();
     btnGroup.add(new Button("关闭", () -> close()));
 
-    root.add(btnGroup).left().top();
-
+    root.add(btnGroup).left().top().align(Align.topLeft).get().align(Align.topLeft);
     Core.scene.root.addChild(root);
     Events.fire(EventType.events.EnterUV);
   }
