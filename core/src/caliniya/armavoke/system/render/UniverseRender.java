@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.Camera;
 import arc.graphics.g2d.Draw;
+import arc.math.geom.Rect;
 import arc.util.Log;
 import caliniya.armavoke.base.shaders.SpaceShader;
 import caliniya.armavoke.base.type.EventType;
@@ -35,10 +36,11 @@ public class UniverseRender extends System<UniverseRender> {
     if (!inited || paused) return;
     Camera cam = Render.universeCamera;
     float zoom = UniverseCameraInput.zoom;
+    cam.update();
     background.render();
     Draw.proj(cam);
-    // Game.starMap.draw(cam);
-    Game.starMap.roadSet.each(r -> r.draw());
+    Game.starMap.draw(cam);
+    //Game.starMap.roadSet.each(r -> r.draw());
     Draw.proj(Core.camera);
   }
 

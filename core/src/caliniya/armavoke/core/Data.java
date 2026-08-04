@@ -82,9 +82,9 @@ public class Data {
       Game.starMap.link(A, B);
     }
 
-    Log.info(Render.universeCamera.position);
-    Log.info(Render.universeCamera.width + "  " + Render.universeCamera.height);
-    Log.info(Game.starMap.tree);
+    //Log.info(Render.universeCamera.position);
+    //Log.info(Render.universeCamera.width + "  " + Render.universeCamera.height);
+    //Log.info(Game.starMap.tree);
     /*
     Game.starMap.nodeSet.each(n->{
       Log.info(n.x +"   "+n.y);

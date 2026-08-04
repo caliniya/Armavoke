@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.Camera;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.ObjectSet;
 
@@ -56,12 +57,12 @@ public class StarMap {
   }
 
   public void draw(Camera c) {
-    get(/*
+    get(
         c.position.x - (c.width / 2),
         c.position.y - (c.height / 2),
         c.width,
-        c.height,*/
-        0,0,w,h,
+        c.height,
         road -> road.draw());
+    // Log.info(tree.any(0,0,w,h));
   }
 }
