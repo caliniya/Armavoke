@@ -24,8 +24,6 @@ public class Window {
   public float maxOut = 0.8f; // 允许80%移出屏幕
   public String title = "Window";
 
-  public javax.swing.JFrame j;
-
   /** 是否为模态窗口。模态窗口会显示暗色遮罩并阻断背景所有输入。 */
   public boolean modal = false;
 
@@ -158,8 +156,6 @@ public class Window {
 
     Core.scene.add(window);
 
-    window.pack();
-
     // 初始居中
     window.setPosition(
         (Core.scene.getWidth() - window.getWidth()) / 2,
@@ -172,6 +168,9 @@ public class Window {
       modalOverlay.remove();
       modalOverlay = null;
     }
+    top.remove();
+    main.remove();
+    low.remove();
   }
   
   // 应该通过覆写这三个方法来实现内容
