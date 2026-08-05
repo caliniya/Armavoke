@@ -19,10 +19,11 @@ public class Window {
 
   public Table window;
   public Table main, top, low;
+  // 这是默认的大小
   public float w = 400f, h = 300f;
   public float maxOut = 0.8f; // 允许80%移出屏幕
   public String title = "Window";
-  
+
   public javax.swing.JFrame j;
 
   /** 是否为模态窗口。模态窗口会显示暗色遮罩并阻断背景所有输入。 */
@@ -40,6 +41,10 @@ public class Window {
 
   public Window(String titleText) {
     this.title = titleText;
+    // 容器
+    main = new Table();
+    top = new Table();
+    low = new Table();
   }
 
   /** 链式设置模态 */
@@ -89,11 +94,6 @@ public class Window {
 
       Core.scene.add(modalOverlay);
     }
-
-    // 容器
-    main = new Table();
-    top = new Table();
-    low = new Table();
 
     top(top);
     main(main);
@@ -158,6 +158,8 @@ public class Window {
 
     Core.scene.add(window);
 
+    window.pack();
+
     // 初始居中
     window.setPosition(
         (Core.scene.getWidth() - window.getWidth()) / 2,
@@ -171,7 +173,8 @@ public class Window {
       modalOverlay = null;
     }
   }
-
+  
+  // 应该通过覆写这三个方法来实现内容
   public void main(Table t) {}
 
   public void top(Table t) {}

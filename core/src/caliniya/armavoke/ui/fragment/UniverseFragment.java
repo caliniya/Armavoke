@@ -9,11 +9,17 @@ import arc.struct.StringMap;
 import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.content.Stars;
+import caliniya.armavoke.core.Campaign;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Game;
+import caliniya.armavoke.game.data.ProgressData;
+import caliniya.armavoke.io.ProgressIO;
 import caliniya.armavoke.io.WorldIO;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.windows.Window;
+import caliniya.armavoke.world.stars.StarMap;
+import caliniya.armavoke.world.stars.StarNode;
 
 /** */
 public class UniverseFragment {
@@ -25,7 +31,7 @@ public class UniverseFragment {
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     root.align(Align.topLeft);
-    
+
     Table btnGroup = new Table();
     btnGroup.defaults().width(120f).height(50f).pad(4f);
     btnGroup.left().top().align(Align.topLeft);
@@ -33,6 +39,8 @@ public class UniverseFragment {
     btnGroup.add(new Button("保存星域", () -> saveCurrent()));
     btnGroup.row();
     btnGroup.add(new Button("读档", () -> showLoadList()));
+    btnGroup.row();
+    btnGroup.add(new Button("进度测试", () -> showProgressTest()));
     btnGroup.row();
     btnGroup.add(new Button("关闭", () -> close()));
 
@@ -81,20 +89,20 @@ public class UniverseFragment {
       if (file.extension().equals("aess")) {
         any = true;
         win.main.add(
-            new Button(
-                file.nameWithoutExtension(),
-                () -> {
-                  WorldIO.load(
-                      file,
-                      map -> {
-                        if (map != null) {
-                          Game.starMap = map;
-                          Log.info(file);
-                          Log.info("Okay");
-                        }
-                      });
-                  win.remove();
-                }))
+                new Button(
+                    file.nameWithoutExtension(),
+                    () -> {
+                      WorldIO.load(
+                          file,
+                          map -> {
+                            if (map != null) {
+                              Game.starMap = map;
+                              Log.info(file);
+                              Log.info("Okay");
+                            }
+                          });
+                      win.remove();
+                    }))
             .growX()
             .pad(4f);
         win.main.row();
@@ -104,5 +112,126 @@ public class UniverseFragment {
     if (!any) {
       win.main.add("[lightgray]没有星域存档[]").pad(20f).center();
     }
+  }
+
+  /** 进度测试窗口：验证 ProgressData / ProgressIO 的读写。 */
+  private void showProgressTest() {
+    Window win = new Window("进度测试");
+    win.build();
+    rebuildProgressWindow(win);
+  }
+
+  /** 重建进度测试窗口内容（每次操作后调用以刷新显示）。 */
+  private void rebuildProgressWindow(Window win) {
+    win.main.clearChildren();
+
+          // 当前星域
+          String star = Campaign.progress().currentStar;
+          win.main
+              .add("[lightgray]当前星域:[] " + (star == null || star.isEmpty() ? "(无)" : star))
+              .left()
+              .row();
+          win.main.add().height(8f).row();
+
+          // 每个节点/地图一行
+          StarMap demo = Stars.demo;
+          if (demo == null || demo.nodeSet.size == 0) {
+            win.main.add("[red]没有可用的星域节点（Stars.load 没执行？）[]").row();
+          } else {
+            for (StarNode node : demo.nodeSet) {
+              ProgressData.MapProgress p = Campaign.progress().get(node.name);
+              boolean unlocked = p != null && p.unlocked;
+              boolean completed = p != null && p.completed;
+
+              String status =
+                  (unlocked ? "[green]已解锁[]" : "[red]未解锁[]")
+                      + " "
+                      + (completed ? "[green]已通关[]" : "[red]未通关[]");
+
+              Table row = new Table();
+              row.defaults().pad(2f);
+              row.add(node.name).width(90f).left();
+              row.add(status).width(150f).left();
+              row.add(
+                      new Button(
+                          "解锁",
+                          () -> {
+                            ProgressData.MapProgress mp =
+                                Campaign.progress().getOrCreate(node.name);
+                            mp.unlocked = !mp.unlocked;
+                            rebuildProgressWindow(win);
+                          }))
+                  .size(64f, 40f);
+              row.add(
+                      new Button(
+                          "通关",
+                          () -> {
+                            ProgressData.MapProgress mp =
+                                Campaign.progress().getOrCreate(node.name);
+                            mp.completed = !mp.completed;
+                            rebuildProgressWindow(win);
+                          }))
+                  .size(64f, 40f);
+              win.main.add(row).growX();
+              win.main.row();
+            }
+          }
+
+          win.main.add().height(10f).row();
+
+          // 操作按钮
+          Table ops = new Table();
+          ops.defaults().size(100f, 44f).pad(3f);
+          ops.add(
+              new Button(
+                  "设为demo",
+                  () -> {
+                    Campaign.progress().currentStar = "demo";
+                    rebuildProgressWindow(win);
+                  }));
+          ops.add(
+              new Button(
+                  "保存进度",
+                  () -> {
+                    Campaign.saveProgress();
+                    Log.info("Progress saved -> @", ProgressIO.file().absolutePath());
+                    rebuildProgressWindow(win);
+                  }));
+          ops.row();
+          ops.add(
+              new Button(
+                  "加载进度",
+                  () -> {
+                    Campaign.loadProgress();
+                    Log.info("Progress loaded, maps=@", Campaign.progress().maps.size);
+                    rebuildProgressWindow(win);
+                  }));
+          ops.add(
+              new Button(
+                  "清除进度",
+                  () -> {
+                    Campaign.progress().currentStar = "";
+                    Campaign.progress().maps.clear();
+                    rebuildProgressWindow(win);
+                  }));
+          win.main.add(ops).growX();
+          win.main.row();
+
+          // 文件信息
+          Fi pf = ProgressIO.file();
+          win.main
+              .add(
+                  "[gray]进度文件: "
+                      + (pf.exists() ? "已存在" : "不存在")
+                      + "（"
+                      + pf.absolutePath()
+                      + "）[]")
+              .left()
+              .padTop(8f)
+              .row();
+          win.main
+              .add("[gray]记录地图数: " + Campaign.progress().maps.size + "[]")
+              .left()
+              .row();
   }
 }
