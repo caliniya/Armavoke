@@ -19,7 +19,8 @@ public class Window {
 
   public Table window;
   public Table main, top, low;
-  // 这是默认的大小
+  // 最小尺寸：pack 自适应后的下限，内容少时不会缩得更小。
+  // 全局兜底下限是屏幕宽/高的 3/7（见 build()），这里设置的更大值会覆盖默认下限。
   public float w = 400f, h = 300f;
   public float maxOut = 0.8f; // 允许80%移出屏幕
   public String title = "Window";
@@ -60,6 +61,12 @@ public class Window {
   public void build() {
     if (window != null) window.remove();
     if (modalOverlay != null) modalOverlay.remove();
+
+    // 三个内容容器在构造时初始化、可能被复用（如 PauseWindow 单例反复 build），
+    // 这里先清空，避免重复 build 时内容（按钮等）不断累积。
+    main.clearChildren();
+    top.clearChildren();
+    low.clearChildren();
 
     window = new Table();
     window.setSize(w, h);
@@ -156,7 +163,21 @@ public class Window {
 
     Core.scene.add(window);
 
-    // 初始居中
+    // --- 自适应大小 ---
+    // 先按内容 pack() 收缩到恰好容纳的大小，
+    // 再用 Mathf.clamp 设下限/上限：
+    //   下限 = 屏幕宽高的 3/7（内容少的窗口不会缩成一小点），
+    //         若调用方设置了更大的 w/h 则尊重该值
+    //   上限 = 屏幕尺寸（内容多的窗口自动撑大，最多占满屏幕）。
+    float minW = Math.max(w, Core.scene.getWidth() * 3f / 7f);
+    float minH = Math.max(h, Core.scene.getHeight() * 3f / 7f);
+    window.pack();
+    float finalW = Mathf.clamp(window.getWidth(), minW, Core.scene.getWidth());
+    float finalH = Mathf.clamp(window.getHeight(), minH, Core.scene.getHeight());
+    window.setSize(finalW, finalH);
+    window.validate();
+
+    // 初始居中（使用最终尺寸）
     window.setPosition(
         (Core.scene.getWidth() - window.getWidth()) / 2,
         (Core.scene.getHeight() - window.getHeight()) / 2);
