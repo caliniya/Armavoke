@@ -51,6 +51,7 @@ public class Contents {
     for (Ar<ContentType> types : contentByTypes) {
       types.each(t -> t.load());
     }
+    Techs.load();
     // EntitysID = new IntAr(100);
     // items = new ItemType[totalItemCount];
     // items = (ItemType[]) getByType(CType.Item).items;

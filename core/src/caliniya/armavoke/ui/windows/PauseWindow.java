@@ -21,6 +21,8 @@ public class PauseWindow extends Window {
 
   @Override
   public void main(Table t) {
+    // 单例反复 build()，先清空避免按钮累积
+    t.clearChildren();
     t.add(
             new Button(
                 "宇宙",
@@ -35,6 +37,11 @@ public class PauseWindow extends Window {
                   this.window.visible = false;
                   this.modalOverlay.visible = false;
                 }))
+        .size(120f, 50f)
+        .left()
+        .top();
+    t.row();
+    t.add(new Button("科技树", () -> new TechTreeWindow().build()))
         .size(120f, 50f)
         .left()
         .top();
