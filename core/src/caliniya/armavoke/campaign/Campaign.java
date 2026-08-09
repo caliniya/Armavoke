@@ -1,4 +1,4 @@
-package caliniya.armavoke.core;
+package caliniya.armavoke.campaign;
 
 import arc.Core;
 import arc.files.Fi;

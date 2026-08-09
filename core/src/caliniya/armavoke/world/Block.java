@@ -18,7 +18,7 @@ import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.ui.*;
 
-public class Block extends ContentType implements DrawType<Building> {
+public class Block extends ContentType implements DrawType<Building>, TechNodeContent {
 
   // --- 基础属性 ---
   public float psize; // 大小，像素级
@@ -37,6 +37,11 @@ public class Block extends ContentType implements DrawType<Building> {
 
   public Block(String name) {
     super(name, CType.Block);
+  }
+
+  @Override
+  public TechNodeContent[] requirements() {
+    return requirements; // ContentType 里的前置字段（默认 null）
   }
 
   public Building create() {

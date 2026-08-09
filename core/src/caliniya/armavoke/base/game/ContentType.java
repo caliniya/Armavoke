@@ -2,6 +2,7 @@ package caliniya.armavoke.base.game;
 
 import arc.Core;
 import arc.util.Nullable;
+import caliniya.armavoke.base.api.TechNodeContent;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.game.*;
@@ -20,6 +21,10 @@ public class ContentType {
   //本地化名称
   public String localizedName;
   public @Nullable String description;
+
+  // 科技树相关：不参与科技的内容（如环境方块）保持 null 即可
+  /** 科技树前置内容（null = 不参与科技树 / 无前置）。 */
+  public TechNodeContent[] requirements = null;
 
   public ContentType(String name, CType type) {
     this(name, type, true);

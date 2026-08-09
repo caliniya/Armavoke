@@ -10,7 +10,7 @@ import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.Stars;
-import caliniya.armavoke.core.Campaign;
+import caliniya.armavoke.campaign.Campaign;
 import caliniya.armavoke.core.UI;
 import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.data.ProgressData;

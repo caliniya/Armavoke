@@ -16,7 +16,7 @@ import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
 
-public class UnitType extends ContentType implements DrawType<Unit> {
+public class UnitType extends ContentType implements DrawType<Unit>, TechNodeContent {
 
   public float speed = 60f, // 格每秒
       health = 100f,
@@ -41,6 +41,11 @@ public class UnitType extends ContentType implements DrawType<Unit> {
 
   public UnitType(String name) {
     super(name, CType.Unit);
+  }
+
+  @Override
+  public TechNodeContent[] requirements() {
+    return requirements; // ContentType 里的前置字段（默认 null）
   }
 
   // 加载资源 (在 Assets 加载完成后调用)
