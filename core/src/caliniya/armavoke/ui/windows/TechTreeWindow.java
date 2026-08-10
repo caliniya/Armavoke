@@ -6,7 +6,7 @@ import caliniya.armavoke.campaign.TechTree;
 import caliniya.armavoke.content.Techs;
 import caliniya.armavoke.ui.Button;
 
-/** 科技树测试窗口：显示所有节点与解锁/研究状态，可点击研究。 */
+/** 科技树测试窗口：以树形结构显示节点与解锁/研究状态，可点击研究。 */
 public class TechTreeWindow extends Window {
 
   public TechTreeWindow() {
@@ -26,26 +26,52 @@ public class TechTreeWindow extends Window {
     t.add("[lightgray]共 " + tree.nodes.size + " 个节点[]").left().row();
     t.add().height(8f).row();
 
+    // 从每个根节点开始递归绘制整棵子树
     for (TechNode node : tree.nodes) {
-      String status =
-          (node.unlocked ? "[green]已解锁[]" : "[red]未解锁[]")
-              + " "
-              + (node.researched ? "[green]已研究[]" : "[red]未研究[]");
+      if (node.parent == null) {
+        drawNode(t, node, 0, true);
+      }
+    }
+  }
 
-      Table row = new Table();
-      row.defaults().pad(3f);
-      row.add(node.name).width(170f).left();
-      row.add(status).expandX().left();
-      row.add(
-              new Button(
-                  "研究",
-                  () -> {
-                    tree.research(node.name);
-                    main(this.main); // 刷新
-                  }))
-          .size(84f, 44f);
-      t.add(row).growX();
-      t.row();
+  /**
+   * 递归绘制一个节点及其子树。
+   *
+   * @param depth 深度（用于缩进/树枝符号）
+   * @param last  是否为父节点的最后一个子节点（决定用 └─ 还是 ├─）
+   */
+  private void drawNode(Table t, TechNode node, int depth, boolean last) {
+    // 构建树形前缀
+    StringBuilder prefix = new StringBuilder();
+    for (int i = 1; i < depth; i++) {
+      prefix.append("  ");
+    }
+    if (depth > 0) {
+      prefix.append(last ? "└─ " : "├─ ");
+    }
+
+    String status =
+        (node.unlocked ? "[green]已解锁[]" : "[red]未解锁[]")
+            + " "
+            + (node.researched ? "[green]已研究[]" : "[red]未研究[]");
+
+    Table row = new Table();
+    row.defaults().pad(2f);
+    row.add(prefix + node.name).expandX().left();
+    row.add(status).width(140f).left();
+    row.add(
+            new Button(
+                "研究",
+                () -> {
+                  Techs.tree.research(node.name);
+                  main(this.main); // 刷新
+                }))
+        .size(80f, 42f);
+    t.add(row).growX();
+    t.row();
+
+    for (int i = 0; i < node.children.size; i++) {
+      drawNode(t, node.children.get(i), depth + 1, i == node.children.size - 1);
     }
   }
 }

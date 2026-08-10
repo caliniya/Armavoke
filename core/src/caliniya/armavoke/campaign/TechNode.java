@@ -6,9 +6,8 @@ import caliniya.armavoke.base.tool.Ar;
 /**
  * 科技树节点。
  *
- * <p>解锁条件：同时满足「父节点已解锁」和「自身定义的前置全部已研究」。
- * 结构（父子关系）由代码在构建科技树时显式指定，
- * 节点可关联一个 {@link TechNodeContent}（可空，纯策略节点无需内容）。
+ * <p>解锁条件：同时满足「父节点已解锁」和「自身定义的前置全部已研究」。 结构（父子关系）由代码在构建科技树时显式指定， 节点可关联一个 {@link
+ * TechNodeContent}（可空，纯策略节点无需内容）。
  */
 public class TechNode {
 
@@ -69,11 +68,12 @@ public class TechNode {
   }
 
   /**
-   * 解锁条件：父节点已解锁，且自身前置全部已研究。
-   * （自定义解锁条件暂未实现）
+   * 解锁条件：父节点已研究（或为根节点），且自身前置全部已研究。
+   *
+   * <p>语义：unlocked = 现在可以研究（可点研究按钮）；researched = 已研究完成。 根节点无父节点，一开始就解锁；研究父节点后其子节点才解锁。
    */
   public boolean available() {
-    if (parent != null && !parent.unlocked) return false;
+    if (parent != null && !parent.researched) return false;
     for (TechNode r : requirements) {
       if (!r.researched) return false;
     }

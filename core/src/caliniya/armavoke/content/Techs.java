@@ -9,7 +9,7 @@ import caliniya.armavoke.campaign.TechTree;
  * <p>结构：
  *
  * <pre>
- * base（根）
+ * base（唯一根）
  * ├── turret   （研究后解锁 Blocks.testTurret）
  * │   ├── building（Blocks.TestBlock，需要先研究 turret）
  * │   └── unit     （UnitTypes.test，需要先研究 turret）
@@ -22,11 +22,11 @@ public class Techs {
   public static void load() {
     tree = new TechTree();
 
-    TechNode base = tree.add("base");
+    TechNode base = tree.root("base");
 
-    TechNode turret = tree.addChild(base, Blocks.testTurret.techName());
-    TechNode building = tree.addChild(turret, Blocks.TestBlock.techName());
-    TechNode unit = tree.addChild(turret, UnitTypes.test.techName());
+    TechNode turret = tree.addChild(base, Blocks.testTurret);
+    TechNode building = tree.addChild(turret, Blocks.TestBlock);
+    TechNode unit = tree.addChild(turret, UnitTypes.test);
 
     tree.updateUnlocks();
   }
