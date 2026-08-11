@@ -17,8 +17,11 @@ public abstract class Ability {
    * 受伤拦截：返回穿透到下一层的伤害。
    *
    * <p>例如护盾能力在这里吸收伤害并返回 0；不拦截时原样返回 damage。
+   *
+   * @param breakShield 本次攻击是否破盾（无视护盾强度减伤）
+   * @param bypassShield 本次攻击是否穿盾（直接穿过护盾）
    */
-  public float applyDamage(Entity e, float damage, DamageType type) {
+  public float applyDamage(Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
     return damage;
   }
 

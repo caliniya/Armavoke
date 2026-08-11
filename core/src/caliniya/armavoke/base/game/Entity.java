@@ -80,7 +80,13 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public abstract void read(Reads r);
 
   public void hit(Bullet b) {
-    applyDamage(b.type.damage, b.type.damageType);
+    applyDamage(
+        b.type.damage,
+        b.type.damageType,
+        b.type.breakArmor,
+        b.type.bypassArmor,
+        b.type.breakShield,
+        b.type.bypassShield);
   }
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
@@ -111,22 +117,41 @@ public abstract class Entity implements Poolable, QuadTreeObject {
    * </ol>
    */
   public void applyDamage(float damage, DamageType type) {
+    applyDamage(damage, type, false, false, false, false);
+  }
+
+  /**
+   * 对实体造成一次伤害（三层结算：能力拦截 → 护甲 → 本体）。
+   *
+   * @param breakArmor 破甲：无视护甲的固定减伤值（护甲容量照扣）
+   * @param bypassArmor 穿甲：直接穿过护甲层攻击核心
+   * @param breakShield 破盾：无视护盾的强度减伤（护盾容量照扣）
+   * @param bypassShield 穿盾：直接穿过护盾层
+   */
+  public void applyDamage(
+      float damage,
+      DamageType type,
+      boolean breakArmor,
+      boolean bypassArmor,
+      boolean breakShield,
+      boolean bypassShield) {
     // 1. 能力拦截（护盾等），全部吸收则直接结束
     for (Ability a : abilities) {
-      damage = a.applyDamage(this, damage, type);
+      damage = a.applyDamage(this, damage, type, breakShield, bypassShield);
     }
     if (damage <= 0f) return;
 
-    // 2. 护甲层（容量 > 0 时存在）
-    if (armor > 0f) {
-      float actual = Math.max(0f, damage * type.armorMult * (1f - armorResist(type)) - armorValue);
+    // 2. 护甲层（容量 > 0 时存在；穿甲直接跳过护甲打核心）
+    if (!bypassArmor && armor > 0f) {
+      float armorReduce = breakArmor ? 0f : armorValue;
+      float actual = Math.max(0f, damage * type.armorMult * (1f - armorResist(type)) - armorReduce);
       if (actual <= 0f) return; // 被护甲完全挡下
       armor -= actual;
       if (armor < 0f) armor = 0f;
       return; // 护甲破：剩余伤害不传递
     }
 
-    // 3. 本体（无护甲：无抗性减伤、无固定减伤）
+    // 3. 本体（无护甲或被穿甲跳过：无抗性减伤、无固定减伤）
     damage = damage * type.armorMult;
     health -= damage;
     if (health <= 0f) {

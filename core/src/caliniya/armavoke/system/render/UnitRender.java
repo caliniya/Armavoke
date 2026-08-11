@@ -25,8 +25,8 @@ public class UnitRender extends System<UnitRender> {
   // 调试开关
   public static boolean debug = true;
 
-  /** 血条样式：1/2/3 为旧样式；4 = 右侧垂直条（完全填满 + 护盾平均容量）。 */
-  public static int barStyle = 4;
+  /** 血条样式：5 = 固定分段 + 段内独立填充（最终版，默认）；1~4 为旧样式。 */
+  public static int barStyle = 5;
 
   public static Ar<Bullet> temp = new Ar<Bullet>(false, 1000);
 
@@ -35,7 +35,7 @@ public class UnitRender extends System<UnitRender> {
     this.index = 13;
     Events.run(EventType.events.EnterUV, () -> paused = true);
     Events.run(EventType.events.ExitUV, () -> paused = false);
-    return super.init(false, false);
+    return super.init(false,false);
   }
 
   @Override
@@ -53,6 +53,8 @@ public class UnitRender extends System<UnitRender> {
               drawHealthBar3(u);
             } else if (barStyle == 4) {
               drawHealthBar4(u);
+            } else if (barStyle == 5) {
+              drawHealthBar5(u);
             } else {
               drawHealthBar(u);
             }
@@ -79,9 +81,11 @@ public class UnitRender extends System<UnitRender> {
   }
 
   /**
-   * 整合血条：一个血条按三层容量比例分段，从左到右依次为 核心（红）、护甲（白）、护盾（蓝），每段按当前值填充。
+   * 整合血条：一个血条按三层容量比例分段，从左到右依次为
+   * 核心（红）、护甲（白）、护盾（蓝），每段按当前值填充。
    *
-   * <p>各段宽度 = 该层最大容量占总容量的比例； 例如核心/护甲/护盾容量相等时各占 1/3，护甲空（容量 0）时核心与护盾各占 1/2。
+   * <p>各段宽度 = 该层最大容量占总容量的比例；
+   * 例如核心/护甲/护盾容量相等时各占 1/3，护甲空（容量 0）时核心与护盾各占 1/2。
    */
   private void drawHealthBar(Unit u) {
     ShieldAbility shield = u.shield();
@@ -135,9 +139,12 @@ public class UnitRender extends System<UnitRender> {
   }
 
   /**
-   * 整合血条第 2 种样式：各段**永远整段填充**， 段宽 = 该层剩余容量 / 三层**当前剩余总容量**， 三段正好填满整条血条（永远完全填充，无底色空隙）。
+   * 整合血条第 2 种样式：各段**永远整段填充**，
+   * 段宽 = 该层剩余容量 / 三层**当前剩余总容量**，
+   * 三段正好填满整条血条（永远完全填充，无底色空隙）。
    *
-   * <p>例如 核心 500、护甲 300、护盾 200（剩余总 1000）： 核心段 500/1000、护甲段 300/1000、护盾段 200/1000，正好占满整条。
+   * <p>例如 核心 500、护甲 300、护盾 200（剩余总 1000）：
+   * 核心段 500/1000、护甲段 300/1000、护盾段 200/1000，正好占满整条。
    */
   private void drawHealthBar2(Unit u) {
     ShieldAbility shield = u.shield();
@@ -184,7 +191,8 @@ public class UnitRender extends System<UnitRender> {
   }
 
   /**
-   * 整合血条第 3 种样式：血条只画**护甲 + 核心**两段； 护盾按单位的 {@code size} 画成**环绕圆环**（能量护盾感）。
+   * 整合血条第 3 种样式：血条只画**护甲 + 核心**两段；
+   * 护盾按单位的 {@code size} 画成**环绕圆环**（能量护盾感）。
    *
    * <p>圆环比例 = 当前等效护盾 / 最高等效护盾：
    *
@@ -250,10 +258,12 @@ public class UnitRender extends System<UnitRender> {
   /**
    * 最终血条样式：单位右边缘的垂直条。
    *
-   * <p>以单位正中心为原点，起点 (size, -size)，向上长 size×1.5（size 为直径）。 从下到上依次为核心（红）、护甲（白）、护盾（蓝），**完全填满**样式： 各段高度
-   * = 条长 × (该层当前容量 / 当前总容量)。
+   * <p>以单位正中心为原点，起点 (size, -size)，向上长 size×1.5（size 为直径）。
+   * 从下到上依次为核心（红）、护甲（白）、护盾（蓝），**完全填满**样式：
+   * 各段高度 = 条长 × (该层当前容量 / 当前总容量)。
    *
-   * <p>护盾段使用**平均容量** = (原始容量 + 等效容量) / 2， 其中等效容量 = 原始容量 × 最大护盾强度（固定系数），用于总容量计算与护盾段显示。
+   * <p>护盾段使用**平均容量** = (原始容量 + 等效容量) / 2，
+   * 其中等效容量 = 原始容量 × 最大护盾强度（固定系数），用于总容量计算与护盾段显示。
    */
   private void drawHealthBar4(Unit u) {
     ShieldAbility shield = u.shield();
@@ -263,11 +273,11 @@ public class UnitRender extends System<UnitRender> {
     float armor = Math.max(0f, u.armor);
 
     // 护盾平均容量
-    // 方案二：E / Smax = C² / Cmax
     float shieldAvg = 0f;
     if (shield != null && shield.max > 0f) {
       float cur = Math.max(0f, shield.current);
-      shieldAvg = (cur * cur) / shield.max;
+      float equiv = cur * shield.maxStrength; // 等效容量 = 原始容量 × 最大护盾强度
+      shieldAvg = (cur + equiv) / 2f;
     }
 
     float total = core + armor + shieldAvg;
@@ -302,6 +312,69 @@ public class UnitRender extends System<UnitRender> {
     if (shieldH > 0f) {
       Draw.color(Color.sky);
       Fill.rect(startX + barW / 2f, startY + coreH + armorH + shieldH / 2f, barW, shieldH);
+    }
+
+    Draw.color();
+  }
+
+  /**
+   * 最终血条样式：单位右边缘垂直条，**固定分段 + 段内独立填充**。
+   *
+   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max，
+   *      各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
+   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充，
+   *      左侧固定、右侧随当前值缩（留出底色）；
+   * <p>3. 护盾段比例用等效容量：等效 = 当前 × 最大护盾强度，
+   *      比例 = 等效 / 最大等效 = 当前/最大（接近线性）。
+   */
+  private void drawHealthBar5(Unit u) {
+    ShieldAbility shield = u.shield();
+
+    float coreMax = Math.max(0f, u.maxHealth);
+    float core = Math.max(0f, u.health);
+    float armorMax = Math.max(0f, u.armorMax);
+    float armor = Math.max(0f, u.armor);
+    float shieldMax = shield == null ? 0f : Math.max(0f, shield.max);
+    float shieldCur = shield == null ? 0f : Math.max(0f, shield.current);
+
+    // 固定分段：总容量用护盾字面最大容量
+    float totalMax = coreMax + armorMax + shieldMax;
+    if (totalMax <= 0f) return;
+
+    // 血条几何（右侧垂直条）
+    float barLen = u.size * 1.5f;
+    float barW = 6f;
+    float startX = u.x + u.size;
+    float startY = u.y - u.size;
+
+    // 底色
+    Draw.color(Color.darkGray);
+    Fill.rect(startX + barW / 2f, startY + barLen / 2f, barW, barLen);
+
+    // 各段宽（固定）
+    float coreSeg = barLen * coreMax / totalMax;
+    float armorSeg = barLen * armorMax / totalMax;
+    float shieldSeg = barLen * shieldMax / totalMax;
+
+    // 核心段（最下，红）：段内按当前/最大填充
+    if (coreSeg > 0f && core > 0f) {
+      float h = coreSeg * (core / coreMax);
+      Draw.color(Color.scarlet);
+      Fill.rect(startX + barW / 2f, startY + h / 2f, barW, h);
+    }
+
+    // 护甲段（中，白）
+    if (armorSeg > 0f && armor > 0f) {
+      float h = armorSeg * (armor / armorMax);
+      Draw.color(Color.lightGray);
+      Fill.rect(startX + barW / 2f, startY + coreSeg + h / 2f, barW, h);
+    }
+
+    // 护盾段（最上，蓝）：用等效容量比例（= 当前/最大，线性）
+    if (shieldSeg > 0f && shieldCur > 0f) {
+      float h = shieldSeg * (shieldCur / shieldMax);
+      Draw.color(Color.sky);
+      Fill.rect(startX + barW / 2f, startY + coreSeg + armorSeg + h / 2f, barW, h);
     }
 
     Draw.color();

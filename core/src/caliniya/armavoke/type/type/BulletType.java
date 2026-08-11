@@ -21,6 +21,18 @@ public class BulletType {
   /** 伤害类型（默认动能）。 */
   public DamageType damageType = DamageType.Kinetic;
 
+  /** 破甲：无视护甲的固定伤害减免（护甲容量照扣）。 */
+  public boolean breakArmor;
+
+  /** 穿甲：直接穿过护甲层攻击核心（必定不能穿盾，数值受限）。 */
+  public boolean bypassArmor;
+
+  /** 破盾：无视护盾的强度减伤（护盾容量照扣）。 */
+  public boolean breakShield;
+
+  /** 穿盾：直接穿过护盾层。 */
+  public boolean bypassShield;
+
   public float lifetime = 600f;
   public float size = 60f;
 

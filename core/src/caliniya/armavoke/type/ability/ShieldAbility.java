@@ -64,12 +64,17 @@ public class ShieldAbility extends Ability {
   }
 
   @Override
-  public float applyDamage(Entity e, float damage, DamageType type) {
+  public float applyDamage(
+      Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
+    // 穿盾：护盾完全不拦截，伤害直接穿过
+    if (bypassShield) return damage;
     if (!active || current <= 0) return damage;
 
     float p = current / max;
     float strength = p * maxStrength;
-    float actual = damage * type.shieldMult * (1f - resist[type.ordinal()]) / strength;
+    // 破盾：无视护盾强度减伤（全伤害扣盾，护盾掉得更快）
+    float reduction = breakShield ? 1f : (1f / strength);
+    float actual = damage * type.shieldMult * (1f - resist[type.ordinal()]) * reduction;
     current -= actual;
     if (current <= 0) current = 0;
 

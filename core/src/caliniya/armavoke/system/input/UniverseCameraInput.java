@@ -36,7 +36,7 @@ public class UniverseCameraInput extends System<UniverseCameraInput>
     Events.run(EventType.events.EnterUV, () -> paused = false);
     Events.run(EventType.events.ExitUV, ()->paused = true);
     paused = true;
-    return super.init();
+    return super.init(false,false);
   }
 
   @Override
