@@ -20,6 +20,7 @@ public class BulletType {
 
   /** 伤害类型（默认动能）。 */
   public DamageType damageType = DamageType.Kinetic;
+
   public float lifetime = 600f;
   public float size = 60f;
 
@@ -60,12 +61,27 @@ public class BulletType {
     // TEST 临时：实弹命中观察日志（Step4 血条 UI 完成后移除）
     ShieldAbility shield = target.shield();
     Log.info(
-        "[实弹测试] 命中 类型=@ 伤害=@ 目标盾=@ 目标护甲=@ 目标血=@",
-        b.type.damageType, b.type.damage, shield == null ? 0f : shield.current, target.armor,
+        "[实弹测试] @→@ 命中前 类型=@ 伤害=@ 盾=@ 甲=@ 血=@",
+        b.owner == null ? "?" : b.owner.team,
+        target.team,
+        b.type.damageType,
+        b.type.damage,
+        shield == null ? 0f : shield.current,
+        target.armor,
         target.health);
+
     target.hit(b);
+
+    ShieldAbility after = target.shield();
+    Log.info(
+        "[实弹测试] @→@ 命中后 盾=@ 甲=@ 血=@",
+        b.owner == null ? "?" : b.owner.team,
+        target.team,
+        after == null ? 0f : after.current,
+        target.armor,
+        target.health);
   }
-  
+
   /** 命中墙壁/消失时的回调 */
   public void despawn(Bullet b) {
     // TODO: 播放消失特效

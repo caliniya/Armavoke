@@ -31,8 +31,14 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public Entity target;
 
   // --- 战斗基础属性（特殊机制如护盾/过热走能力）---
-  /** 护甲强度：固定减伤值（可直接减到 0）。 */
+  /** 当前护甲容量（护甲血条，0 = 无护甲）。 */
   public float armor;
+
+  /** 最大护甲容量。 */
+  public float armorMax;
+
+  /** 护甲强度：固定减伤值（护甲存在时生效，可直接减到 0）。 */
+  public float armorValue;
 
   /** 能量池：当前能量。 */
   public float energy;
@@ -111,11 +117,17 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     }
     if (damage <= 0f) return;
 
-    // 2. 护甲层
-    damage = Math.max(0f, damage * type.armorMult * (1f - armorResist(type)) - armor);
-    if (damage <= 0f) return;
+    // 2. 护甲层（容量 > 0 时存在）
+    if (armor > 0f) {
+      float actual = Math.max(0f, damage * type.armorMult * (1f - armorResist(type)) - armorValue);
+      if (actual <= 0f) return; // 被护甲完全挡下
+      armor -= actual;
+      if (armor < 0f) armor = 0f;
+      return; // 护甲破：剩余伤害不传递
+    }
 
-    // 3. 本体
+    // 3. 本体（无护甲：无抗性减伤、无固定减伤）
+    damage = damage * type.armorMult;
     health -= damage;
     if (health <= 0f) {
       health = 0f;
@@ -142,6 +154,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     health = 0;
     maxHealth = 0;
     armor = 0;
+    armorMax = 0;
+    armorValue = 0;
     energy = 0;
     energyMax = 0;
     energyRegen = 0;

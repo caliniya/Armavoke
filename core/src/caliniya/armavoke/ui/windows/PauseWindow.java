@@ -63,7 +63,9 @@ public class PauseWindow extends Window {
     Unit u = UnitTypes.test.create(TeamTypes.Evoke, 0, 0);
     u.health = 500;
     u.maxHealth = 500;
-    u.armor = 30;
+    u.armor = 500;
+    u.armorMax = 500;
+    u.armorValue = 30;
 
     ShieldAbility shield = new ShieldAbility(500);
     shield.regen = 0;
@@ -84,22 +86,30 @@ public class PauseWindow extends Window {
     u.applyDamage(1000f, DamageType.Kinetic);
     Log.info("[4] 破盾动能1000: 盾=@ 血=@ (预期 盾0/血500, 溢出不传递)", shield.current, u.health);
 
-    // 无盾动能100：100×1.0-30 = 70
+    // 无盾动能100：100×1.0-30 = 70 → 扣护甲容量，血不变
     u.applyDamage(100f, DamageType.Kinetic);
-    Log.info("[5] 无盾动能100: 血=@ (预期 430)", u.health);
+    Log.info("[5] 无盾动能100: 甲=@ 血=@ (预期 甲430/血500)", u.armor, u.health);
 
-    // 无盾热能100：100×1.5-30 = 120
+    // 无盾热能100：100×1.5-30 = 120 → 甲 430-120=310
     u.applyDamage(100f, DamageType.Thermal);
-    Log.info("[6] 无盾热能100: 血=@ (预期 310)", u.health);
+    Log.info("[6] 无盾热能100: 甲=@ 血=@ (预期 甲310/血500)", u.armor, u.health);
 
-    // 低于护甲的伤害完全挡下
+    // 低于护甲强度的伤害完全挡下
     u.applyDamage(10f, DamageType.Kinetic);
-    Log.info("[7] 无盾动能10(<护甲30): 血=@ (预期 310, 完全减伤)", u.health);
+    Log.info("[7] 动能10(<护甲强度30): 甲=@ 血=@ (预期 甲310/血500)", u.armor, u.health);
 
-    // 护甲对动能 50% 抗性：100×1.0×0.5-30 = 20
+    // 护甲对动能 50% 抗性：100×1.0×0.5-30 = 20 → 甲 310-20=290
     u.armorResist[DamageType.Kinetic.ordinal()] = 0.5f;
     u.applyDamage(100f, DamageType.Kinetic);
-    Log.info("[8] 护甲动能抗性50%: 血=@ (预期 290)", u.health);
+    Log.info("[8] 护甲动能抗性50%: 甲=@ 血=@ (预期 甲290/血500)", u.armor, u.health);
+
+    // 打穿护甲：动能1000 → 甲 290-970<0 → 甲0，剩余不传递 → 血不变
+    u.applyDamage(1000f, DamageType.Kinetic);
+    Log.info("[9] 破甲动能1000: 甲=@ 血=@ (预期 甲0/血500, 剩余不传递)", u.armor, u.health);
+
+    // 破甲后本体：动能100 → 无护甲减伤 → 血 500-100=400
+    u.applyDamage(100f, DamageType.Kinetic);
+    Log.info("[10] 破甲后动能100: 血=@ (预期 400)", u.health);
 
     u.remove();
     Log.info("========== 战斗系统测试结束 ==========");

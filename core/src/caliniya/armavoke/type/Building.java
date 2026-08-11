@@ -40,6 +40,8 @@ public class Building extends Entity {
     // 对象池复用防污染：清空能力与战斗基础属性
     abilities.clear();
     armor = 0;
+    armorMax = 0;
+    armorValue = 0;
     energy = 0;
     energyMax = 0;
     energyRegen = 0;
