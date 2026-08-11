@@ -15,6 +15,7 @@ import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.ShieldAbility;
+import caliniya.armavoke.type.ability.ShieldFieldAbility;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.DataIO;
@@ -104,7 +105,7 @@ public class MenuFragment {
                         DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
-                        // UI.Game();
+                      //UI.Game();
                       }));
               menu.row();
 
@@ -118,43 +119,57 @@ public class MenuFragment {
                         Data.load(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             () -> {
-                              // ===== 实弹测试场景（Step3 临时）=====
-                              // 玩家单位：配同样的防护，双方对打便于观察
-                              Unit player = UnitTypes.test.create(TeamTypes.Evoke, 1000, 1000);
-                              player.armor = 500;
-                              player.armorMax = 500;
-                              player.armorValue = 30;
-                              player.energy = 100;
-                              player.energyMax = 100;
-                              player.energyRegen = 10;
-                              ShieldAbility pshield = new ShieldAbility(500);
-                              pshield.regen = 20;
-                              pshield.energyCost = 5;
-                              player.add(pshield);
+                                                            // ===== 力场测试（力场外 vs 力场内）=====
+                              // 玩家单位 A（力场外 1700,1000）：子弹会被敌方力场拦截
+                              Unit playerA = UnitTypes.test.create(TeamTypes.Evoke, 1700, 1000);
+                              playerA.armor = 500;
+                              playerA.armorMax = 500;
+                              playerA.armorValue = 30;
+                              playerA.energy = 100;
+                              playerA.energyMax = 100;
+                              playerA.energyRegen = 10;
+                              ShieldAbility pa = new ShieldAbility(500);
+                              pa.regen = 2;
+                              pa.energyCost = 5;
+                              playerA.add(pa);
 
-                              // 敌方单位：护甲 30 + 满盾 500 + 能量池
+                              // 玩家单位 B（力场内 1050,1000）：子弹不受力场拦截
+                              Unit playerB = UnitTypes.test.create(TeamTypes.Evoke, 1050, 1000);
+                              playerB.armor = 500;
+                              playerB.armorMax = 500;
+                              playerB.armorValue = 30;
+                              playerB.energy = 100;
+                              playerB.energyMax = 100;
+                              playerB.energyRegen = 10;
+                              ShieldAbility pb = new ShieldAbility(500);
+                              pb.regen = 2;
+                              pb.energyCost = 5;
+                              playerB.add(pb);
+
+                              // 敌方单位：护甲 30 + 满盾 500 + 护盾力场
                               Unit enemy = UnitTypes.test.create(TeamTypes.Mutex, 1200, 1000);
-                              enemy.armor = 300;
-                              enemy.armorMax = 300;
-                              enemy.armorValue = 15;
+                              enemy.armor = 500;
+                              enemy.armorMax = 500;
+                              enemy.armorValue = 30;
                               enemy.weapons.clear(); // 只挨打不还手，便于观察
-                              enemy.health = 20;
-                              enemy.maxHealth = 20;
+                              enemy.health = 500;
+                              enemy.maxHealth = 500;
                               enemy.energy = 100;
                               enemy.energyMax = 100;
                               enemy.energyRegen = 10;
                               ShieldAbility shield = new ShieldAbility(500);
-                              shield.regen = 0;
+                              shield.regen = 20;
                               shield.energyCost = 5;
                               enemy.add(shield);
 
+                              // 护盾力场：正六边形，半径 180，拦截进入的子弹
+                              ShieldFieldAbility field = new ShieldFieldAbility(500, 180);
+                              field.regen = 5;
+                              field.cost = 3;
+                              enemy.add(field);
+
                               Log.info(
-                                  "[实弹测试] 敌方生成: 盾=@ 甲=@ 血=@ 减伤=@",
-                                  shield.current,
-                                  enemy.armor,
-                                  enemy.health,
-                                  enemy.armorValue);
-                              Log.info("[实弹测试] 玩家单位(1000,1000) 攻击敌方(1200,1000)，敌方不还手");
+                                  "[力场测试] 敌方(1200,1000) 力场半径180；A(1700,1000)力场外、B(1050,1000)力场内");
                             });
                       }));
               menu.row();

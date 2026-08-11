@@ -15,6 +15,8 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.type.ability.ForceFieldAbility;
+import caliniya.armavoke.type.ability.ShieldAbility;
 
 public class UnitType extends ContentType implements DrawType<Unit>, TechNodeContent {
 
@@ -83,6 +85,76 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     for (Weapon weapon : u.weapons) {
       weapon.type.draw(weapon);
     }
+    Draw.color();
+  }
+
+  /**
+   * 绘制单位血条（默认样式）：单位右边缘垂直条， **固定分段 + 段内独立填充**。
+   *
+   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max， 各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
+   *
+   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充， 左侧固定、右侧随当前值缩；
+   *
+   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。 子类可覆写此方法定制血条。
+   */
+  public void drawHealthBar(Unit u) {
+    ShieldAbility shield = u.shield();
+
+    float coreMax = Math.max(0f, u.maxHealth);
+    float core = Math.max(0f, u.health);
+    float armorMax = Math.max(0f, u.armorMax);
+    float armor = Math.max(0f, u.armor);
+    // 护盾段 = 单体护盾 + 力场护盾 容量之和
+    float shieldMax = 0f, shieldCur = 0f;
+    if (shield != null) {
+      shieldMax += Math.max(0f, shield.max);
+      shieldCur += Math.max(0f, shield.current);
+    }
+    ForceFieldAbility forceField = u.forceField();
+    if (forceField != null) {
+      shieldMax += Math.max(0f, forceField.capacityMax());
+      shieldCur += Math.max(0f, forceField.capacity());
+    }
+
+    float totalMax = coreMax + armorMax + shieldMax;
+    if (totalMax <= 0f) return;
+
+    float barLen = u.size * 1.5f;
+    float barW = 6f;
+    // 以单位中心为原点：血条贴右边缘（半径 0.5×size），垂直居中于单位中心
+    float startX = u.x + u.size * 0.5f;
+    float startY = u.y - u.size * 0.75f; // 下端 -0.75×size，上端 +0.75×size（对称）
+
+    // 底色
+    Draw.color(Color.darkGray);
+    Fill.rect(startX + barW / 2f, startY + barLen / 2f, barW, barLen);
+
+    // 固定分段
+    float coreSeg = barLen * coreMax / totalMax;
+    float armorSeg = barLen * armorMax / totalMax;
+    float shieldSeg = barLen * shieldMax / totalMax;
+
+    // 核心段（最下，红）
+    if (coreSeg > 0f && core > 0f) {
+      float h = coreSeg * (core / coreMax);
+      Draw.color(Color.scarlet);
+      Fill.rect(startX + barW / 2f, startY + h / 2f, barW, h);
+    }
+
+    // 护甲段（中，白）
+    if (armorSeg > 0f && armor > 0f) {
+      float h = armorSeg * (armor / armorMax);
+      Draw.color(Color.lightGray);
+      Fill.rect(startX + barW / 2f, startY + coreSeg + h / 2f, barW, h);
+    }
+
+    // 护盾段（最上，蓝）：等效容量比例（= 当前/最大，线性）
+    if (shieldSeg > 0f && shieldCur > 0f) {
+      float h = shieldSeg * (shieldCur / shieldMax);
+      Draw.color(Color.sky);
+      Fill.rect(startX + barW / 2f, startY + coreSeg + armorSeg + h / 2f, barW, h);
+    }
+
     Draw.color();
   }
 

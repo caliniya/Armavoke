@@ -1,8 +1,11 @@
 package caliniya.armavoke.system.world;
 
 import arc.Core;
+import arc.math.geom.Rect;
 import arc.util.ArcRuntimeException;
 import arc.util.Log;
+import arc.util.Tmp;
+import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.EntityAr;
@@ -66,6 +69,7 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
 
   /** 本帧刚被击杀的实体（由 BulletProcess 写入，GameProcess 读出） */
   private final Ar<Entity> freshKills = new Ar<>(false, 64);
+
   private final Object KILL_LOCK = new Object();
 
   @Override
@@ -185,6 +189,9 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
               });
         });
 
+    // 力场拦截：力场护盾在空间上拦截子弹
+    interceptBullets();
+
     // 批量删除：归还对象池 → 从 EntityAr 注销 → 回收 ID
     toRemove.each(
         b -> {
@@ -203,6 +210,50 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       EntityAr<Bullet> temp = WorldData.bullets;
       WorldData.bullets = renderBuffer;
       renderBuffer = temp;
+    }
+  }
+
+  /**
+   * 力场拦截：遍历力场实体注册表， 用 AABB 粗筛（四叉树）+ 正多边形精判拦截进入力场的子弹。
+   *
+   * <p>被拦截的子弹进入 toRemove，由批量删除统一回收。 无效的力场实体（已死亡/能力关闭）从注册表延迟清理。
+   */
+  private void interceptBullets() {
+    synchronized (ForceFieldAbility.entities) {
+      Ar<Entity> list = ForceFieldAbility.entities;
+      Ar<Entity> toCleanup = null;
+
+      for (int i = 0; i < list.size; i++) {
+        Entity e = list.get(i);
+        ForceFieldAbility field = e == null ? null : e.forceField();
+        if (e == null || e.health <= 0f || field == null || !field.isActive()) {
+          if (toCleanup == null) toCleanup = new Ar<>(false, 4);
+          toCleanup.add(e);
+          continue;
+        }
+
+        Rect aabb = Tmp.r1;
+        field.hitbox(e, aabb);
+        activeBullets.intersect(
+            aabb.x,
+            aabb.y,
+            aabb.width,
+            aabb.height,
+            b -> {
+              if (toRemove.contains(b, true)) return; // 已被命中/拦截
+              if (field.contains(e, b.x, b.y)) {
+                if (field.onBullet(e, b)) {
+                  toRemove.add(b);
+                  // TEST 临时：力场拦截日志
+                  Log.info("[力场] 拦截子弹 伤害=@ 力场余量=@", b.type.damage, field.capacity());
+                }
+              }
+            });
+      }
+
+      if (toCleanup != null) {
+        for (Entity e : toCleanup) list.remove(e, true);
+      }
     }
   }
 

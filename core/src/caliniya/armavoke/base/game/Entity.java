@@ -4,6 +4,7 @@ import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
 import caliniya.armavoke.type.ability.Ability;
+import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
@@ -103,6 +104,14 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public ShieldAbility shield() {
     for (Ability a : abilities) {
       if (a instanceof ShieldAbility s) return s;
+    }
+    return null;
+  }
+
+  /** 获取力场护盾能力（没有则返回 null）。 */
+  public ForceFieldAbility forceField() {
+    for (Ability a : abilities) {
+      if (a instanceof ForceFieldAbility f) return f;
     }
     return null;
   }
