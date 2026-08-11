@@ -68,6 +68,11 @@ public class DataIO {
   }
 
   public static void load(byte[] bytes) {
+    load(bytes, null);
+  }
+
+  /** 从内存数据恢复存档，加载并进入游戏后执行 {@code onEnter}（主线程）。 */
+  public static void load(byte[] bytes, Runnable onEnter) {
     if (!loaded) return;
     try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes))) {
       Reads r = new Reads(in);
@@ -94,6 +99,7 @@ public class DataIO {
                 () -> {
                   Data.loadSystems();
                   Data.enter();
+                  if (onEnter != null) onEnter.run();
                 });
           });
 

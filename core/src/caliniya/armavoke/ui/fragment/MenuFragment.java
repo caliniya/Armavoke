@@ -14,6 +14,7 @@ import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.game.data.RouteData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.DataIO;
@@ -103,7 +104,7 @@ public class MenuFragment {
                         DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
-                      //UI.Game();
+                        // UI.Game();
                       }));
               menu.row();
 
@@ -112,7 +113,37 @@ public class MenuFragment {
                       "test3",
                       () -> {
                         Game.team = TeamTypes.Evoke;
-                        Data.load(Core.settings.getDataDirectory().child("map/space.aevs"));
+
+                        // 保留原读档；加载完成后再放置实弹测试场景
+                        Data.load(
+                            Core.settings.getDataDirectory().child("map/space.aevs"),
+                            () -> {
+                              //WorldData.units.each(u->u.kill());
+                              WorldData.units.clear();
+                              // ===== 实弹测试场景（Step3 临时）=====
+                              // 玩家单位：会自动索敌攻击敌方
+                              UnitTypes.test.create(TeamTypes.Evoke, 200, 200);
+
+                              // 敌方单位：护甲 30 + 满盾 500 + 能量池
+                              Unit enemy = UnitTypes.test.create(TeamTypes.Mutex, 400, 200);
+                              enemy.armor = 30;
+                              enemy.health = 500;
+                              enemy.maxHealth = 500;
+                              enemy.energy = 100;
+                              enemy.energyMax = 100;
+                              enemy.energyRegen = 10;
+                              ShieldAbility shield = new ShieldAbility(500);
+                              shield.regen = 20;
+                              shield.energyCost = 5;
+                              enemy.add(shield);
+
+                              Log.info(
+                                  "[实弹测试] 敌方生成: 盾=@ 血=@ 护甲=@",
+                                  shield.current,
+                                  enemy.health,
+                                  enemy.armor);
+                              Log.info("[实弹测试] 玩家单位(200,200) 会自动攻击敌方(400,200)");
+                            });
                       }));
               menu.row();
 

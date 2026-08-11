@@ -106,6 +106,13 @@ public class Unit extends Entity {
 
     canShoot = true; // 单位一般情况都是可以射击的
 
+    // 对象池复用防污染：清空能力与战斗基础属性
+    abilities.clear();
+    armor = 0;
+    energy = 0;
+    energyMax = 0;
+    energyRegen = 0;
+
     weapons.clear();
     mainFixedWeapon = null;
     for (WeaponType wType : type.weapons) {
@@ -196,6 +203,8 @@ public class Unit extends Entity {
 
   @Override
   public void update(float dt) {
+    updateBase(dt);
+
     float oldX = this.x;
     float oldY = this.y;
     float oldRot = this.rotation;

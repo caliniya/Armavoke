@@ -37,6 +37,13 @@ public class Building extends Entity {
 
     this.angle = angle % 4;
 
+    // 对象池复用防污染：清空能力与战斗基础属性
+    abilities.clear();
+    armor = 0;
+    energy = 0;
+    energyMax = 0;
+    energyRegen = 0;
+
     // 初始化坐标
     this.x = (tx * WorldData.TILE_SIZE) + block.psize / 2;
     this.y = (ty * WorldData.TILE_SIZE) + block.psize / 2;
@@ -62,6 +69,7 @@ public class Building extends Entity {
 
   @Override
   public void update(float dt) {
+    updateBase(dt);
     block.update(this, dt);
   }
 

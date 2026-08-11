@@ -3,19 +3,20 @@ package caliniya.armavoke.base.game;
 import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
+import caliniya.armavoke.type.ability.Ability;
+import caliniya.armavoke.type.ability.ShieldAbility;
+import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.module.ItemModule;
+import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
 
-/**
- * 游戏实体基类。
- * 实现了 {@link QuadTreeObject} 以便放入 EntityGroup 的四叉树空间索引。
- */
+/** 游戏实体基类。 实现了 {@link QuadTreeObject} 以便放入 EntityGroup 的四叉树空间索引。 */
 public abstract class Entity implements Poolable, QuadTreeObject {
 
   // --- 公共坐标 ---
-  public float x, y ;
+  public float x, y;
 
   // --- 公共状态 ---
   public volatile float health;
@@ -25,35 +26,109 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   // --- 公共组件 ---
   public ItemModule item;
-  
+
   // 此实体所锁定的目标
   public Entity target;
+
+  // --- 战斗基础属性（特殊机制如护盾/过热走能力）---
+  /** 护甲强度：固定减伤值（可直接减到 0）。 */
+  public float armor;
+
+  /** 能量池：当前能量。 */
+  public float energy;
+
+  /** 能量池上限。 */
+  public float energyMax;
+
+  /** 能量恢复速率（每秒）。 */
+  public float energyRegen;
+
+  /** 护甲对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
+  public float[] armorResist = new float[DamageType.values().length];
+
+  /** 护甲对指定伤害类型的抗性（0~1）。 */
+  public float armorResist(DamageType type) {
+    return armorResist[type.ordinal()];
+  }
+
+  /** 能力列表：护盾/过热等可组合能力，默认不带。 */
+  public final Ar<Ability> abilities = new Ar<>();
+
+  /** 附加一个能力。 */
+  public void add(Ability ability) {
+    if (ability != null) abilities.add(ability);
+  }
 
   public Entity() {}
 
   public abstract void update(float dt);
+
   public abstract void draw();
+
   public abstract void remove();
+
   public abstract void kill();
+
   public abstract void write(Writes w);
+
   public abstract void read(Reads r);
-  public void hit(Bullet b){
-    health -= b.type.damage;
+
+  public void hit(Bullet b) {
+    applyDamage(b.type.damage, b.type.damageType);
+  }
+
+  /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
+  public void updateBase(float dt) {
+    if (energy < energyMax) {
+      energy = Math.min(energyMax, energy + energyRegen * dt);
+    }
+    for (Ability a : abilities) {
+      a.update(this, dt);
+    }
+  }
+
+  /** 获取护盾能力（没有则返回 null）。 */
+  public ShieldAbility shield() {
+    for (Ability a : abilities) {
+      if (a instanceof ShieldAbility s) return s;
+    }
+    return null;
   }
 
   /**
-   * 返回实体的碰撞盒尺寸（直径）。
-   * 子类应该覆盖此方法以提供准确的碰撞体大小。
-   * 默认返回 8 像素。
+   * 对实体造成一次伤害（三层结算：能力拦截 → 护甲 → 本体）。
+   *
+   * <ol>
+   *   <li>每个能力依次拦截（护盾吸收等），返回穿透到下一层的伤害；
+   *   <li>护甲层：对甲倍率 × (1 - 护甲对该类型抗性)，再减护甲强度（最低 0）；
+   *   <li>本体扣血，归零摧毁。
+   * </ol>
    */
+  public void applyDamage(float damage, DamageType type) {
+    // 1. 能力拦截（护盾等），全部吸收则直接结束
+    for (Ability a : abilities) {
+      damage = a.applyDamage(this, damage, type);
+    }
+    if (damage <= 0f) return;
+
+    // 2. 护甲层
+    damage = Math.max(0f, damage * type.armorMult * (1f - armorResist(type)) - armor);
+    if (damage <= 0f) return;
+
+    // 3. 本体
+    health -= damage;
+    if (health <= 0f) {
+      health = 0f;
+      kill();
+    }
+  }
+
+  /** 返回实体的碰撞盒尺寸（直径）。 子类应该覆盖此方法以提供准确的碰撞体大小。 默认返回 8 像素。 */
   public float hitboxSize() {
     return 8f;
   }
 
-  /**
-   * 填充实体的粗略包围盒。
-   * 该包围盒不能小于实体实际范围，但可以偏大。
-   */
+  /** 填充实体的粗略包围盒。 该包围盒不能小于实体实际范围，但可以偏大。 */
   @Override
   public void hitbox(Rect out) {
     float half = hitboxSize() / 2f;
@@ -66,6 +141,12 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     y = 0;
     health = 0;
     maxHealth = 0;
+    armor = 0;
+    energy = 0;
+    energyMax = 0;
+    energyRegen = 0;
+    java.util.Arrays.fill(armorResist, 0f);
+    abilities.clear();
     team = null;
     item = null;
     target = null;

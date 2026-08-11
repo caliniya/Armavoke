@@ -38,7 +38,12 @@ public class Data {
   // 从指定文件加载整个地图，使用异步
   // 这一步仅加载所有数据，理论上讲 不应该影响任何游戏界面
   public static void load(Fi file) {
-    GameIO.load(file, d -> DataIO.load(d));
+    load(file, null);
+  }
+
+  /** 加载整个地图，加载并进入游戏后执行 onEnter（主线程）。 */
+  public static void load(Fi file, Runnable onEnter) {
+    GameIO.load(file, d -> DataIO.load(d, onEnter));
   }
 
   // 这个方法会加载所有的系统
@@ -82,9 +87,9 @@ public class Data {
       Game.starMap.link(A, B);
     }
 
-    //Log.info(Render.universeCamera.position);
-    //Log.info(Render.universeCamera.width + "  " + Render.universeCamera.height);
-    //Log.info(Game.starMap.tree);
+    // Log.info(Render.universeCamera.position);
+    // Log.info(Render.universeCamera.width + "  " + Render.universeCamera.height);
+    // Log.info(Game.starMap.tree);
     /*
     Game.starMap.nodeSet.each(n->{
       Log.info(n.x +"   "+n.y);

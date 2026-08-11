@@ -7,6 +7,8 @@ import arc.math.Angles;
 import arc.Core;
 import arc.util.Log;
 import caliniya.armavoke.base.game.Entity;
+import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.ui.Fonts;
@@ -15,6 +17,9 @@ public class BulletType {
 
   public float speed = 6f;
   public float damage = 50f;
+
+  /** 伤害类型（默认动能）。 */
+  public DamageType damageType = DamageType.Kinetic;
   public float lifetime = 600f;
   public float size = 60f;
 
@@ -52,6 +57,12 @@ public class BulletType {
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
+    // TEST 临时：实弹命中观察日志（Step4 血条 UI 完成后移除）
+    ShieldAbility shield = target.shield();
+    Log.info(
+        "[实弹测试] 命中 类型=@ 伤害=@ 目标盾=@ 目标护甲=@ 目标血=@",
+        b.type.damageType, b.type.damage, shield == null ? 0f : shield.current, target.armor,
+        target.health);
     target.hit(b);
   }
   
