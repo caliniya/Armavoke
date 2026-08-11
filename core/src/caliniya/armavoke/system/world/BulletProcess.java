@@ -4,7 +4,6 @@ import arc.Core;
 import arc.math.geom.Rect;
 import arc.util.ArcRuntimeException;
 import arc.util.Log;
-import arc.util.Tmp;
 import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
@@ -74,7 +73,17 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
 
   @Override
   public BulletProcess init() {
+    // 内部子弹四叉树必须 resize 到世界大小，否则 intersect 查不到子弹
+    if (WorldData.world != null) {
+      activeBullets.resize(
+          0f, 0f, WorldData.world.W * WorldData.TILE_SIZE, WorldData.world.H * WorldData.TILE_SIZE);
+    }
     return super.init(true);
+  }
+
+  /** 世界尺寸变化时重新设置内部子弹四叉树范围（由 WorldData 调用）。 */
+  public void resizeTree(float w, float h) {
+    activeBullets.resize(0f, 0f, w, h);
   }
 
   /** 添加子弹（线程安全） 会自动为子弹分配唯一ID */
@@ -218,7 +227,17 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
    *
    * <p>被拦截的子弹进入 toRemove，由批量删除统一回收。 无效的力场实体（已死亡/能力关闭）从注册表延迟清理。
    */
+  /** 力场拦截复用的 AABB（后台线程专用，避免与其他线程的 Tmp 竞争）。 */
+  private final Rect aabbRect = new Rect();
+
+  /** 诊断用：拦截帧计数。 */
+  private int interceptFrames = 0;
+
   private void interceptBullets() {
+    // TEST 诊断：每 120 帧（约 2 秒）打印注册表大小，确认拦截循环在跑
+    if (++interceptFrames % 120 == 1) {
+      Log.info("[力场诊断] 注册表实体数=@", ForceFieldAbility.entities.size);
+    }
     synchronized (ForceFieldAbility.entities) {
       Ar<Entity> list = ForceFieldAbility.entities;
       Ar<Entity> toCleanup = null;
@@ -232,13 +251,12 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
           continue;
         }
 
-        Rect aabb = Tmp.r1;
-        field.hitbox(e, aabb);
+        field.hitbox(e, aabbRect);
         activeBullets.intersect(
-            aabb.x,
-            aabb.y,
-            aabb.width,
-            aabb.height,
+            aabbRect.x,
+            aabbRect.y,
+            aabbRect.width,
+            aabbRect.height,
             b -> {
               if (toRemove.contains(b, true)) return; // 已被命中/拦截
               if (field.contains(e, b.x, b.y)) {

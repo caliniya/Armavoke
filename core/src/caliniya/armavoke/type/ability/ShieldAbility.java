@@ -14,7 +14,8 @@ import caliniya.armavoke.base.type.DamageType;
  * 实际受伤比例 = 1 / I            （护盾存在时，伤害 × 此比例）
  * </pre>
  *
- * 开启时每秒消耗固定能量并回充；能量不足以维持时自动关闭。 容量为 0 时护盾层不参与计算；破盾的溢出伤害不传递到下一层。
+ * 开启时每秒消耗固定能量并回充；能量不足以维持时自动关闭。
+ * 容量为 0 时护盾层不参与计算；破盾的溢出伤害不传递到下一层。
  */
 public class ShieldAbility extends Ability {
 
@@ -64,8 +65,7 @@ public class ShieldAbility extends Ability {
   }
 
   @Override
-  public float applyDamage(
-      Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
+  public float applyDamage(Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
     // 穿盾：护盾完全不拦截，伤害直接穿过
     if (bypassShield) return damage;
     if (!active || current <= 0) return damage;
@@ -79,6 +79,16 @@ public class ShieldAbility extends Ability {
     if (current <= 0) current = 0;
 
     return 0; // 破盾溢出不传递
+  }
+
+  /** 当前护盾容量。 */
+  public float capacity() {
+    return current;
+  }
+
+  /** 最大护盾容量。 */
+  public float capacityMax() {
+    return max;
   }
 
   /** 当前容量比例（0 ~ 1），用于血条显示。 */

@@ -8,6 +8,7 @@ import caliniya.armavoke.core.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.system.render.*;
+import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.world.*;
 import arc.math.*;
 import caliniya.armavoke.type.*;
@@ -32,15 +33,15 @@ public class WorldData {
   @SuppressWarnings("unchecked")
   public static void initWorld(int w, int h, boolean space) {
     Game.team = TeamTypes.Evoke;
-    
+
     units = new EntityAr<>(unit -> unit.id);
     buildings = new EntityAr<>(building -> building.id);
     moveunits = new EntityAr<>(unit -> unit.id);
     bullets = new EntityAr<>(bullet -> bullet.id);
-    
+
     world = new World(w, h, space);
     world.init();
-    
+
     Teams.init();
 
     RouteData.init();
@@ -56,6 +57,8 @@ public class WorldData {
     if (buildings != null) buildings.resize(0, 0, worldPixelW, worldPixelH);
     if (moveunits != null) moveunits.resize(0, 0, worldPixelW, worldPixelH);
     if (bullets != null) bullets.resize(0, 0, worldPixelW, worldPixelH);
+    // 同步子弹处理系统的内部子弹树（力场拦截等依赖它的 intersect）
+    if (Systems.BP != null) Systems.BP.resizeTree(worldPixelW, worldPixelH);
   }
 
   public static void clear() {

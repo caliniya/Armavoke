@@ -9,7 +9,12 @@ import caliniya.armavoke.base.type.DamageType;
  * <p>特殊机制（护盾、过热等）都做成能力，可组合地附加到单位或建筑上，默认不带。
  */
 public abstract class Ability {
-
+  
+  //当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
+  public Ability oncteate(Entity e){
+    return this;
+  }
+  
   /** 每帧逻辑：回充、耗能、积累热量等。 */
   public void update(Entity e, float dt) {}
 

@@ -89,13 +89,15 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   }
 
   /**
-   * 绘制单位血条（默认样式）：单位右边缘垂直条， **固定分段 + 段内独立填充**。
+   * 绘制单位血条（默认样式）：单位右边缘垂直条，
+   * **固定分段 + 段内独立填充**。
    *
-   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max， 各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
-   *
-   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充， 左侧固定、右侧随当前值缩；
-   *
-   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。 子类可覆写此方法定制血条。
+   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max，
+   *      各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
+   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充，
+   *      左侧固定、右侧随当前值缩；
+   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。
+   * 子类可覆写此方法定制血条。
    */
   public void drawHealthBar(Unit u) {
     ShieldAbility shield = u.shield();
@@ -104,17 +106,9 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     float core = Math.max(0f, u.health);
     float armorMax = Math.max(0f, u.armorMax);
     float armor = Math.max(0f, u.armor);
-    // 护盾段 = 单体护盾 + 力场护盾 容量之和
-    float shieldMax = 0f, shieldCur = 0f;
-    if (shield != null) {
-      shieldMax += Math.max(0f, shield.max);
-      shieldCur += Math.max(0f, shield.current);
-    }
-    ForceFieldAbility forceField = u.forceField();
-    if (forceField != null) {
-      shieldMax += Math.max(0f, forceField.capacityMax());
-      shieldCur += Math.max(0f, forceField.capacity());
-    }
+    // 护盾段 = 所有护盾能力容量之和（单体护盾 + 力场等）
+    float shieldMax = Math.max(0f, u.totalShieldMax());
+    float shieldCur = Math.max(0f, u.totalShield());
 
     float totalMax = coreMax + armorMax + shieldMax;
     if (totalMax <= 0f) return;

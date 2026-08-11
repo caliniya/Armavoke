@@ -70,7 +70,7 @@ public class PauseWindow extends Window {
     ShieldAbility shield = new ShieldAbility(500);
     shield.regen = 0;
     shield.energyCost = 0;
-    u.add(shield);
+    u.addAbility(shield);
 
     Log.info("[1] 初始: 盾=@ 血=@ (预期 盾500/血500)", shield.current, u.health);
 

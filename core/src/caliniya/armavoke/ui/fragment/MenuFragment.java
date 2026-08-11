@@ -105,7 +105,7 @@ public class MenuFragment {
                         DataIO.setSave(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             new StringMap(tag));
-                      //UI.Game();
+                        // UI.Game();
                       }));
               menu.row();
 
@@ -119,7 +119,7 @@ public class MenuFragment {
                         Data.load(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             () -> {
-                                                            // ===== 力场测试（力场外 vs 力场内）=====
+                              // ===== 力场测试（力场外 vs 力场内）=====
                               // 玩家单位 A（力场外 1700,1000）：子弹会被敌方力场拦截
                               Unit playerA = UnitTypes.test.create(TeamTypes.Evoke, 1700, 1000);
                               playerA.armor = 500;
@@ -131,7 +131,7 @@ public class MenuFragment {
                               ShieldAbility pa = new ShieldAbility(500);
                               pa.regen = 2;
                               pa.energyCost = 5;
-                              playerA.add(pa);
+                              playerA.addAbility(pa);
 
                               // 玩家单位 B（力场内 1050,1000）：子弹不受力场拦截
                               Unit playerB = UnitTypes.test.create(TeamTypes.Evoke, 1050, 1000);
@@ -144,7 +144,7 @@ public class MenuFragment {
                               ShieldAbility pb = new ShieldAbility(500);
                               pb.regen = 2;
                               pb.energyCost = 5;
-                              playerB.add(pb);
+                              playerB.addAbility(pb);
 
                               // 敌方单位：护甲 30 + 满盾 500 + 护盾力场
                               Unit enemy = UnitTypes.test.create(TeamTypes.Mutex, 1200, 1000);
@@ -157,16 +157,17 @@ public class MenuFragment {
                               enemy.energy = 100;
                               enemy.energyMax = 100;
                               enemy.energyRegen = 10;
+                              /*
                               ShieldAbility shield = new ShieldAbility(500);
                               shield.regen = 20;
                               shield.energyCost = 5;
-                              enemy.add(shield);
+                              enemy.add(shield);*/
 
                               // 护盾力场：正六边形，半径 180，拦截进入的子弹
                               ShieldFieldAbility field = new ShieldFieldAbility(500, 180);
                               field.regen = 5;
                               field.cost = 3;
-                              enemy.add(field);
+                              enemy.addAbility(field);
 
                               Log.info(
                                   "[力场测试] 敌方(1200,1000) 力场半径180；A(1700,1000)力场外、B(1050,1000)力场内");

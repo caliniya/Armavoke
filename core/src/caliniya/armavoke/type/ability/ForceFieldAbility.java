@@ -33,7 +33,14 @@ public abstract class ForceFieldAbility extends Ability {
   public boolean isActive() {
     return true;
   }
-
+  
+  @Override
+  public Ability oncteate(Entity e) {
+    entities.add(e);
+    return this;
+  }
+  
+  
   @Override
   public void update(Entity e, float dt) {
     // 注册表维护：生效时注册实体，失效时注销

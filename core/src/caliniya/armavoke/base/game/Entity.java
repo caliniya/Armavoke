@@ -13,11 +13,14 @@ import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
 
-/** 游戏实体基类。 实现了 {@link QuadTreeObject} 以便放入 EntityGroup 的四叉树空间索引。 */
+/**
+ * 游戏实体基类。
+ * 实现了 {@link QuadTreeObject} 以便放入 EntityGroup 的四叉树空间索引。
+ */
 public abstract class Entity implements Poolable, QuadTreeObject {
 
   // --- 公共坐标 ---
-  public float x, y;
+  public float x, y ;
 
   // --- 公共状态 ---
   public volatile float health;
@@ -62,32 +65,22 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public final Ar<Ability> abilities = new Ar<>();
 
   /** 附加一个能力。 */
-  public void add(Ability ability) {
-    if (ability != null) abilities.add(ability);
+  public void addAbility(Ability ability) {
+    if (ability != null) abilities.add(ability.oncteate(this));
   }
 
   public Entity() {}
 
   public abstract void update(float dt);
-
   public abstract void draw();
-
   public abstract void remove();
-
   public abstract void kill();
-
   public abstract void write(Writes w);
-
   public abstract void read(Reads r);
-
-  public void hit(Bullet b) {
+  public void hit(Bullet b){
     applyDamage(
-        b.type.damage,
-        b.type.damageType,
-        b.type.breakArmor,
-        b.type.bypassArmor,
-        b.type.breakShield,
-        b.type.bypassShield);
+        b.type.damage, b.type.damageType,
+        b.type.breakArmor, b.type.bypassArmor, b.type.breakShield, b.type.bypassShield);
   }
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
@@ -116,13 +109,39 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     return null;
   }
 
+  /** 所有护盾能力（单体护盾 + 力场等）的当前总容量。 */
+  public float totalShield() {
+    float total = 0f;
+    for (Ability a : abilities) {
+      if (a instanceof ShieldAbility s) {
+        total += s.capacity();
+      } else if (a instanceof ForceFieldAbility f) {
+        total += f.capacity();
+      }
+    }
+    return total;
+  }
+
+  /** 所有护盾能力的最大总容量。 */
+  public float totalShieldMax() {
+    float total = 0f;
+    for (Ability a : abilities) {
+      if (a instanceof ShieldAbility s) {
+        total += s.capacityMax();
+      } else if (a instanceof ForceFieldAbility f) {
+        total += f.capacityMax();
+      }
+    }
+    return total;
+  }
+
   /**
    * 对实体造成一次伤害（三层结算：能力拦截 → 护甲 → 本体）。
    *
    * <ol>
-   *   <li>每个能力依次拦截（护盾吸收等），返回穿透到下一层的伤害；
-   *   <li>护甲层：对甲倍率 × (1 - 护甲对该类型抗性)，再减护甲强度（最低 0）；
-   *   <li>本体扣血，归零摧毁。
+   *   <li>每个能力依次拦截（护盾吸收等），返回穿透到下一层的伤害；</li>
+   *   <li>护甲层：对甲倍率 × (1 - 护甲对该类型抗性)，再减护甲强度（最低 0）；</li>
+   *   <li>本体扣血，归零摧毁。</li>
    * </ol>
    */
   public void applyDamage(float damage, DamageType type) {
@@ -132,18 +151,14 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   /**
    * 对实体造成一次伤害（三层结算：能力拦截 → 护甲 → 本体）。
    *
-   * @param breakArmor 破甲：无视护甲的固定减伤值（护甲容量照扣）
+   * @param breakArmor  破甲：无视护甲的固定减伤值（护甲容量照扣）
    * @param bypassArmor 穿甲：直接穿过护甲层攻击核心
-   * @param breakShield 破盾：无视护盾的强度减伤（护盾容量照扣）
+   * @param breakShield  破盾：无视护盾的强度减伤（护盾容量照扣）
    * @param bypassShield 穿盾：直接穿过护盾层
    */
   public void applyDamage(
-      float damage,
-      DamageType type,
-      boolean breakArmor,
-      boolean bypassArmor,
-      boolean breakShield,
-      boolean bypassShield) {
+      float damage, DamageType type,
+      boolean breakArmor, boolean bypassArmor, boolean breakShield, boolean bypassShield) {
     // 1. 能力拦截（护盾等），全部吸收则直接结束
     for (Ability a : abilities) {
       damage = a.applyDamage(this, damage, type, breakShield, bypassShield);
@@ -169,12 +184,19 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     }
   }
 
-  /** 返回实体的碰撞盒尺寸（直径）。 子类应该覆盖此方法以提供准确的碰撞体大小。 默认返回 8 像素。 */
+  /**
+   * 返回实体的碰撞盒尺寸（直径）。
+   * 子类应该覆盖此方法以提供准确的碰撞体大小。
+   * 默认返回 8 像素。
+   */
   public float hitboxSize() {
     return 8f;
   }
 
-  /** 填充实体的粗略包围盒。 该包围盒不能小于实体实际范围，但可以偏大。 */
+  /**
+   * 填充实体的粗略包围盒。
+   * 该包围盒不能小于实体实际范围，但可以偏大。
+   */
   @Override
   public void hitbox(Rect out) {
     float half = hitboxSize() / 2f;
