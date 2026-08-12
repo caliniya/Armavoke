@@ -26,6 +26,7 @@ public class HeatAbility extends Ability {
   
   @Override
   public Ability oncteate(Entity e) {
+    e.heatSpeed = heatSpeed;
     e.heatable = true;
     e.heatMax = heatMax;
     return super.oncteate(e);
@@ -40,10 +41,14 @@ public class HeatAbility extends Ability {
     super("heat");
     this.heatMax = heatMax;
   }
-
+  
+  // 对于过热锁定 只能在这里进行
   @Override
   public void update(Entity e, float dt) {
     heat = e.heat;
+    if(heat > heatMax) {
+    	e.locked = true;
+    }
   }
 
   /** 当前热量比例（0~1），用于热量条显示。 */

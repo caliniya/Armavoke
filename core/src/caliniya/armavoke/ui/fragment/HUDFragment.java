@@ -37,6 +37,7 @@ public class HUDFragment {
   private Button moveBtn, stopBtn;
   private Element healthBarElement; // 复用的血条元素
   private Element energyBarElement; // 复用的能量条元素
+  private Element heatBarElement; // 复用的热量条元素
   private Unit selectedUnit; // 血条当前绑定的单位
 
   //  A左上  B左下
@@ -227,6 +228,9 @@ public class HUDFragment {
       if (u.energyMax > 0f) {
         unitInfoTable.add(energyBar()).growX().height(10f).left().padTop(0f).row();
       }
+      if (u.heatable && u.heatMax > 0f) {
+        unitInfoTable.add(heatBar()).growX().height(10f).left().padTop(2f).row();
+      }
     } else {
       selectedUnit = null;
       for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
@@ -334,7 +338,7 @@ public class HUDFragment {
               if (ratio > 0f) {
                 float fw = w * ratio;
                 Draw.color(Pal.light);
-                Fill.rect(x + fw / 2f,(y + h / 2f), fw, h);
+                Fill.rect(x + fw / 2f, (y + h / 2f), fw, h);
               }
 
               Draw.color();
@@ -342,6 +346,44 @@ public class HUDFragment {
           };
     }
     return energyBarElement;
+  }
+
+  /** 整合热量条元素（复用一个实例，绘制时读取 selectedUnit）。 */
+  private Element heatBar() {
+    if (heatBarElement == null) {
+      heatBarElement =
+          new Element() {
+            {
+              setSize(10f, 10f);
+            }
+
+            @Override
+            public void draw() {
+              if (selectedUnit == null || !selectedUnit.heatable || selectedUnit.heatMax <= 0f)
+                return;
+              float x = this.x;
+              float y = this.y;
+              float w = getWidth();
+              float h = getHeight();
+
+              Unit u = selectedUnit;
+              float ratio = Math.min(1f, Math.max(0f, u.heat) / u.heatMax);
+
+              // 底色（空条槽位）
+              Draw.color(Color.darkGray);
+              Fill.rect(x + w / 2f, y + h / 2f, w, h);
+              // 橙色填充，从左往右（过热时满条）
+              if (ratio > 0f) {
+                float fw = w * ratio;
+                Draw.color(Color.orange);
+                Fill.rect(x + fw / 2f, y + h / 2f, fw, h);
+              }
+
+              Draw.color();
+            }
+          };
+    }
+    return heatBarElement;
   }
 
   private void updateRightPanel() {

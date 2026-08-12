@@ -186,11 +186,13 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       Fill.rect(startX + barW / 2f, startY + coreSeg + armorSeg + h / 2f, barW, h);
     }
 
-    // --- 能量条（紧贴血条右侧，与血条等长，从下往上填充）---
+    // --- 能量条 + 热量条（血条右侧副条，从下往上填充）---
+    float gap = -1f; // 条间距
+    float energyW = 5f; // 能量条宽度
+    float heatW = 3f; // 热量条宽度
+    float energyX = startX + barW + gap; // 能量条左缘
+
     if (u.energyMax > 0f) {
-      float gap = -1f; // 条间距
-      float energyW = 5f; // 副条宽度（比血条细）
-      float energyX = startX + barW + gap; // 能量条左缘
       float energy = Math.max(0f, u.energy);
       float energyH = barLen * Math.min(1f, energy / u.energyMax);
 
@@ -204,8 +206,18 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       }
     }
 
-    // --- 热量条（预留）：未来单位附加了 HeatAbility 时在此绘制，
-    //     位于能量条右侧（gap 同能量条），橙红色，比例 = heat/heatMax ---
+    // 热量条：仅有过热机制（heatable 且上限 > 0）的单位显示，位于能量条右侧
+    if (u.heatable && u.heatMax > 0f) {
+      float heatX = u.energyMax > 0f ? energyX + energyW + gap : energyX;
+      float heatH = barLen * Math.min(1f, Math.max(0f, u.heat) / u.heatMax);
+
+      Draw.color(Color.darkGray);
+      Fill.rect(heatX + heatW / 2f, startY + barLen / 2f, heatW, barLen);
+      if (heatH > 0f) {
+        Draw.color(Color.orange);
+        Fill.rect(heatX + heatW / 2f, startY + heatH / 2f, heatW, heatH);
+      }
+    }
 
     Draw.color();
   }

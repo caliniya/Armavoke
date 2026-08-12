@@ -58,7 +58,7 @@ public class UnitTypes {
             this.abilities.add(
                 new HeatAbility(100f) {
                   {
-                    this.heatSpeed = 5f;
+                    this.heatSpeed = 10f;
                   }
                 });
           }
