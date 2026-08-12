@@ -15,6 +15,9 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
+import caliniya.armavoke.core.meta.stat.Stat;
+import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
 
@@ -41,6 +44,8 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   // 渲染资源
   public TextureRegion region, cell;
 
+  public StatStack stat;
+
   public UnitType(String name) {
     super(name, CType.Unit);
   }
@@ -48,6 +53,11 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   @Override
   public TechNodeContent[] requirements() {
     return requirements; // ContentType 里的前置字段（默认 null）
+  }
+
+  /** 类型统计信息（meta），用于详情窗口展示。 */
+  public StatStack stats() {
+    return stat;
   }
 
   // 加载资源 (在 Assets 加载完成后调用)
@@ -58,6 +68,9 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     for (WeaponType weapon : weapons) {
       weapon.load(name);
     }
+    stat = new StatStack();
+    stat.add(Stat.health, health, StatUnit.none);
+    stat.add(Stat.speed, speed, StatUnit.tilesSecond);
   }
 
   public Unit create(TeamTypes team, float x, float y) {
@@ -89,15 +102,13 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   }
 
   /**
-   * 绘制单位血条（默认样式）：单位右边缘垂直条，
-   * **固定分段 + 段内独立填充**。
+   * 绘制单位血条（默认样式）：单位右边缘垂直条， **固定分段 + 段内独立填充**。
    *
-   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max，
-   *      各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
-   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充，
-   *      左侧固定、右侧随当前值缩；
-   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。
-   * 子类可覆写此方法定制血条。
+   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max， 各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
+   *
+   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充， 左侧固定、右侧随当前值缩；
+   *
+   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。 子类可覆写此方法定制血条。
    */
   public void drawHealthBar(Unit u) {
     ShieldAbility shield = u.shield();

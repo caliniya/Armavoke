@@ -45,6 +45,7 @@ public class ShieldFieldAbility extends ForceFieldAbility {
     this.max = max;
     this.current = max;
     this.radius = radius;
+    this.toggleable = true;
   }
 
   @Override
@@ -53,14 +54,17 @@ public class ShieldFieldAbility extends ForceFieldAbility {
   }
 
   @Override
+  public float energyUse() {
+    return active ? cost : 0;
+  }
+
   protected void updateField(Entity e, float dt) {
     if (!active) return;
-    float c = cost * dt;
-    if (c > 0 && e.energy < c) {
-      active = false; // 能量不足自动关闭
+    // 能量扣减由 Entity.updateBase 统一按净回复处理
+    if (cost > 0 && e.energy <= 0) {
+      active = false; // 能量耗尽自动关闭
       return;
     }
-    e.energy -= c;
     current = Math.min(max, current + regen * dt);
     // 力场保持静止（如需旋转可手动设置 rotation）
   }

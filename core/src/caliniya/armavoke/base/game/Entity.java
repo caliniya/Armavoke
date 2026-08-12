@@ -92,8 +92,14 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
   public void updateBase(float dt) {
-    if (energy < energyMax) {
-      energy = Math.min(energyMax, energy + energyRegen * dt);
+    // 净回复 = 基础回复 - 所有激活能力的能耗（避免能量条在满值附近抖动）
+    float use = 0f;
+    for (Ability a : abilities) {
+      use += a.energyUse();
+    }
+    float net = energyRegen - use;
+    if (net != 0f) {
+      energy = Math.min(energyMax, energy + net * dt);
     }
     for (Ability a : abilities) {
       a.update(this, dt);

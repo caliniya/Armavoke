@@ -26,6 +26,11 @@ public abstract class Ability {
     this.enabled = enabled;
   }
 
+  /** 能力激活时每秒消耗的能量。由 Entity 的净回复统一扣除，避免能量条抖动。 */
+  public float energyUse() {
+    return 0;
+  }
+
   /** 每帧逻辑：回充、耗能、积累热量等。 */
   public void update(Entity e, float dt) {}
 

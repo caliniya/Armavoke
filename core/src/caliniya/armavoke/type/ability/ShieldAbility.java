@@ -53,19 +53,22 @@ public class ShieldAbility extends Ability {
   public ShieldAbility(float max) {
     this.max = max;
     this.current = max;
+    this.toggleable = true;
   }
 
   @Override
+  public float energyUse() {
+    return active ? energyCost : 0;
+  }
+
   public void update(Entity e, float dt) {
     if (!active) return;
-
-    float cost = energyCost * dt;
-    if (cost > 0 && e.energy < cost) {
-      // 能量不足以维持 → 自动关闭
+    // 能量扣减由 Entity.updateBase 统一按净回复处理（避免能量条抖动）
+    if (energyCost > 0 && e.energy <= 0) {
+      // 能量耗尽 → 自动关闭
       active = false;
       return;
     }
-    e.energy -= cost;
     current = Math.min(max, current + regen * dt);
   }
 

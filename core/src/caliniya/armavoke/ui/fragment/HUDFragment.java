@@ -123,9 +123,10 @@ public class HUDFragment {
     // 顶部：指挥信息 + 清空选择
     Table topRow = new Table();
     topRow.defaults().size(90f, 40f).pad(2f);
+    topRow.left().top();
     topRow.add(new Button("指挥信息", () -> new CommandInfoWindow().build()));
     topRow.add(new Button("清空", () -> clearSelection()));
-    commandPanel.add(topRow);
+    commandPanel.add(topRow).growX().left();
     commandPanel.row();
     commandPanel.add().height(6f).row();
 
@@ -141,16 +142,17 @@ public class HUDFragment {
     moveBtn = new Button("移动", () -> setCommand(CommandData.CommandType.Move));
     stopBtn = new Button("停止", () -> setCommand(CommandData.CommandType.Stop));
     moveBtn.setChecked(true); // 默认移动模式
+    directRow.left().bottom();
     directRow.add(moveBtn);
     directRow.add(stopBtn);
-    commandPanel.add(directRow);
+    commandPanel.add(directRow).growX().left();
     commandPanel.row();
     commandPanel.add().height(6f).row();
 
     // 单位状态行：占位 + 批量开关可切换能力
     Table stateRow = new Table();
     stateRow.defaults().size(70f, 40f).pad(3f);
-    stateRow.left();
+    stateRow.left().bottom();
     stateRow.button("待命", () -> Log.info("指令：原地待命（未实现）"));
     stateRow.button("停火", () -> Log.info("指令：停火（未实现）"));
     stateRow.button("全部开启", () -> toggleAllAbilities(true));
@@ -298,12 +300,13 @@ public class HUDFragment {
 
     currentPanel.clearActions();
 
-    Cell<Table> cell = rightContainer.add(currentPanel);
+    Cell<Table> cell = rightContainer.add(currentPanel).bottom();
+    
+    rightContainer.pack();
+    //currentPanel.pack();
 
-    currentPanel.pack();
-
-    float minW = Core.scene.getWidth() / 4f;
-    float minH = Core.scene.getHeight() / 3f;
+    float minW = Core.scene.getWidth() / 5f;
+    float minH = Core.scene.getHeight() / 4f;
     cell.minSize(minW, minH);
 
     float height = Math.max(minH, currentPanel.getPrefHeight());

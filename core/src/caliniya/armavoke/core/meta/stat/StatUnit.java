@@ -32,7 +32,7 @@ public enum StatUnit {
     StatUnit(String name, boolean space) {
         this.name = name;
         this.space = space;
-        this.localizedName = Core.bundle.get("statUnit." + name.toLowerCase(Locale.ROOT));
+        this.localizedName = Core.bundle.get("statUnit." + name);
     }
 
     StatUnit(String name) {

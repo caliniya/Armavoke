@@ -4,7 +4,9 @@ import arc.Core;
 import caliniya.armavoke.base.tool.Ar;
 
 public enum Stat {
-  health("health", StatType.general);
+  health("health", StatType.general),
+  armor("armor", StatType.general),
+  speed("speed", StatType.general);
   public final String name, localizedName;
   public final StatType type;
 
