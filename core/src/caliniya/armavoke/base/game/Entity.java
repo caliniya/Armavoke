@@ -97,7 +97,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     for (Ability a : abilities) {
       use += a.energyUse();
     }
-    float net = energyRegen - use;
+    float net = energyRegen / 60f - use; // energyRegen 以秒设计，这里转成每帧
     if (net != 0f) {
       energy = Math.min(energyMax, energy + net * dt);
     }

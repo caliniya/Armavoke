@@ -27,11 +27,17 @@ public class ShieldAbility extends Ability {
   /** 最大护盾强度（满盾时的强度，默认 2 → 满盾承受 50% 伤害）。 */
   public float maxStrength = 2f;
 
-  /** 回充速率（每秒恢复的护盾容量）。 */
+  /** 回充速率（以秒为单位设计）。 */
   public float regen;
 
-  /** 开启时每秒消耗的能量。 */
+  /** 回充速率（每帧 = regen / 60，update 用）。 */
+  public float regenFrame;
+
+  /** 开启时每秒消耗的能量（以秒为单|&&位设计）。 */
   public float energyCost;
+
+  /** 开启时每帧消耗的能量（= energyCost / 60，update 用）。 */
+  public float energyCostFrame;
 
   /** 护盾对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
   public float[] resist = new float[DamageType.values().length];
@@ -54,22 +60,30 @@ public class ShieldAbility extends Ability {
     this.max = max;
     this.current = max;
     this.toggleable = true;
+    syncFrames();
+  }
+
+  /** 把"每秒"数值同步到"每帧"（字段可能被外部直接修改，update 时再同步一次）。 */
+  private void syncFrames() {
+    regenFrame = regen / 60f;
+    energyCostFrame = energyCost / 60f;
   }
 
   @Override
   public float energyUse() {
-    return active ? energyCost : 0;
+    return active ? energyCostFrame : 0;
   }
 
   public void update(Entity e, float dt) {
     if (!active) return;
+    syncFrames();
     // 能量扣减由 Entity.updateBase 统一按净回复处理（避免能量条抖动）
-    if (energyCost > 0 && e.energy <= 0) {
+    if (energyCostFrame > 0 && e.energy <= 0) {
       // 能量耗尽 → 自动关闭
       active = false;
       return;
     }
-    current = Math.min(max, current + regen * dt);
+    current = Math.min(max, current + regenFrame * dt);
   }
 
   @Override
@@ -92,7 +106,7 @@ public class ShieldAbility extends Ability {
 
   /** 当前护盾容量。 */
   public float capacity() {
-    return current;
+    return active ? current : 0f;
   }
 
   /** 最大护盾容量。 */

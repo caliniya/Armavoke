@@ -195,6 +195,8 @@ public class Unit extends Entity {
     this.team = null;
     this.teamData = null;
     isSelected = false;
+    // 死亡/移除时从指挥列表剔除
+    CommandData.checkedUnits.remove(this);
     Pools.free(this);
   }
 
@@ -251,8 +253,8 @@ public class Unit extends Entity {
     if (moving || rotated) {
       updateHitbox();
     }
-    if(moving) {
-    	WorldData.units.move(this , x , y);
+    if (moving) {
+      WorldData.units.move(this, x, y);
     }
   }
 
@@ -305,7 +307,7 @@ public class Unit extends Entity {
   public void draw() {
     type.draw(this);
   }
-  
+
   public void updateWeapons(float dt) {
     float aimX = targetX;
     float aimY = targetY;
@@ -358,7 +360,7 @@ public class Unit extends Entity {
     }
 
     teamData = team.data();
-    
+
     this.speedX = 0;
     this.speedY = 0;
 
@@ -368,7 +370,7 @@ public class Unit extends Entity {
     this.velocityDirty = true;
     Entities.add(this);
     WorldData.moveunits.add(this);
-    WorldData.units.move(this , x ,y);
+    WorldData.units.move(this, x, y);
     updateHitbox();
   }
 

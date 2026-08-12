@@ -194,6 +194,16 @@ public class HUDFragment {
   /** 刷新指挥面板：选中单位信息 + 当前指令状态。 */
   public void refreshCommand() {
     if (unitInfoTable == null) return;
+
+    // 清理死亡/失效单位（null 或血量归零）并取消选中
+    for (int i = CommandData.checkedUnits.size - 1; i >= 0; i--) {
+      caliniya.armavoke.type.Unit u = CommandData.checkedUnits.get(i);
+      if (u == null || u.health <= 0) {
+        CommandData.checkedUnits.remove(i);
+        if (u != null) u.isSelected = false;
+      }
+    }
+
     unitInfoTable.clearChildren();
 
     if (CommandData.checkedUnits.isEmpty()) {
@@ -300,7 +310,7 @@ public class HUDFragment {
     Cell<Table> cell = rightContainer.add(currentPanel).bottom();
     
     float minW = Core.scene.getWidth() / 5f;
-    cell.width(minW);
+    cell.minWidth(minW);
     
     float height = currentPanel.getPrefHeight();
     currentPanel.setTranslation(0, -height);
