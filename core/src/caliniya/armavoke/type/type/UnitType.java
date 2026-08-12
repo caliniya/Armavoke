@@ -131,7 +131,6 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
    * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。 子类可覆写此方法定制血条。
    */
   public void drawHealthBar(Unit u) {
-    ShieldAbility shield = u.shield();
 
     float coreMax = Math.max(0f, u.maxHealth);
     float core = Math.max(0f, u.health);

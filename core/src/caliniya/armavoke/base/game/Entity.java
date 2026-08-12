@@ -8,6 +8,7 @@ import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.ability.api.Shield;
 import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
@@ -106,18 +107,11 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     }
   }
 
-  /** 获取护盾能力（没有则返回 null）。 */
-  public ShieldAbility shield() {
+  public <T extends Ability> T getAbility(Class<T> S) {
     for (Ability a : abilities) {
-      if (a instanceof ShieldAbility s) return s;
-    }
-    return null;
-  }
-
-  /** 获取力场护盾能力（没有则返回 null）。 */
-  public ForceFieldAbility forceField() {
-    for (Ability a : abilities) {
-      if (a instanceof ForceFieldAbility f) return f;
+      if (S.isInstance(a)) {
+        return S.cast(a);
+      }
     }
     return null;
   }
@@ -126,7 +120,9 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float totalShield() {
     float total = 0f;
     for (Ability a : abilities) {
-      total += a.capacity();
+      if(a instanceof Shield s) {
+      	total += s.capacity();
+      }
     }
     return total;
   }
@@ -142,10 +138,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float totalShieldMax() {
     float total = 0f;
     for (Ability a : abilities) {
-      if (a instanceof ShieldAbility s) {
-        total += s.capacityMax();
-      } else if (a instanceof ForceFieldAbility f) {
-        total += f.capacityMax();
+      if(a instanceof Shield s) {
+      	total += s.capacityMax();
       }
     }
     return total;

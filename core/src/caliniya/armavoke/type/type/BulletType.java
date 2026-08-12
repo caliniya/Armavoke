@@ -71,7 +71,6 @@ public class BulletType {
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
     // TEST 临时：实弹命中观察日志（Step4 血条 UI 完成后移除）
-    ShieldAbility shield = target.shield();
     Log.info(
         "[实弹测试] @→@ 命中前 类型=@ 伤害=@ 盾=@ 甲=@ 血=@",
         b.owner == null ? "?" : b.owner.team,
@@ -84,7 +83,6 @@ public class BulletType {
 
     target.hit(b);
 
-    ShieldAbility after = target.shield();
     Log.info(
         "[实弹测试] @→@ 命中后 盾=@ 甲=@ 血=@",
         b.owner == null ? "?" : b.owner.team,

@@ -234,17 +234,13 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   private int interceptFrames = 0;
 
   private void interceptBullets() {
-    // TEST 诊断：每 120 帧（约 2 秒）打印注册表大小，确认拦截循环在跑
-    if (++interceptFrames % 120 == 1) {
-      Log.info("[力场诊断] 注册表实体数=@", ForceFieldAbility.entities.size);
-    }
     synchronized (ForceFieldAbility.entities) {
       Ar<Entity> list = ForceFieldAbility.entities;
       Ar<Entity> toCleanup = null;
 
       for (int i = 0; i < list.size; i++) {
         Entity e = list.get(i);
-        ForceFieldAbility field = e == null ? null : e.forceField();
+        ForceFieldAbility field = e == null ? null : e.getAbility(ForceFieldAbility.class);
         if (e == null || e.health <= 0f || field == null || !field.isActive()) {
           if (toCleanup == null) toCleanup = new Ar<>(false, 4);
           toCleanup.add(e);

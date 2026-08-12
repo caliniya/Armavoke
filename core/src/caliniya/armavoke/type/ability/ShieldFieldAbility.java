@@ -9,13 +9,14 @@ import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.ability.api.Shield;
 
 /**
  * 护盾力场：**空间拦截**进入力场的子弹（正多边形或圆形）。
  *
  * <p>拦截时按子弹伤害扣减力场容量；容量耗尽或关闭后不再拦截（注册表自动注销）。
  */
-public class ShieldFieldAbility extends ForceFieldAbility {
+public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
 
   /** 最大力场容量。 */
   public float max;
@@ -137,13 +138,49 @@ public class ShieldFieldAbility extends ForceFieldAbility {
     return max;
   }
 
+  /** 当前护盾强度（= 当前比例 × 最大强度）。 */
+  @Override
+  public float strength() {
+    return max <= 0f ? 0f : (current / max) * maxStrength;
+  }
+
+  /** 最大护盾强度（满盾时的强度）。 */
+  @Override
+  public float maxStrength() {
+    return maxStrength;
+  }
+
+  /** 护盾对各类伤害的百分比抗性数组（0~1），索引 = DamageType.ordinal()。 */
+  @Override
+  public float[] resist() {
+    return resist;
+  }
+
+  /** 护盾回充速率（每秒设计值）。 */
+  @Override
+  public float regen() {
+    return regen;
+  }
+
+  /** 护盾耗能速率（每秒设计值）。 */
+  @Override
+  public float energyCost() {
+    return cost;
+  }
+
+  /** 当前护盾比例（0 ~ 1）。 */
+  @Override
+  public float percent() {
+    return max <= 0f ? 0f : current / max;
+  }
+
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.shield, max, StatUnit.none, "ShieldFieldAbility");
-    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, "ShieldFieldAbility");
-    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, "ShieldFieldAbility");
-    stack.add(Stat.shieldCost, cost, StatUnit.perSecond, "ShieldFieldAbility");
-    stack.add(Stat.radius, radius, StatUnit.none, "ShieldFieldAbility");
+    stack.add(Stat.shield, max, StatUnit.none, localizedName);
+    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, localizedName);
+    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
+    stack.add(Stat.shieldCost, cost, StatUnit.perSecond, localizedName);
+    stack.add(Stat.radius, radius, StatUnit.none, localizedName);
   }
 
   @Override

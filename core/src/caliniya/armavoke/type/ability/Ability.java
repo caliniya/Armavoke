@@ -60,10 +60,6 @@ public abstract class Ability implements Cloneable {
       Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
     return damage;
   }
-  
-  public float capacity() {
-    return 0f;
-  }
 
   /** 可选视觉绘制（护盾光圈等）。 */
   public void draw(Entity e) {}

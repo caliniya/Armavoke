@@ -5,6 +5,7 @@ import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatUnit;
+import caliniya.armavoke.type.ability.api.Shield;
 
 /**
  * 护盾能力。
@@ -19,7 +20,7 @@ import caliniya.armavoke.core.meta.stat.StatUnit;
  *
  * 开启时每秒消耗固定能量并回充；能量不足以维持时自动关闭。 容量为 0 时护盾层不参与计算；破盾的溢出伤害不传递到下一层。
  */
-public class ShieldAbility extends Ability {
+public class ShieldAbility extends Ability implements Shield {
 
   /** 最大护盾容量。 */
   public float max;
@@ -109,16 +110,49 @@ public class ShieldAbility extends Ability {
   }
 
   /** 当前护盾容量。 */
+  @Override
   public float capacity() {
     return active ? current : 0f;
   }
 
   /** 最大护盾容量。 */
+  @Override
   public float capacityMax() {
     return max;
   }
 
+  /** 当前护盾强度（= 当前比例 × 最大强度）。 */
+  @Override
+  public float strength() {
+    return max <= 0f ? 0f : (current / max) * maxStrength;
+  }
+
+  /** 最大护盾强度（满盾时的强度）。 */
+  @Override
+  public float maxStrength() {
+    return maxStrength;
+  }
+
+  /** 护盾对各类伤害的百分比抗性数组（0~1），索引 = DamageType.ordinal()。 */
+  @Override
+  public float[] resist() {
+    return resist;
+  }
+
+  /** 护盾回充速率（每秒设计值）。 */
+  @Override
+  public float regen() {
+    return regen;
+  }
+
+  /** 护盾耗能速率（每秒设计值）。 */
+  @Override
+  public float energyCost() {
+    return energyCost;
+  }
+
   /** 当前容量比例（0 ~ 1），用于血条显示。 */
+  @Override
   public float percent() {
     return max <= 0 ? 0f : current / max;
   }
