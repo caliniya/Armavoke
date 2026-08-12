@@ -1,6 +1,8 @@
 package caliniya.armavoke.type.ability;
 
 import arc.Core;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.stat.StatStack;
@@ -63,6 +65,16 @@ public abstract class Ability implements Cloneable {
 
   /** 可选视觉绘制（护盾光圈等）。 */
   public void draw(Entity e) {}
+
+  /** 序列化运行时状态（开关等）。类型定义参数由 {@link #copy()} 从类型复制，不写存档。 */
+  public void write(Writes w) {
+    w.bool(enabled);
+  }
+
+  /** 反序列化运行时状态，覆盖 {@link #copy()} 得到的类型默认值。 */
+  public void read(Reads r) {
+    enabled = r.bool();
+  }
 
   public Ability copy() {
     try {

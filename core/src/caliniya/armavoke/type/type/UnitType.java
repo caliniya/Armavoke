@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.graphics.g2d.*;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.game.*;
@@ -93,7 +94,9 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     stat.addResists(StatType.protect, "stat.armorResist", armorResist, null);
     abilities.each(
         e -> {
+          stat.groupStart(e.localizedName);
           e.stats(stat);
+          stat.groupStart(null);
         });
   }
 
@@ -148,7 +151,7 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     if (totalMax <= 0f) return;
 
     float barLen = u.size * 1.5f;
-    float barW = 6f;
+    float barW = 8f;
     // 以单位中心为原点：血条贴右边缘（半径 0.5×size），垂直居中于单位中心
     float startX = u.x + u.size * 0.5f;
     float startY = u.y - u.size * 0.75f; // 下端 -0.75×size，上端 +0.75×size（对称）
@@ -182,6 +185,27 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       Draw.color(Color.sky);
       Fill.rect(startX + barW / 2f, startY + coreSeg + armorSeg + h / 2f, barW, h);
     }
+
+    // --- 能量条（紧贴血条右侧，与血条等长，从下往上填充）---
+    if (u.energyMax > 0f) {
+      float gap = -1f; // 条间距
+      float energyW = 5f; // 副条宽度（比血条细）
+      float energyX = startX + barW + gap; // 能量条左缘
+      float energy = Math.max(0f, u.energy);
+      float energyH = barLen * Math.min(1f, energy / u.energyMax);
+
+      // 底色（空条，让玩家知道有这个槽位）
+      Draw.color(Color.darkGray);
+      Fill.rect(energyX + energyW / 2f, startY + barLen / 2f, energyW, barLen);
+      // 金色填充，从下往上
+      if (energyH > 0f) {
+        Draw.color(Pal.light);
+        Fill.rect(energyX + energyW / 2f, startY + energyH / 2f, energyW, energyH);
+      }
+    }
+
+    // --- 热量条（预留）：未来单位附加了 HeatAbility 时在此绘制，
+    //     位于能量条右侧（gap 同能量条），橙红色，比例 = heat/heatMax ---
 
     Draw.color();
   }

@@ -51,11 +51,12 @@ public class DataWindow extends Window {
           t.add("   " + indent(e.level) + e.data.data).left().padBottom(2).align(Align.left);
           t.row();
         } else {
-          if (!e.group.equals(lastGroup)) {
+          // 去重用内部 groupKey（同能力实例合并，同名多实例各自成块），标题显示用 group（无编号）
+          if (!e.groupKey.equals(lastGroup)) {
             // 能力名：层 1
             t.add("   " + indent(1) + "[light]" + e.group + "[]").left().padTop(2).padBottom(2);
             t.row();
-            lastGroup = e.group;
+            lastGroup = e.groupKey;
           }
           // 能力参数 2 / 护盾抗性 3，层级已在 StatStack 计算
           t.add("   " + indent(e.level) + e.data.data).left().padBottom(1).align(Align.left);

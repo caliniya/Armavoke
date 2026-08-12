@@ -11,6 +11,7 @@ import caliniya.armavoke.ui.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
@@ -344,10 +345,17 @@ public class Unit extends Entity {
     w.f(y);
     w.f(rotation);
     w.f(health);
+    w.f(armor);
+    w.f(energy);
     w.f(targetX);
     w.f(targetY);
     w.b(team.ordinal());
     w.i(id);
+    // 能力运行时状态（类型定义参数由 copy() 提供，这里只存开关/当前容量等）
+    w.i(abilities.size);
+    for (Ability a : abilities) {
+      a.write(w);
+    }
   }
 
   @Override
@@ -357,6 +365,8 @@ public class Unit extends Entity {
     this.y = r.f();
     this.rotation = r.f();
     this.health = r.f();
+    this.armor = r.f();
+    this.energy = r.f();
     this.targetX = r.f();
     this.targetY = r.f();
     byte teamId = r.b();
@@ -369,6 +379,13 @@ public class Unit extends Entity {
     }
 
     teamData = team.data();
+
+    // 能力运行时状态（数量防御：以存档为准，截断到当前能力列表）
+    int abilityCount = r.i();
+    int count = Math.min(abilityCount, abilities.size);
+    for (int i = 0; i < count; i++) {
+      abilities.get(i).read(r);
+    }
 
     this.speedX = 0;
     this.speedY = 0;

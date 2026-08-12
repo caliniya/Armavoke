@@ -11,6 +11,7 @@ import arc.scene.Element;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.Unit;
 import arc.util.Align;
 import arc.util.Log;
@@ -35,6 +36,7 @@ public class HUDFragment {
   private Table unitInfoTable;
   private Button moveBtn, stopBtn;
   private Element healthBarElement; // 复用的血条元素
+  private Element energyBarElement; // 复用的能量条元素
   private Unit selectedUnit; // 血条当前绑定的单位
 
   //  A左上  B左下
@@ -220,8 +222,11 @@ public class HUDFragment {
           .size(64f, 36f)
           .padLeft(8f);
       unitInfoTable.add(infoRow).growX().left().row();
-      // 血条横向扩张占满面板宽度
-      unitInfoTable.add(healthBar()).growX().height(10f).left().pad(2f).row();
+      // 血条（占满）+ 能量条（紧贴下方，长度一致）
+      unitInfoTable.add(healthBar()).growX().height(10f).left().row();
+      if (u.energyMax > 0f) {
+        unitInfoTable.add(energyBar()).growX().height(10f).left().padTop(0f).row();
+      }
     } else {
       selectedUnit = null;
       for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
@@ -303,15 +308,51 @@ public class HUDFragment {
     return healthBarElement;
   }
 
+  /** 整合能量条元素（复用一个实例，绘制时读取 selectedUnit）。 */
+  private Element energyBar() {
+    if (energyBarElement == null) {
+      energyBarElement =
+          new Element() {
+            {
+              setSize(10f, 10f);
+            }
+
+            @Override
+            public void draw() {
+              if (selectedUnit == null || selectedUnit.energyMax <= 0f) return;
+              float x = this.x;
+              float y = this.y;
+              float w = getWidth();
+              float h = getHeight();
+
+              Unit u = selectedUnit;
+              float ratio = Math.min(1f, Math.max(0f, u.energy) / u.energyMax);
+
+              // 底色（空条槽位）
+              Draw.color(Color.darkGray);
+              Fill.rect(x + w / 2f, y + h / 2f, w, h);
+              if (ratio > 0f) {
+                float fw = w * ratio;
+                Draw.color(Pal.light);
+                Fill.rect(x + fw / 2f,(y + h / 2f), fw, h);
+              }
+
+              Draw.color();
+            }
+          };
+    }
+    return energyBarElement;
+  }
+
   private void updateRightPanel() {
     rightContainer.clearChildren();
     Table currentPanel = CommandData.commanding ? commandPanel : buildingPanel;
     currentPanel.clearActions();
     Cell<Table> cell = rightContainer.add(currentPanel).bottom();
-    
+
     float minW = Core.scene.getWidth() / 5f;
     cell.minWidth(minW);
-    
+
     float height = currentPanel.getPrefHeight();
     currentPanel.setTranslation(0, -height);
     currentPanel.addAction(Actions.translateBy(0, height, 0.3f, Interp.fade));

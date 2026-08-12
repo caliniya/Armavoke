@@ -16,6 +16,10 @@ public class StatStack {
     public final StatType type;
     public final Stat stat;
     public final String group; // 能力名（null = 分组直属）
+
+    /** 内部唯一分组键（能力名 + 实例编号，如 "护盾#1"），用于渲染端去重，不直接展示。 */
+    public final String groupKey;
+
     public final StatData data;
 
     /**
@@ -30,16 +34,49 @@ public class StatStack {
      */
     public final int level;
 
-    public StatEntry(StatType type, Stat stat, String group, StatData data, int level) {
+    public StatEntry(
+        StatType type, Stat stat, String group, String groupKey, StatData data, int level) {
       this.type = type;
       this.stat = stat;
       this.group = group;
+      this.groupKey = groupKey;
       this.data = data;
       this.level = level;
     }
   }
 
   private final Ar<StatEntry> entries = new Ar<>();
+
+  /** 分组实例计数：同一显示名（能力名）出现过的次数，用于生成内部唯一键。 */
+  private final ObjectIntMap<String> groupCount = new ObjectIntMap<>();
+
+  private String currentGroupName; // 当前分组块显示名
+  private String currentGroupKey; // 当前分组块内部唯一键
+
+  /**
+   * 开始一个新的分组块（每个能力实例写入数据前调用一次）。
+   *
+   * <p>同一显示名的多个实例会得到不同的内部键（"护盾#0"/"护盾#1"），渲染时显示名相同但各自成块。
+   *
+   * @param group 分组显示名（能力名）；传 null 结束当前块
+   */
+  public void groupStart(String group) {
+    if (group == null) {
+      currentGroupName = null;
+      currentGroupKey = null;
+      return;
+    }
+    currentGroupName = group;
+    int count = groupCount.get(group, 0);
+    groupCount.put(group, count + 1);
+    currentGroupKey = group + "#" + count;
+  }
+
+  /** 计算条目分组键：处于分组块内且分组名匹配时跟随当前块 key；否则回退为 group 本身（无编号）。 */
+  private static String entryKey(String group, String currentName, String currentKey) {
+    if (group == null) return null;
+    return group.equals(currentName) && currentKey != null ? currentKey : group;
+  }
 
   public StatStack add(Stat stat, float value, StatUnit unit) {
     return add(stat, value, unit, null);
@@ -51,7 +88,12 @@ public class StatStack {
   public StatStack add(Stat stat, float value, StatUnit unit, String group) {
     entries.add(
         new StatEntry(
-            stat.type, stat, group, new StatData(stat, value, unit), levelOf(stat.type, group, 0)));
+            stat.type,
+            stat,
+            group,
+            entryKey(group, currentGroupName, currentGroupKey),
+            new StatData(stat, value, unit),
+            levelOf(stat.type, group, 0)));
     return this;
   }
 
@@ -68,7 +110,14 @@ public class StatStack {
 
   /** 带次级标志的原始文本条目（indent 1 = 次级条目，如抗性列表）。 */
   public StatStack addRaw(StatType type, String text, String group, int indent) {
-    entries.add(new StatEntry(type, null, group, new StatData(text), levelOf(type, group, indent)));
+    entries.add(
+        new StatEntry(
+            type,
+            null,
+            group,
+            entryKey(group, currentGroupName, currentGroupKey),
+            new StatData(text),
+            levelOf(type, group, indent)));
     return this;
   }
 

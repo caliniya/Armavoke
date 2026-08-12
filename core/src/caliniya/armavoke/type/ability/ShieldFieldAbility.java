@@ -9,6 +9,8 @@ import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.ability.api.Shield;
 
@@ -203,5 +205,19 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
     ShieldFieldAbility a = (ShieldFieldAbility) super.copy();
     a.resist = resist.clone();
     return a;
+  }
+
+  @Override
+  public void write(Writes w) {
+    super.write(w);
+    w.f(current);
+    w.bool(active);
+  }
+
+  @Override
+  public void read(Reads r) {
+    super.read(r);
+    current = r.f();
+    active = r.bool();
   }
 }
