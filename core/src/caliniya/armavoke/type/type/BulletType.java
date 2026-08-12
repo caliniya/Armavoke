@@ -78,7 +78,7 @@ public class BulletType {
         target.team,
         b.type.damageType,
         b.type.damage,
-        shield == null ? 0f : shield.current,
+        target.totalShield(),
         target.armor,
         target.health);
 
@@ -89,7 +89,7 @@ public class BulletType {
         "[实弹测试] @→@ 命中后 盾=@ 甲=@ 血=@",
         b.owner == null ? "?" : b.owner.team,
         target.team,
-        after == null ? 0f : after.current,
+        target.totalShield(),
         target.armor,
         target.health);
   }

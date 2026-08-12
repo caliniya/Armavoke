@@ -36,7 +36,7 @@ public class UnitTypes {
             this.abilities.add(
                 new ShieldFieldAbility(500, 200) {
                   {
-                    this.regen = 50;
+                    this.regen = 10;
                     this.cost = 3;
                   }
                 });

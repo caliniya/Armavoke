@@ -52,7 +52,7 @@ public class UnitDetailWindow extends Window {
       for (Ability a : unit.abilities) {
         Table row = new Table();
         row.left();
-        row.add("[gray]" + a.getClass().getSimpleName() + "[]").left().pad(2f);
+        row.add("[gray]" + a.localizedName + "[]").left().pad(2f);
         if (a.toggleable) {
           row.add(
                   new Button(

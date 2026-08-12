@@ -85,16 +85,31 @@ public class Unit extends Entity {
       Log.err(this.toString() + "@ No unitTpye used test");
     }
 
+    // 对象池复用防污染：清空能力与战斗基础属性
+    abilities.clear();
+    armor = 0;
+    armorMax = 0;
+    armorValue = 0;
+    energy = 0;
+    energyMax = 0;
+    energyRegen = 0;
+    
     this.speed = this.type.speedt;
     this.rotationSpeed = this.type.rotationSpeend;
     this.region = this.type.region;
     this.cell = this.type.cell;
-
     this.maxHealth = this.type.health;
     this.health = this.type.health;
+    this.armorMax = this.type.armorMax;
+    this.armorValue = this.type.armorValue;
+    this.energyMax = this.type.energyMax;
+    this.energyRegen = this.type.energyRegen;
+    this.size = this.type.size;
+    // 当前护甲初始为满甲（无护甲时自然为 0）
+    this.armor = this.armorMax;
 
-    this.type.abilities.each(a -> this.addAbility(a));
-    
+    this.type.abilities.each(a -> this.addAbility(a.copy()));
+
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {
       hitboxData = new float[type.hitbox.length];
@@ -107,15 +122,6 @@ public class Unit extends Entity {
     }
 
     canShoot = true; // 单位一般情况都是可以射击的
-
-    // 对象池复用防污染：清空能力与战斗基础属性
-    abilities.clear();
-    armor = 0;
-    armorMax = 0;
-    armorValue = 0;
-    energy = 0;
-    energyMax = 0;
-    energyRegen = 0;
 
     weapons.clear();
     mainFixedWeapon = null;

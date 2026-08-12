@@ -126,11 +126,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float totalShield() {
     float total = 0f;
     for (Ability a : abilities) {
-      if (a instanceof ShieldAbility s) {
-        total += s.capacity();
-      } else if (a instanceof ForceFieldAbility f) {
-        total += f.capacity();
-      }
+      total += a.capacity();
     }
     return total;
   }

@@ -10,7 +10,7 @@ import caliniya.armavoke.core.meta.stat.StatStack;
  *
  * <p>特殊机制（护盾、过热等）都做成能力，可组合地附加到单位或建筑上，默认不带。
  */
-public abstract class Ability {
+public abstract class Ability implements Cloneable {
 
   public String localizedName, name;
 
@@ -42,8 +42,8 @@ public abstract class Ability {
 
   /** 向 StatStack 上报能力相关的类型参数（如护盾容量/强度/回充）。 */
   public void stats(StatStack stack) {}
-  
-  public void statAbility(StatStack stat){}
+
+  public void statAbility(StatStack stat) {}
 
   /** 每帧逻辑：回充、耗能、积累热量等。 */
   public void update(Entity e, float dt) {}
@@ -60,7 +60,19 @@ public abstract class Ability {
       Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
     return damage;
   }
+  
+  public float capacity() {
+    return 0f;
+  }
 
   /** 可选视觉绘制（护盾光圈等）。 */
   public void draw(Entity e) {}
+
+  public Ability copy() {
+    try {
+      return (Ability) this.clone();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

@@ -157,4 +157,12 @@ public class ShieldFieldAbility extends ForceFieldAbility {
     }
     Draw.color();
   }
+
+  @Override
+  public ShieldFieldAbility copy() {
+    // TODO: Implement this method
+    ShieldFieldAbility a = (ShieldFieldAbility)super.copy();
+    a.resist = resist.clone();
+    return a;
+  }
 }

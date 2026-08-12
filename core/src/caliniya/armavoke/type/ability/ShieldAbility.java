@@ -130,4 +130,11 @@ public class ShieldAbility extends Ability {
     stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
     stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond, localizedName);
   }
+
+  @Override
+  public ShieldAbility copy() {
+    ShieldAbility a = (ShieldAbility) super.copy();
+    a.resist = resist.clone();
+    return a;
+  }
 }
