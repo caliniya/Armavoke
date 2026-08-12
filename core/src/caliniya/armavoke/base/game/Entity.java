@@ -9,6 +9,8 @@ import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.ability.api.Shield;
+import caliniya.armavoke.type.enhance.*;
+import caliniya.armavoke.type.enhance.api.*;
 import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
@@ -105,6 +107,23 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     for (Ability a : abilities) {
       a.update(this, dt);
     }
+    // 强化模组：只需每帧更新的（实现 Updatable 接口的）
+    for (Updatable u : updatableEnhancements) {
+      u.update(this, dt);
+    }
+  }
+
+  /** 强化模组列表（全部，用于来源记录/开关管理）。 */
+  public Ar<Enhancement> enhancements = new Ar<>();
+
+  /** 只需每帧更新的强化模组（实现 {@link Updatable} 接口的），避免空转。 */
+  public Ar<Updatable> updatableEnhancements = new Ar<>();
+
+  /**
+   * 挂载一个强化模组：绑定实体 → 绑定能力 → 入列表 → 需要每帧则入 updatable 列表 → 初始开启则应用。
+   */
+  public void addEnhancement(Enhancement enh) {
+    enhancements.add(enh);
   }
 
   public <T extends Ability> T getAbility(Class<T> S) {
@@ -224,6 +243,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     energyRegen = 0;
     java.util.Arrays.fill(armorResist, 0f);
     abilities.clear();
+    enhancements.clear();
+    updatableEnhancements.clear();
     team = null;
     item = null;
     target = null;

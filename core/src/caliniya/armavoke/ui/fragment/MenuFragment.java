@@ -23,6 +23,7 @@ import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Map;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.system.Systems;
+import caliniya.armavoke.type.enhance.ShieldBoostEnhancement;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
@@ -129,7 +130,10 @@ public class MenuFragment {
                               Unit enemy = UnitTypes.test.create(TeamTypes.Mutex, 1200, 1000);
                               enemy.armorValue = 30;
                               enemy.weapons.clear(); // 只挨打不还手，便于观察
-
+                              
+                              ShieldBoostEnhancement se = new ShieldBoostEnhancement();
+                              se.bindAbility(enemy.getAbility(ShieldFieldAbility.class));
+                              
                               /*
                               ShieldAbility shield = new ShieldAbility(500);
                               shield.regen = 20;

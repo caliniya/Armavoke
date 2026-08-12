@@ -5,6 +5,7 @@ import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.ability.ShieldFieldAbility;
+import caliniya.armavoke.type.enhance.ShieldBoostEnhancement;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.Armavoke;

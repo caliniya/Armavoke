@@ -12,6 +12,7 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.Ability;
+import caliniya.armavoke.type.enhance.Enhancement;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
@@ -111,6 +112,9 @@ public class Unit extends Entity {
     this.armor = this.armorMax;
 
     this.type.abilities.each(a -> this.addAbility(a.copy()));
+    // 强化模组深拷贝挂载（绑定能力/实体，初始开启则应用）
+    enhancements.clear();
+    this.type.enhancements.each(e -> this.addEnhancement(e.copy()));
 
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {
