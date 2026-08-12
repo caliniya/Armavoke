@@ -34,30 +34,26 @@ public class UnitTypes {
                   {
                     mirror = true;
                     x = 50;
-                    bullet = new BulletType(){{
-                      this.knock = 100f;
-                    }};
+                    bullet =
+                        new BulletType() {
+                          {
+                            this.knock = 100f;
+                          }
+                        };
                     rotate = true;
                   }
                 });
-                
+
             this.abilities.add(
-                new ShieldAbility(500) {
+                new ShieldFieldAbility(500f, 195f) {
                   {
+                    this.sides = 7;
                     this.regen = 10;
                     this.energyCost = 3;
                     this.resist[DamageType.Energy.ordinal()] = 0.6f;
                   }
                 });
-            this.abilities.add(
-                new ShieldAbility(200f) {
-                  {
-                    this.regen = 10;
-                    this.energyCost = 3;
-                    this.resist[DamageType.Thermal.ordinal()] = 0.6f;
-                  }
-                });
-                
+
             // 过热能力演示：储热 100，每发 10，散热 20/秒
             this.abilities.add(
                 new HeatAbility(100f) {

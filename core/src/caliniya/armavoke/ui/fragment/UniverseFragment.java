@@ -121,7 +121,7 @@ public class UniverseFragment {
         new Window("进度测试") {
           @Override
           public void main(Table main) {
-
+            main.clearChildren();
             // 当前星域
             String star = Campaign.progress().currentStar;
             main.add("[lightgray]当前星域:[] " + (star == null || star.isEmpty() ? "(无)" : star))
