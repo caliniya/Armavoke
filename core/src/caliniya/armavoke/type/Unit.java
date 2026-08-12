@@ -12,6 +12,7 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.Ability;
+import caliniya.armavoke.type.ability.HeatAbility;
 import caliniya.armavoke.type.Enhancement;
 import caliniya.armavoke.type.enhance.EnhancementType;
 import caliniya.armavoke.content.*;
@@ -220,7 +221,9 @@ public class Unit extends Entity {
   @Override
   public void update(float dt) {
     updateBase(dt);
-
+    
+    if(locked) return;
+    
     float oldX = this.x;
     float oldY = this.y;
     float oldRot = this.rotation;
@@ -330,8 +333,15 @@ public class Unit extends Entity {
     }
 
     for (Weapon weapon : weapons) {
-      weapon.update(dt, canShoot);
+      // 过热锁定期间无法射击
+      weapon.update(dt, canShoot && !overheated());
     }
+  }
+
+  /** 是否过热锁定（单位附加了被锁定的 HeatAbility）。 */
+  public boolean overheated() {
+    HeatAbility h = getAbility(HeatAbility.class);
+    return h != null && locked;
   }
 
   public void impuse(float knockX, float knockY) {

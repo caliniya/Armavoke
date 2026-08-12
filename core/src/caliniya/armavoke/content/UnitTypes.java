@@ -5,6 +5,7 @@ import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.ability.ShieldFieldAbility;
+import caliniya.armavoke.type.ability.HeatAbility;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.Armavoke;
@@ -51,6 +52,13 @@ public class UnitTypes {
                     this.regen = 10;
                     this.energyCost = 3;
                     this.resist[DamageType.Thermal.ordinal()] = 0.6f;
+                  }
+                });
+            // 过热能力演示：储热 100，每发 10，散热 20/秒
+            this.abilities.add(
+                new HeatAbility(100f) {
+                  {
+                    this.heatSpeed = 5f;
                   }
                 });
           }

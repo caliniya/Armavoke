@@ -21,7 +21,9 @@ public enum Stat {
   shieldRegen("shieldRegen", StatType.function),
   heat("heat", StatType.function),
   shieldCost("shieldCost", StatType.function),
-  radius("radius", StatType.function);
+  radius("radius", StatType.function),
+  heatSpeed("heatSpeed", StatType.function),
+  heatPerShot("heatPerShot", StatType.function);
   public final String name, localizedName;
   public final StatType type;
 

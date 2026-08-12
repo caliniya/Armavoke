@@ -11,6 +11,7 @@ import arc.scene.ui.layout.Table;
 import caliniya.armavoke.type.Unit;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.type.ability.Ability;
+import caliniya.armavoke.type.Enhancement;
 import caliniya.armavoke.ui.Button;
 
 /** 单位详细信息窗口： 类型信息（名字 + DataWindow 按钮 + stats meta）、 血量/能量/护盾（数字 + 条形图，实时更新）、能力列表（可开关能力带开关按钮）。 */
@@ -78,6 +79,30 @@ public class UnitDetailWindow extends Window {
         } else {
           row.add("[gray]" + Core.bundle.get("unitDetail.passive") + "[]").padLeft(6f);
         }
+        t.add(row).growX().left().row();
+      }
+    }
+
+    // 模组列表（运行时安装的强化模组，可开关）
+    t.add("[light]" + Core.bundle.get("unitDetail.enhancements") + "[]").left().pad(2f).row();
+    if (unit.enhancements.size == 0) {
+      t.add("[gray]" + Core.bundle.get("unitDetail.noEnhancements") + "[]").left().pad(2f).row();
+    } else {
+      for (Enhancement enh : unit.enhancements) {
+        Table row = new Table();
+        row.left();
+        row.add("[gray]" + enh.type.localizedName + "[]").left().pad(2f);
+        row.add(
+                new Button(
+                    enh.enabled
+                        ? Core.bundle.get("unitDetail.disable")
+                        : Core.bundle.get("unitDetail.enable"),
+                    () -> {
+                      enh.setEnabled(!enh.enabled);
+                      main(this.main); // 刷新窗口内容
+                    }))
+            .size(64f, 36f)
+            .padLeft(6f);
         t.add(row).growX().left().row();
       }
     }

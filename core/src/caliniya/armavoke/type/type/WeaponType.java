@@ -8,7 +8,7 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.base.api.*;
 
-public class WeaponType implements Cloneable , DrawType<Weapon> {
+public class WeaponType implements Cloneable, DrawType<Weapon> {
 
   public String name;
   public TextureRegion region;
@@ -19,6 +19,9 @@ public class WeaponType implements Cloneable , DrawType<Weapon> {
   public float reload = 60f;
   public float x = 0f, y = 0f;
   public float shootX = 0f, shootY = 0f;
+
+  /** 每发热量（向单位添加的热量；单位无过热机制时忽略）。 */
+  public float heatPerShot = 20f;
 
   // 镜像控制
   public boolean mirror = true;
@@ -69,15 +72,14 @@ public class WeaponType implements Cloneable , DrawType<Weapon> {
       throw new RuntimeException(e);
     }
   }
-  
-  public void draw(Weapon w){
+
+  public void draw(Weapon w) {
     float wRot = w.owner.rotation + w.rotation;
     Draw.rect(region, w.wx, w.wy, wRot);
   }
-  
-  public void drawDebug(Weapon w){
+
+  public void drawDebug(Weapon w) {
     Draw.color(Pal.light);
-    Lines.circle(w.wx,w.wy,range);
+    Lines.circle(w.wx, w.wy, range);
   }
-  
 }

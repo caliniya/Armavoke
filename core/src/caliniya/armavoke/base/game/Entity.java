@@ -5,6 +5,7 @@ import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
 import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.type.ability.ForceFieldAbility;
+import caliniya.armavoke.type.ability.HeatAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
@@ -53,6 +54,17 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   /** 能量恢复速率（每秒）。 */
   public float energyRegen;
 
+  // 当前热量与最大热量
+  public float heat, heatMax = 0f;
+  
+  public float heatSpeed = 0f;
+
+  /** 这个实体是否具有过热能力 */
+  public boolean heatable = false;
+  
+  /**实体当前是否处于锁定状态(可能但不限于是由于热量造成的)*/
+  public boolean locked;
+
   /** 护甲对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
   public float[] armorResist = new float[DamageType.values().length];
 
@@ -95,6 +107,20 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
   public void updateBase(float dt) {
+    
+    float cool = heatSpeed / 60f * dt;
+    if (locked) {
+      // 锁定期间持续散热，归零后恢复
+      heat -= cool;
+      if (heat <= 0f) {
+        heat = 0f;
+        locked = false;
+      }
+      return;
+    } else {
+      heat = Math.max(0f, heat - cool);
+    }
+    
     // 净回复 = 基础回复 - 所有激活能力的能耗（避免能量条在满值附近抖动）
     float use = 0f;
     for (Ability a : abilities) {
@@ -140,6 +166,13 @@ public abstract class Entity implements Poolable, QuadTreeObject {
       }
     }
     return null;
+  }
+
+  /** 向实体添加热量（由武器/能力/模组等热源调用）。 实体没有过热能力（或储热上限为 0）时忽略——即没有过热机制。 */
+  public void addHeat(float amount) {
+    if (heatable) {
+      heat += amount;
+    }
   }
 
   /** 所有护盾能力（单体护盾 + 力场等）的当前总容量。 */

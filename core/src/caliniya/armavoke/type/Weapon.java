@@ -41,6 +41,7 @@ public class Weapon {
 
   // 如果第2个参数为假 说明单位武器被瘫痪 不能射击
   public void update(float dt, boolean can) {
+    if(owner.locked) return;
     // 冷却逻辑
     if (reloadTimer > 0) {
       reloadTimer -= dt;
@@ -99,6 +100,8 @@ public class Weapon {
 
   private void shoot(float wx, float wy, float angle) {
     this.reloadTimer = type.reload;
+    
+    owner.addHeat(type.heatPerShot);
 
     // 计算枪口位置 (基于传入的最终射击角度)
     float bulletX = wx + Angles.trnsx(angle, type.shootX, type.shootY);

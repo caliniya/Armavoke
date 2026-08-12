@@ -65,7 +65,12 @@ public abstract class Ability implements Cloneable {
 
   /** 可选视觉绘制（护盾光圈等）。 */
   public void draw(Entity e) {}
-
+  
+  
+  public void write(Entity e ,Writes w) {
+    write(w);
+  }
+  
   /** 序列化运行时状态（开关等）。类型定义参数由 {@link #copy()} 从类型复制，不写存档。 */
   public void write(Writes w) {
     w.bool(enabled);
@@ -74,6 +79,10 @@ public abstract class Ability implements Cloneable {
   /** 反序列化运行时状态，覆盖 {@link #copy()} 得到的类型默认值。 */
   public void read(Reads r) {
     enabled = r.bool();
+  }
+  
+  public void read(Entity e ,Reads r) {
+    read(r);
   }
 
   public Ability copy() {
