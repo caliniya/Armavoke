@@ -227,11 +227,17 @@ public class Unit extends Entity {
     // 击退冲量：复制副本 → 施加位移 → 平滑衰减（写回共享字段）
     float kx = knockX, ky = knockY;
     if (kx != 0f || ky != 0f) {
-      x += kx * dt;
-      y += ky * dt;
+      // 位移并 clamp 到地图内（防止击退出界无法指挥）
+      float maxX = WorldData.world.W * WorldData.TILE_SIZE;
+      float maxY = WorldData.world.H * WorldData.TILE_SIZE;
+      x = Mathf.clamp(x + kx * dt, 0f, maxX);
+      y = Mathf.clamp(y + ky * dt, 0f, maxY);
       knockX = Mathf.lerpDelta(knockX, 0f, knockDamp);
       knockY = Mathf.lerpDelta(knockY, 0f, knockDamp);
       velocityDirty = true;
+      // 立即更新四叉树位置与碰撞盒（oldX 在击退后才记录，moving 判定会漏掉击退）
+      WorldData.units.move(this, x, y);
+      updateHitbox();
     }
     updateBase(dt);
 
