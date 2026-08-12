@@ -119,12 +119,12 @@ public class ShieldFieldAbility extends ForceFieldAbility {
 
   @Override
   public boolean onBullet(Entity e, Bullet b) {
-    if (!active || current <= 0f) return false;
     // 默认放行力场内部发射的子弹；interceptInternal 时拦截范围内所有子弹
     if (!interceptInternal && b.owner != null && contains(e, b.owner.x, b.owner.y)) return false;
-    current -= b.type.damage;
-    if (current < 0f) current = 0f;
-    return true; // 拦截
+    // 与单体护盾完全相同的结算：返回 0 = 完全拦截（子弹消失），>0 = 穿透（放行）
+    float remaining =
+        applyDamage(e, b.type.damage, b.type.damageType, b.type.breakShield, b.type.bypassShield);
+    return remaining <= 0f;
   }
 
   @Override
@@ -161,7 +161,7 @@ public class ShieldFieldAbility extends ForceFieldAbility {
   @Override
   public ShieldFieldAbility copy() {
     // TODO: Implement this method
-    ShieldFieldAbility a = (ShieldFieldAbility)super.copy();
+    ShieldFieldAbility a = (ShieldFieldAbility) super.copy();
     a.resist = resist.clone();
     return a;
   }
