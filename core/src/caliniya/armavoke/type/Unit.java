@@ -93,7 +93,7 @@ public class Unit extends Entity {
     energy = 0;
     energyMax = 0;
     energyRegen = 0;
-    
+
     this.speed = this.type.speedt;
     this.rotationSpeed = this.type.rotationSpeend;
     this.region = this.type.region;
@@ -102,6 +102,7 @@ public class Unit extends Entity {
     this.health = this.type.health;
     this.armorMax = this.type.armorMax;
     this.armorValue = this.type.armorValue;
+    this.armorResist = this.type.armorResist.clone();
     this.energyMax = this.type.energyMax;
     this.energyRegen = this.type.energyRegen;
     this.size = this.type.size;

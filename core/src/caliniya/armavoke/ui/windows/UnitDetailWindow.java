@@ -1,5 +1,6 @@
 package caliniya.armavoke.ui.windows;
 
+import arc.Core;
 import arc.func.Floatf;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -32,22 +33,31 @@ public class UnitDetailWindow extends Window {
     nameRow.left();
     nameRow.add("[light]" + unit.type.name + "[]").left().pad(2f);
     nameRow
-        .add(new Button("类型信息", () -> new DataWindow(unit.type.stats()).build()))
+        .add(
+            new Button(
+                Core.bundle.get("unitDetail.info"),
+                () -> new DataWindow(unit.type.stats()).build()))
         .size(84f, 36f)
         .padLeft(8f);
     t.add(nameRow).growX().left().row();
 
     // 实例属性（数字 + 条形图，每帧实时刷新）
-    addStat(t, "血量", u -> u.health, u -> u.maxHealth, Color.scarlet);
-    addStat(t, "护盾", u -> u.totalShield(), u -> u.totalShieldMax(), Color.sky);
-    addStat(t, "护甲", u -> u.armor, u -> u.armorMax, Color.lightGray);
-    addStat(t, "能量", u -> u.energy, u -> u.energyMax, Color.gold);
+    addStat(
+        t, Core.bundle.get("unitDetail.health"), u -> u.health, u -> u.maxHealth, Color.scarlet);
+    addStat(
+        t,
+        Core.bundle.get("unitDetail.shield"),
+        u -> u.totalShield(),
+        u -> u.totalShieldMax(),
+        Color.sky);
+    addStat(t, Core.bundle.get("unitDetail.armor"), u -> u.armor, u -> u.armorMax, Color.lightGray);
+    addStat(t, Core.bundle.get("unitDetail.energy"), u -> u.energy, u -> u.energyMax, Color.gold);
     t.add().height(8f).row();
 
     // 能力列表
-    t.add("[light]能力[]").left().pad(2f).row();
+    t.add("[light]" + Core.bundle.get("unitDetail.abilities") + "[]").left().pad(2f).row();
     if (unit.abilities.size == 0) {
-      t.add("[gray]无能力[]").left().pad(2f).row();
+      t.add("[gray]" + Core.bundle.get("unitDetail.noAbilities") + "[]").left().pad(2f).row();
     } else {
       for (Ability a : unit.abilities) {
         Table row = new Table();
@@ -56,7 +66,9 @@ public class UnitDetailWindow extends Window {
         if (a.toggleable) {
           row.add(
                   new Button(
-                      a.enabled ? "关闭" : "开启",
+                      a.enabled
+                          ? Core.bundle.get("unitDetail.disable")
+                          : Core.bundle.get("unitDetail.enable"),
                       () -> {
                         a.setEnabled(!a.enabled);
                         main(this.main); // 刷新窗口内容
@@ -64,7 +76,7 @@ public class UnitDetailWindow extends Window {
               .size(64f, 36f)
               .padLeft(6f);
         } else {
-          row.add("[gray]被动[]").padLeft(6f);
+          row.add("[gray]" + Core.bundle.get("unitDetail.passive") + "[]").padLeft(6f);
         }
         t.add(row).growX().left().row();
       }

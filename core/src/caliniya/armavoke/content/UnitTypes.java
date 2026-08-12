@@ -1,6 +1,7 @@
 package caliniya.armavoke.content;
 
 import arc.util.Log;
+import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.ShieldFieldAbility;
 import caliniya.armavoke.type.type.*;
@@ -22,6 +23,8 @@ public class UnitTypes {
             //this.energy = 100;
             this.energyMax = 100;
             this.energyRegen = 10;
+            // 类型级演示数据：护甲对动能 50% 抗性（DataWindow 可展示）
+            this.armorResist[DamageType.Kinetic.ordinal()] = 0.5f;
             this.hitbox = new float[] {0f, 60f, 60f, 0f, 0f, 60f, 60f, 0f, 60f};
 
             addWeapons(

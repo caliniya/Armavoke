@@ -1,5 +1,7 @@
 package caliniya.armavoke.base.type;
 
+import arc.Core;
+
 /**
  * 伤害类型。
  *
@@ -22,9 +24,13 @@ public enum DamageType {
   /** 是否造成击退。 */
   public final boolean knockback;
 
+  /** 本地化名称（如 "能量"），用于抗性列表等展示。 */
+  public final String localizedName;
+
   DamageType(float shieldMult, float armorMult, boolean knockback) {
     this.shieldMult = shieldMult;
     this.armorMult = armorMult;
     this.knockback = knockback;
+    this.localizedName = Core.bundle.get("damageType." + name());
   }
 }

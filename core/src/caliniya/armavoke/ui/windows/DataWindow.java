@@ -50,7 +50,7 @@ public class DataWindow extends Window {
             t.row();
             lastGroup = e.group;
           }
-          t.add(e.data.data).left().padLeft(28).padBottom(1).align(Align.left);
+          t.add(e.data.data).left().padLeft(28 + e.indent * 16).padBottom(1).align(Align.left);
           t.row();
         }
       }

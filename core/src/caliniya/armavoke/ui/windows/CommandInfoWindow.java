@@ -1,5 +1,6 @@
 package caliniya.armavoke.ui.windows;
 
+import arc.Core;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.data.WorldData;
@@ -14,7 +15,7 @@ import caliniya.armavoke.ui.Button;
 public class CommandInfoWindow extends Window {
 
   public CommandInfoWindow() {
-    super("指挥信息");
+    super(Core.bundle.get("commandInfo.title"));
   }
 
   @Override
@@ -27,25 +28,22 @@ public class CommandInfoWindow extends Window {
           Table row = new Table();
           row.left();
           row.add(
-                  "[light]"
-                      + u.type.name
-                      + "[] 血="
-                      + (int) u.health
-                      + " 盾="
-                      + (int) u.totalShield()
-                      + " 甲="
-                      + (int) u.armor
-                      + " 能="
-                      + (int) u.energy)
+                  Core.bundle.format(
+                      "commandInfo.row",
+                      u.type.name,
+                      (int) u.health,
+                      (int) u.totalShield(),
+                      (int) u.armor,
+                      (int) u.energy))
               .left()
               .pad(2f);
-          row.add(new Button("详情", () -> new UnitDetailWindow(u).build()))
+          row.add(new Button("@commandInfo.detail", () -> new UnitDetailWindow(u).build()))
               .size(60f, 36f)
               .padLeft(6f);
           t.add(row).growX().left().row();
         });
     if (count[0] == 0) {
-      t.add("[gray]没有友军单位[]").pad(10f);
+      t.add("[gray]" + Core.bundle.get("commandInfo.empty") + "[]").pad(10f);
     }
   }
 }

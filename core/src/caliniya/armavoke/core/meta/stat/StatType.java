@@ -11,7 +11,8 @@ public enum StatType {
   crafting("crafting"), // 生产
   general("general"), // 基础，通用
   function("function"), // 支持
-  protect("protect");//防护
+  protect("protect"),//防护
+  none("");
   
   public final String name, localizedName;
 

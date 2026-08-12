@@ -4,6 +4,7 @@ import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.ability.api.Shield;
 
@@ -163,6 +164,7 @@ public class ShieldAbility extends Ability implements Shield {
     stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, localizedName);
     stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
     stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond, localizedName);
+    stack.addResists(StatType.function, "stat.shieldResist", resist, localizedName);
   }
 
   @Override

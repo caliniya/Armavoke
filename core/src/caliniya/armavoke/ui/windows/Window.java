@@ -25,6 +25,12 @@ public class Window {
   public float maxOut = 0.8f; // 允许80%移出屏幕
   public String title = "Window";
 
+  /** 是否全屏：true 时窗口铺满整个屏幕（忽略 {@link #maxExpand} 与最小尺寸）。 */
+  public boolean fullscreen = false;
+
+  /** 非全屏时窗口最大扩张到屏幕宽/高的比例（0~1，默认 60%）。 */
+  public float maxExpand = 0.6f;
+
   /** 是否为模态窗口。模态窗口会显示暗色遮罩并阻断背景所有输入。 */
   public boolean modal = false;
 
@@ -69,7 +75,7 @@ public class Window {
     low.clearChildren();
 
     window = new Table();
-    window.setSize(w, h);
+    if (!fullscreen) window.setSize(w, h);
 
     window.setBackground(
         new NinePatchDrawable((NinePatchDrawable) Core.atlas.getDrawable("Window")));
@@ -105,7 +111,7 @@ public class Window {
     low(low);
     ScrollPane scrollPane = new ScrollPane(main);
     scrollPane.setFadeScrollBars(true);
-    scrollPane.setScrollingDisabled(true, false);
+    scrollPane.setScrollingDisabled(false, false); // 纵向 + 横向滚动（内容过宽时可横滚）
 
     Table titleTable = new Table();
     Label titleLabel = new Label(title);
@@ -145,6 +151,17 @@ public class Window {
 
     titleTable.add(titleLabel).growX().fillX().left().padLeft(10f);
 
+    // 全屏切换按钮：全屏 ↔ 还原为最大 60%
+    Button fullBtn =
+        new Button(
+            fullscreen ? "@window.restore" : "@window.fullscreen",
+            () -> {
+              fullscreen = !fullscreen;
+              build();
+            });
+    // 与关闭按钮保持间隔（屏幕宽度的 1/32）
+    titleTable.add(fullBtn).padRight(5f).align(Align.topRight);
+
     Button closeBtn = new Button("@close", () -> remove());
     titleTable.add(closeBtn).align(Align.topRight);
 
@@ -164,17 +181,25 @@ public class Window {
     Core.scene.add(window);
 
     // --- 自适应大小 ---
-    // 先按内容 pack() 收缩到恰好容纳的大小，
-    // 再用 Mathf.clamp 设下限/上限：
-    //   下限 = 屏幕宽高的 3/7（内容少的窗口不会缩成一小点），
-    //         若调用方设置了更大的 w/h 则尊重该值
-    //   上限 = 屏幕尺寸（内容多的窗口自动撑大，最多占满屏幕）。
-    float minW = Math.max(w, Core.scene.getWidth() * 3f / 7f);
-    float minH = Math.max(h, Core.scene.getHeight() * 3f / 7f);
-    window.pack();
-    float finalW = Mathf.clamp(window.getWidth(), minW, Core.scene.getWidth());
-    float finalH = Mathf.clamp(window.getHeight(), minH, Core.scene.getHeight());
-    window.setSize(finalW, finalH);
+    // 全屏：直接铺满整个屏幕。
+    // 非全屏：先按内容 pack() 收缩到恰好容纳的大小，
+    //   再用 Mathf.clamp 设下限/上限：
+    //     下限 = 屏幕宽高的 3/7（内容少的窗口不会缩成一小点），
+    //           若调用方设置了更大的 w/h 则尊重该值
+    //     上限 = 屏幕宽高 × maxExpand（默认 60%，内容多的窗口最多撑到 60%）。
+    //     当下限超过上限（调用方设了很大的 w/h）时以 60% 上限优先，避免破上限。
+    if (fullscreen) {
+      window.setSize(Core.scene.getWidth(), Core.scene.getHeight());
+    } else {
+      float maxW = Core.scene.getWidth() * maxExpand;
+      float maxH = Core.scene.getHeight() * maxExpand;
+      float minW = Math.min(Math.max(w, Core.scene.getWidth() * 3f / 7f), maxW);
+      float minH = Math.min(Math.max(h, Core.scene.getHeight() * 3f / 7f), maxH);
+      window.pack();
+      float finalW = Mathf.clamp(window.getWidth(), minW, maxW);
+      float finalH = Mathf.clamp(window.getHeight(), minH, maxH);
+      window.setSize(finalW, finalH);
+    }
     window.validate();
 
     // 初始居中（使用最终尺寸）
@@ -193,7 +218,7 @@ public class Window {
     main.remove();
     low.remove();
   }
-  
+
   // 应该通过覆写这三个方法来实现内容
   public void main(Table t) {}
 

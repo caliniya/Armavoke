@@ -18,6 +18,7 @@ import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
@@ -44,6 +45,9 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   public float armorMax; // 护甲容量上限
   public float armorValue; // 护甲强度（固定减伤）
 
+  /** 护甲对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
+  public float[] armorResist = new float[DamageType.values().length];
+
   // 能量回充速率（每秒，类型默认）
   public float energyRegen;
   public float energyMax;
@@ -54,8 +58,6 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
 
   // 渲染资源
   public TextureRegion region, cell;
-
-  public StatStack stat;
 
   public UnitType(String name) {
     super(name, CType.Unit);
@@ -79,18 +81,20 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     for (WeaponType weapon : weapons) {
       weapon.load(name);
     }
-    stat = new StatStack();
     // 基础
     stat.add(Stat.health, health, StatUnit.none);
     stat.add(Stat.speed, speed, StatUnit.tilesSecond);
     stat.add(Stat.rotateSpeed, rotationSpeend, StatUnit.degrees);
+    stat.add(Stat.energyMax, energyMax, StatUnit.none);
     stat.add(Stat.energyRegen, energyRegen, StatUnit.perSecond);
     // 防护
     stat.add(Stat.armor, armorMax, StatUnit.none);
     stat.add(Stat.armorValue, armorValue, StatUnit.none);
-    abilities.each(e -> {
-      e.stats(stat);
-    });
+    stat.addResists(StatType.protect, "stat.armorResist", armorResist, null);
+    abilities.each(
+        e -> {
+          e.stats(stat);
+        });
   }
 
   public Unit create(TeamTypes team, float x, float y) {

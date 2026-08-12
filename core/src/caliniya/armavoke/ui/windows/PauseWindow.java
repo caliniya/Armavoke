@@ -66,6 +66,8 @@ public class PauseWindow extends Window {
     u.armor = 500;
     u.armorMax = 500;
     u.armorValue = 30;
+    // 隔离类型默认抗性：公式验证用全 0 抗性基线（第 8 步再手动设置动能抗性）
+    u.armorResist = new float[DamageType.values().length];
 
     ShieldAbility shield = new ShieldAbility(500);
     shield.regen = 0;
