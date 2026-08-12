@@ -59,7 +59,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   }
 
   /** 能力列表：护盾/过热等可组合能力，默认不带。 */
-  public final Ar<Ability> abilities = new Ar<>();
+  public Ar<Ability> abilities = new Ar<>();
 
   /** 附加一个能力。 */
   public void addAbility(Ability ability) {

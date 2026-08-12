@@ -26,14 +26,9 @@ public class DataWindow extends Window {
     if (stack == null) return;
 
     for (StatType type : StatType.values()) {
-      Ar<StatData> items = new Ar<>();
-      stack.getByType(
-          type,
-          s -> {
-            if (s != null) items.add(s);
-          });
-
-      if (!items.any()) continue;
+      Ar<StatStack.StatEntry> items = new Ar<>();
+      stack.getEntries(type, items::add);
+      if (items.isEmpty()) continue;
 
       // 分组标题
       t.add("[#03ECED]" + type.localizedName + "[]")
@@ -43,13 +38,21 @@ public class DataWindow extends Window {
           .labelAlign(Align.left);
       t.row();
 
-      // 数据项
-      for (StatData item : items) {
-        if (item == null) {
-          continue;
+      // 无分组项直接显示；带分组（能力名）的先显示标题再缩进参数
+      String lastGroup = null;
+      for (StatStack.StatEntry e : items) {
+        if (e.group == null) {
+          t.add(e.data.data).left().padLeft(16).padBottom(2).align(Align.left);
+          t.row();
+        } else {
+          if (!e.group.equals(lastGroup)) {
+            t.add("[light]" + e.group + "[]").left().padLeft(8).padTop(2).padBottom(2);
+            t.row();
+            lastGroup = e.group;
+          }
+          t.add(e.data.data).left().padLeft(28).padBottom(1).align(Align.left);
+          t.row();
         }
-        t.add(item.data).left().padLeft(16).padBottom(2).align(Align.left);
-        t.row();
       }
     }
   }

@@ -16,6 +16,12 @@ public class UnitTypes {
     test =
         new UnitType("testunit") {
           {
+            //this.armor = 500;
+            this.armorMax = 500;
+            this.armorValue = 30;
+            //this.energy = 100;
+            this.energyMax = 100;
+            this.energyRegen = 10;
             this.hitbox = new float[] {0f, 60f, 60f, 0f, 0f, 60f, 60f, 0f, 60f};
 
             addWeapons(

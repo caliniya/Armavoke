@@ -93,6 +93,8 @@ public class Unit extends Entity {
     this.maxHealth = this.type.health;
     this.health = this.type.health;
 
+    this.type.abilities.each(a -> this.addAbility(a));
+    
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {
       hitboxData = new float[type.hitbox.length];

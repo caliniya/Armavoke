@@ -125,8 +125,9 @@ public class ShieldAbility extends Ability {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.shield, max, StatUnit.none);
-    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent);
-    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond);
+    stack.add(Stat.shield, max, StatUnit.none, localizedName);
+    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, localizedName);
+    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
+    stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond, localizedName);
   }
 }

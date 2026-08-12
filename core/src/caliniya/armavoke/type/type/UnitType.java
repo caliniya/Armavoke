@@ -46,6 +46,7 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
 
   // 能量回充速率（每秒，类型默认）
   public float energyRegen;
+  public float energyMax;
 
   public Ar<Ability> abilities = new Ar<Ability>();
 

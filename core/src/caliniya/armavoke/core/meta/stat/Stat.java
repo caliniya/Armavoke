@@ -12,11 +12,13 @@ public enum Stat {
   // 防护
   armor("armor", StatType.protect),
   armorValue("armorValue", StatType.protect),
-  shield("shield", StatType.protect),
-  shieldStrength("shieldStrength", StatType.protect),
-  shieldRegen("shieldRegen", StatType.protect),
+  shield("shield", StatType.function),
+  shieldStrength("shieldStrength", StatType.function),
+  shieldRegen("shieldRegen", StatType.function),
   // 支持（能力/热量）
-  heat("heat", StatType.function);
+  heat("heat", StatType.function),
+  shieldCost("shieldCost", StatType.function),
+  radius("radius", StatType.function);
   public final String name, localizedName;
   public final StatType type;
 

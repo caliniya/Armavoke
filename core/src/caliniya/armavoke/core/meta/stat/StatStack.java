@@ -9,48 +9,70 @@ import caliniya.armavoke.base.tool.Ar;
 /** 表示一组统计数据 */
 public class StatStack {
 
-  private ObjectMap<StatType, OrderedMap<Stat, StatData>> data =
-      new ObjectMap<StatType, OrderedMap<Stat, StatData>>();
+  /** 一条统计项（可带能力分组名）。 */
+  public static class StatEntry {
+    public final StatType type;
+    public final Stat stat;
+    public final String group; // 能力名（null = 分组直属）
+    public final StatData data;
+
+    public StatEntry(StatType type, Stat stat, String group, StatData data) {
+      this.type = type;
+      this.stat = stat;
+      this.group = group;
+      this.data = data;
+    }
+  }
+
+  private final Ar<StatEntry> entries = new Ar<>();
 
   public StatStack add(Stat stat, float value, StatUnit unit) {
-    if (!data.containsKey(stat.type)) {
-      data.put(stat.type, new OrderedMap<>());
+    return add(stat, value, unit, null);
+  }
+
+  /**
+   * @param group 能力名等子组标题（null 则直接显示在分组下）
+   */
+  public StatStack add(Stat stat, float value, StatUnit unit, String group) {
+    entries.add(new StatEntry(stat.type, stat, group, new StatData(stat, value, unit)));
+    return this;
+  }
+
+  /** 复制另一份 StatStack 的所有条目。 */
+  public StatStack addAll(StatStack other) {
+    for (StatEntry e : other.entries) {
+      entries.add(e);
     }
-    data.get(stat.type).put(stat, new StatData(stat, value, unit));
     return this;
   }
 
   public void getByType(StatType type, Cons<StatData> using) {
-    if (!data.containsKey(type)) {
-      using.get(null);
-      return;
+    for (StatEntry e : entries) {
+      if (e.type == type) using.get(e.data);
     }
-    data.get(type)
-        .each(
-            (K, V) -> {
-              using.get(V);
-            });
+  }
+
+  /** 获取指定类型的所有条目（含 group 信息），按添加顺序。 */
+  public void getEntries(StatType type, Cons<StatEntry> using) {
+    for (StatEntry e : entries) {
+      if (e.type == type) using.get(e);
+    }
   }
 
   public void get(Stat stat, Cons<StatData> using) {
-    if (!data.containsKey(stat.type)) {
-      data.put(stat.type, new OrderedMap<>());
+    for (StatEntry e : entries) {
+      if (e.stat == stat) using.get(e.data);
     }
-    using.get(data.get(stat.type).get(stat));
   }
 
   public void getAll(Cons<StatData> using) {
-    data.each(
-        (K, V) -> {
-          V.each(
-              (k, v) -> {
-                using.get(v);
-              });
-        });
+    for (StatEntry e : entries) {
+      using.get(e.data);
+    }
   }
 
   /** 清空所有数据 */
   public void clear() {
-    data.clear();
+    entries.clear();
   }
 }

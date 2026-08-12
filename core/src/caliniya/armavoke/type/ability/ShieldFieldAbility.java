@@ -45,9 +45,6 @@ public class ShieldFieldAbility extends ForceFieldAbility {
     return resist[type.ordinal()];
   }
 
-  /** 关闭前保存的力场容量（重新开启时恢复）。 */
-  private float savedCurrent;
-
   /** 开关。 */
   public boolean active = true;
 
@@ -142,9 +139,11 @@ public class ShieldFieldAbility extends ForceFieldAbility {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.shield, max, StatUnit.none);
-    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent);
-    //stack.add(Stat.shieldRegen, regen, StatUnit.perSecond);
+    stack.add(Stat.shield, max, StatUnit.none, "ShieldFieldAbility");
+    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, "ShieldFieldAbility");
+    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, "ShieldFieldAbility");
+    stack.add(Stat.shieldCost, cost, StatUnit.perSecond, "ShieldFieldAbility");
+    stack.add(Stat.radius, radius, StatUnit.none, "ShieldFieldAbility");
   }
 
   @Override
