@@ -40,9 +40,9 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
-                /*
+                
             this.abilities.add(
-                new ShieldFieldAbility(500, 200) {
+                new ShieldAbility(500) {
                   {
                     this.regen = 10;
                     this.energyCost = 3;
@@ -50,14 +50,14 @@ public class UnitTypes {
                   }
                 });
             this.abilities.add(
-                new ShieldFieldAbility(200f, 195f) {
+                new ShieldAbility(200f) {
                   {
                     this.regen = 10;
                     this.energyCost = 3;
                     this.resist[DamageType.Thermal.ordinal()] = 0.6f;
                   }
                 });
-                */
+                
             // 过热能力演示：储热 100，每发 10，散热 20/秒
             this.abilities.add(
                 new HeatAbility(100f) {

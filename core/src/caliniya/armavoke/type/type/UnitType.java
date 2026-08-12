@@ -95,6 +95,10 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     abilities.each(
         e -> {
           stat.groupStart(e.localizedName);
+          // 能力介绍（若配置了 bundle 描述）：与能力名对齐（层 1），紧随能力名
+          if (e.description != null) {
+            stat.addRawLevel(StatType.function, e.description, e.localizedName, 1);
+          }
           e.stats(stat);
           stat.groupStart(null);
         });

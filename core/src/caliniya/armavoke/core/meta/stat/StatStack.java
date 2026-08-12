@@ -121,6 +121,19 @@ public class StatStack {
     return this;
   }
 
+  /** 直接指定渲染层级的原始文本条目（如能力介绍与能力名对齐用 level 1）。 */
+  public StatStack addRawLevel(StatType type, String text, String group, int level) {
+    entries.add(
+        new StatEntry(
+            type,
+            null,
+            group,
+            entryKey(group, currentGroupName, currentGroupKey),
+            new StatData(text),
+            level));
+    return this;
+  }
+
   /**
    * 计算渲染层级。
    *

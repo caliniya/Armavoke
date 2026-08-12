@@ -1,6 +1,7 @@
 package caliniya.armavoke.type.ability;
 
 import arc.Core;
+import arc.util.Nullable;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
@@ -16,6 +17,9 @@ public abstract class Ability implements Cloneable {
 
   public String localizedName, name;
 
+  /** 能力介绍（bundle：ability.名称.description），用于类型信息展示。 */
+  public @Nullable String description;
+
   /** 是否可以被主动开启/关闭（指挥面板提供开关按钮）。 */
   public boolean toggleable;
 
@@ -25,6 +29,7 @@ public abstract class Ability implements Cloneable {
   public Ability(String name) {
     this.name = name;
     localizedName = Core.bundle.get("ability." + name);
+    description = Core.bundle.getOrNull("ability." + name + ".description");
   }
 
   // 当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
@@ -65,12 +70,11 @@ public abstract class Ability implements Cloneable {
 
   /** 可选视觉绘制（护盾光圈等）。 */
   public void draw(Entity e) {}
-  
-  
-  public void write(Entity e ,Writes w) {
+
+  public void write(Entity e, Writes w) {
     write(w);
   }
-  
+
   /** 序列化运行时状态（开关等）。类型定义参数由 {@link #copy()} 从类型复制，不写存档。 */
   public void write(Writes w) {
     w.bool(enabled);
@@ -80,8 +84,8 @@ public abstract class Ability implements Cloneable {
   public void read(Reads r) {
     enabled = r.bool();
   }
-  
-  public void read(Entity e ,Reads r) {
+
+  public void read(Entity e, Reads r) {
     read(r);
   }
 
