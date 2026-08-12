@@ -23,6 +23,7 @@ import caliniya.armavoke.io.*;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.Styles;
 import caliniya.armavoke.ui.windows.CommandInfoWindow;
+import caliniya.armavoke.ui.windows.UnitDetailWindow;
 import arc.files.Fi;
 
 public class HUDFragment {
@@ -44,13 +45,17 @@ public class HUDFragment {
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
-    
+
     a = new Table().top().left();
     b = new Table().bottom().left();
 
-    a.add(new Button("@菜单", () -> {
-      UI.pauseWindow.build();
-    })).size(120f , 50f);
+    a.add(
+            new Button(
+                "@菜单",
+                () -> {
+                  UI.pauseWindow.build();
+                }))
+        .size(120f, 50f);
 
     Button commandBtn =
         new Button(
@@ -70,7 +75,7 @@ public class HUDFragment {
     setupCommandPanel();
 
     updateRightPanel();
-    
+
     root.add(a).top().left();
     root.row();
     root.row();
@@ -142,12 +147,15 @@ public class HUDFragment {
     commandPanel.row();
     commandPanel.add().height(6f).row();
 
-    // 单位状态行（占位，未来实现）
+    // 单位状态行：占位 + 批量开关可切换能力
     Table stateRow = new Table();
-    stateRow.defaults().size(85f, 44f).pad(3f);
+    stateRow.defaults().size(70f, 40f).pad(3f);
+    stateRow.left();
     stateRow.button("待命", () -> Log.info("指令：原地待命（未实现）"));
     stateRow.button("停火", () -> Log.info("指令：停火（未实现）"));
-    commandPanel.add(stateRow);
+    stateRow.button("全部开启", () -> toggleAllAbilities(true));
+    stateRow.button("全部关闭", () -> toggleAllAbilities(false));
+    commandPanel.add(stateRow).growX().left();
 
     refreshCommand();
   }
@@ -161,6 +169,14 @@ public class HUDFragment {
     CommandData.commandType = CommandData.CommandType.Move; // 恢复默认移动模式
     moveBtn.setChecked(true);
     stopBtn.setChecked(false);
+    refreshCommand();
+  }
+
+  /** 批量开关所有选中单位的可切换能力。 */
+  private void toggleAllAbilities(boolean enabled) {
+    for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
+      if (u != null) u.setAllAbilities(enabled);
+    }
     refreshCommand();
   }
 
@@ -184,7 +200,14 @@ public class HUDFragment {
     } else if (CommandData.checkedUnits.size == 1) {
       caliniya.armavoke.type.Unit u = CommandData.checkedUnits.first();
       selectedUnit = u;
-      unitInfoTable.add("[light]" + u.type.name + "[]").left().pad(2f).row();
+      Table infoRow = new Table();
+      infoRow.left();
+      infoRow.add("[light]" + u.type.name + "[]").left().pad(2f);
+      infoRow
+          .add(new Button("详情", () -> new UnitDetailWindow(u).build()))
+          .size(64f, 36f)
+          .padLeft(8f);
+      unitInfoTable.add(infoRow).growX().left().row();
       // 血条横向扩张占满面板宽度
       unitInfoTable.add(healthBar()).growX().height(10f).left().pad(2f).row();
     } else {
@@ -230,36 +253,36 @@ public class HUDFragment {
               float shield = Math.max(0f, u.totalShield());
               float shieldMax = Math.max(0f, u.totalShieldMax());
 
-        float totalMax = coreMax + armorMax + shieldMax;
-        if (totalMax <= 0f) return;
+              float totalMax = coreMax + armorMax + shieldMax;
+              if (totalMax <= 0f) return;
 
-        // 底色
-        Draw.color(Color.darkGray);
-        Fill.rect(x + w / 2f, y + h / 2f, w, h);
+              // 底色
+              Draw.color(Color.darkGray);
+              Fill.rect(x + w / 2f, y + h / 2f, w, h);
 
-        // 核心段（红，最左）
-        float coreW = w * coreMax / totalMax;
-        if (coreW > 0f && core > 0f) {
-          float fw = coreW * (core / coreMax);
-          Draw.color(Color.scarlet);
-          Fill.rect(x + fw / 2f, y + h / 2f, fw, h);
-        }
+              // 核心段（红，最左）
+              float coreW = w * coreMax / totalMax;
+              if (coreW > 0f && core > 0f) {
+                float fw = coreW * (core / coreMax);
+                Draw.color(Color.scarlet);
+                Fill.rect(x + fw / 2f, y + h / 2f, fw, h);
+              }
 
-        // 护甲段（白，中）
-        float armorW = w * armorMax / totalMax;
-        if (armorW > 0f && armor > 0f) {
-          float fw = armorW * (armor / armorMax);
-          Draw.color(Color.lightGray);
-          Fill.rect(x + coreW + fw / 2f, y + h / 2f, fw, h);
-        }
+              // 护甲段（白，中）
+              float armorW = w * armorMax / totalMax;
+              if (armorW > 0f && armor > 0f) {
+                float fw = armorW * (armor / armorMax);
+                Draw.color(Color.lightGray);
+                Fill.rect(x + coreW + fw / 2f, y + h / 2f, fw, h);
+              }
 
-        // 护盾段（蓝，右）
-        float shieldW = w * shieldMax / totalMax;
-        if (shieldW > 0f && shield > 0f) {
-          float fw = shieldW * (shield / shieldMax);
-          Draw.color(Color.sky);
-          Fill.rect(x + coreW + armorW + fw / 2f, y + h / 2f, fw, h);
-        }
+              // 护盾段（蓝，右）
+              float shieldW = w * shieldMax / totalMax;
+              if (shieldW > 0f && shield > 0f) {
+                float fw = shieldW * (shield / shieldMax);
+                Draw.color(Color.sky);
+                Fill.rect(x + coreW + armorW + fw / 2f, y + h / 2f, fw, h);
+              }
 
               Draw.color();
             }
@@ -278,7 +301,7 @@ public class HUDFragment {
     Cell<Table> cell = rightContainer.add(currentPanel);
 
     currentPanel.pack();
-    
+
     float minW = Core.scene.getWidth() / 4f;
     float minH = Core.scene.getHeight() / 3f;
     cell.minSize(minW, minH);

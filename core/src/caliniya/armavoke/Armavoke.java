@@ -96,7 +96,7 @@ public class Armavoke extends ApplicationCore {
 
       Log.info(
           "Game inited - Using: " + String.format("%d ms / %d µs", durationMillis, durationMicros));
-      // Systems.DE = new DebugRender().init();
+      Systems.DE = new DebugRender().init();
     }
 
     // 加载界面

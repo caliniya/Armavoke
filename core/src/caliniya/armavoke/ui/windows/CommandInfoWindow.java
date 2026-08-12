@@ -4,6 +4,7 @@ import arc.scene.ui.layout.Table;
 import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.Unit;
+import caliniya.armavoke.ui.Button;
 
 /**
  * 指挥信息窗口：列出所有友军单位的具体信息。
@@ -23,7 +24,9 @@ public class CommandInfoWindow extends Window {
         u -> {
           if (u == null || u.team != Game.team) return;
           count[0]++;
-          t.add(
+          Table row = new Table();
+          row.left();
+          row.add(
                   "[light]"
                       + u.type.name
                       + "[] 血="
@@ -35,8 +38,11 @@ public class CommandInfoWindow extends Window {
                       + " 能="
                       + (int) u.energy)
               .left()
-              .pad(2f)
-              .row();
+              .pad(2f);
+          row.add(new Button("详情", () -> new UnitDetailWindow(u).build()))
+              .size(60f, 36f)
+              .padLeft(6f);
+          t.add(row).growX().left().row();
         });
     if (count[0] == 0) {
       t.add("[gray]没有友军单位[]").pad(10f);

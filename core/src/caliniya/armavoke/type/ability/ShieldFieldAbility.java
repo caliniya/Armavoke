@@ -28,11 +28,16 @@ public class ShieldFieldAbility extends ForceFieldAbility {
   /** 开关。 */
   public boolean active = true;
 
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    this.active = enabled;
+  }
+
   /**
    * 是否拦截力场内部发射的子弹。
    *
-   * <p>false（默认）：放行内部发射的子弹，支持"逼近敌人穿盾输出"；
-   * true：拦截范围内所有子弹，适合庇护/压制型力场（贴脸压制敌人火力、保护友军）。
+   * <p>false（默认）：放行内部发射的子弹，支持"逼近敌人穿盾输出"； true：拦截范围内所有子弹，适合庇护/压制型力场（贴脸压制敌人火力、保护友军）。
    */
   public boolean interceptInternal = false;
 

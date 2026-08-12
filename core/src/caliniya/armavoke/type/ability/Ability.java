@@ -9,12 +9,23 @@ import caliniya.armavoke.base.type.DamageType;
  * <p>特殊机制（护盾、过热等）都做成能力，可组合地附加到单位或建筑上，默认不带。
  */
 public abstract class Ability {
-  
-  //当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
-  public Ability oncteate(Entity e){
+
+  /** 是否可以被主动开启/关闭（指挥面板提供开关按钮）。 */
+  public boolean toggleable;
+
+  /** 能力当前是否开启（可开关能力的通用状态）。 */
+  public boolean enabled = true;
+
+  // 当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
+  public Ability oncteate(Entity e) {
     return this;
   }
-  
+
+  /** 开关能力（toggleable 时由 UI 调用）。子类覆写以同步自己的开关状态。 */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
   /** 每帧逻辑：回充、耗能、积累热量等。 */
   public void update(Entity e, float dt) {}
 
@@ -26,7 +37,8 @@ public abstract class Ability {
    * @param breakShield 本次攻击是否破盾（无视护盾强度减伤）
    * @param bypassShield 本次攻击是否穿盾（直接穿过护盾）
    */
-  public float applyDamage(Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
+  public float applyDamage(
+      Entity e, float damage, DamageType type, boolean breakShield, boolean bypassShield) {
     return damage;
   }
 
