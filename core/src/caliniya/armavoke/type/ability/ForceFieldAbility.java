@@ -28,6 +28,10 @@ public abstract class ForceFieldAbility extends Ability {
 
   /** 力场实体注册表：当前所有**生效**的力场实体。 由基类 update 维护，BulletProcess（子弹线程）遍历做拦截/效果。 */
   public static final Ar<Entity> entities = new Ar<>(false, 8);
+  
+  public ForceFieldAbility(String name){
+    super(name);
+  }
 
   /** 该力场当前是否生效（子类覆写，如护盾力场看 active 与容量）。 */
   public boolean isActive() {

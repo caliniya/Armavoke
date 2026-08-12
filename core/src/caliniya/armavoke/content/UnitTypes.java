@@ -2,6 +2,7 @@ package caliniya.armavoke.content;
 
 import arc.util.Log;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.ability.ShieldFieldAbility;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
 import caliniya.armavoke.Armavoke;
@@ -15,18 +16,7 @@ public class UnitTypes {
     test =
         new UnitType("testunit") {
           {
-            this.hitbox =
-                new float[] {
-                  0f,
-                  60f,
-                  60f, 
-                  0f,
-                  0f,
-                  60f,
-                  60f,
-                  0f,
-                  60f 
-                };
+            this.hitbox = new float[] {0f, 60f, 60f, 0f, 0f, 60f, 60f, 0f, 60f};
 
             addWeapons(
                 new WeaponType("aa") {
@@ -37,9 +27,16 @@ public class UnitTypes {
                     rotate = true;
                   }
                 });
+            this.abilities.add(
+                new ShieldFieldAbility(500, 200) {
+                  {
+                    this.regen = 50;
+                    this.cost = 3;
+                  }
+                });
           }
         };
-    
+
     test2 =
         new UnitType("starNode") {
           {

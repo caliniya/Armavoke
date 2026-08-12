@@ -5,6 +5,9 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.core.meta.stat.Stat;
+import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.Bullet;
 
 /**
@@ -62,6 +65,7 @@ public class ShieldFieldAbility extends ForceFieldAbility {
   public boolean interceptInternal = false;
 
   public ShieldFieldAbility(float max, float radius) {
+    super("shieldfield");
     this.max = max;
     this.current = max;
     this.radius = radius;
@@ -128,12 +132,19 @@ public class ShieldFieldAbility extends ForceFieldAbility {
 
   @Override
   public float capacity() {
-    return return active ? current : 0f;
+    return active ? current : 0f;
   }
 
   @Override
   public float capacityMax() {
     return max;
+  }
+
+  @Override
+  public void stats(StatStack stack) {
+    stack.add(Stat.shield, max, StatUnit.none);
+    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent);
+    //stack.add(Stat.shieldRegen, regen, StatUnit.perSecond);
   }
 
   @Override

@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.graphics.g2d.*;
+import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
@@ -39,6 +40,15 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   // 单位的物品容量，使用通用的物品模块规则
   public int itemCap = 50;
 
+  // 防护（类型默认，实例可覆盖）
+  public float armorMax; // 护甲容量上限
+  public float armorValue; // 护甲强度（固定减伤）
+
+  // 能量回充速率（每秒，类型默认）
+  public float energyRegen;
+
+  public Ar<Ability> abilities = new Ar<Ability>();
+
   public Ar<WeaponType> weapons = new Ar<WeaponType>();
 
   // 渲染资源
@@ -69,8 +79,17 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       weapon.load(name);
     }
     stat = new StatStack();
+    // 基础
     stat.add(Stat.health, health, StatUnit.none);
     stat.add(Stat.speed, speed, StatUnit.tilesSecond);
+    stat.add(Stat.rotateSpeed, rotationSpeend, StatUnit.degrees);
+    stat.add(Stat.energyRegen, energyRegen, StatUnit.perSecond);
+    // 防护
+    stat.add(Stat.armor, armorMax, StatUnit.none);
+    stat.add(Stat.armorValue, armorValue, StatUnit.none);
+    abilities.each(e -> {
+      e.stats(stat);
+    });
   }
 
   public Unit create(TeamTypes team, float x, float y) {

@@ -1,7 +1,9 @@
 package caliniya.armavoke.type.ability;
 
+import arc.Core;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.core.meta.stat.StatStack;
 
 /**
  * 能力基类（类似 Mindustry 的 ability）。
@@ -10,11 +12,18 @@ import caliniya.armavoke.base.type.DamageType;
  */
 public abstract class Ability {
 
+  public String localizedName, name;
+
   /** 是否可以被主动开启/关闭（指挥面板提供开关按钮）。 */
   public boolean toggleable;
 
   /** 能力当前是否开启（可开关能力的通用状态）。 */
   public boolean enabled = true;
+
+  public Ability(String name) {
+    this.name = name;
+    localizedName = Core.bundle.get("ability." + name);
+  }
 
   // 当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
   public Ability oncteate(Entity e) {
@@ -30,6 +39,11 @@ public abstract class Ability {
   public float energyUse() {
     return 0;
   }
+
+  /** 向 StatStack 上报能力相关的类型参数（如护盾容量/强度/回充）。 */
+  public void stats(StatStack stack) {}
+  
+  public void statAbility(StatStack stat){}
 
   /** 每帧逻辑：回充、耗能、积累热量等。 */
   public void update(Entity e, float dt) {}

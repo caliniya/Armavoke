@@ -165,7 +165,7 @@ public class MenuFragment {
 
                               // 护盾力场：正六边形，半径 180，拦截进入的子弹
                               ShieldFieldAbility field = new ShieldFieldAbility(500, 180);
-                              field.regen = 5;
+                              field.regen = 50;
                               field.cost = 3;
                               enemy.addAbility(field);
 

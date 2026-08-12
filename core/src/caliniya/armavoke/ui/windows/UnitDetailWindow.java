@@ -8,14 +8,11 @@ import arc.scene.Element;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.type.Unit;
+import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.ui.Button;
 
-/**
- * 单位详细信息窗口：
- * 类型信息（名字 + DataWindow 按钮 + stats meta）、
- * 血量/能量/护盾（数字 + 条形图，实时更新）、能力列表（可开关能力带开关按钮）。
- */
+/** 单位详细信息窗口： 类型信息（名字 + DataWindow 按钮 + stats meta）、 血量/能量/护盾（数字 + 条形图，实时更新）、能力列表（可开关能力带开关按钮）。 */
 public class UnitDetailWindow extends Window {
 
   private final Unit unit;
@@ -34,7 +31,8 @@ public class UnitDetailWindow extends Window {
     Table nameRow = new Table();
     nameRow.left();
     nameRow.add("[light]" + unit.type.name + "[]").left().pad(2f);
-    nameRow.add(new Button("类型信息", () -> new DataWindow(unit.type.stats()).build()))
+    nameRow
+        .add(new Button("类型信息", () -> new DataWindow(unit.type.stats()).build()))
         .size(84f, 36f)
         .padLeft(8f);
     t.add(nameRow).growX().left().row();

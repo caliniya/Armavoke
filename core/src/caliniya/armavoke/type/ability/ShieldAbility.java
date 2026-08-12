@@ -2,6 +2,9 @@ package caliniya.armavoke.type.ability;
 
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.core.meta.stat.Stat;
+import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatUnit;
 
 /**
  * 护盾能力。
@@ -57,6 +60,7 @@ public class ShieldAbility extends Ability {
   }
 
   public ShieldAbility(float max) {
+    super("shield");
     this.max = max;
     this.current = max;
     this.toggleable = true;
@@ -117,5 +121,12 @@ public class ShieldAbility extends Ability {
   /** 当前容量比例（0 ~ 1），用于血条显示。 */
   public float percent() {
     return max <= 0 ? 0f : current / max;
+  }
+
+  @Override
+  public void stats(StatStack stack) {
+    stack.add(Stat.shield, max, StatUnit.none);
+    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent);
+    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond);
   }
 }
