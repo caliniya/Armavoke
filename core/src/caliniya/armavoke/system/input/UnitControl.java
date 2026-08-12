@@ -17,9 +17,9 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.*;
 
 public class UnitControl implements InputProcessor, GestureListener {
-  
+
   public boolean b = false;
-    
+
   public UnitControl init() {
     return this;
   }
@@ -33,7 +33,7 @@ public class UnitControl implements InputProcessor, GestureListener {
     Vec2 worldPos = Core.camera.unproject(x, y);
     float wx = worldPos.x;
     float wy = worldPos.y;
-    
+
     b = false;
 
     CommandData.findUnit(
@@ -43,18 +43,41 @@ public class UnitControl implements InputProcessor, GestureListener {
           if (t == null) return;
           toggleUnitSelection(t);
         });
-    
-    if(b) {
-    	return true;
+
+    if (b) {
+      // 选中变化，刷新指挥面板
+      UI.hud.refreshCommand();
+      return true;
     }
 
-    // 2. 点击空地或敌人：尝试移动
-    if (!CommandData.checkedUnits.isEmpty()) {
-      issueMoveCommand(wx, wy);
+    // 按当前指挥状态执行（直接指挥）
+    if (CommandData.commandType == CommandData.CommandType.Move) {
+      if (!CommandData.checkedUnits.isEmpty()) {
+        issueMoveCommand(wx, wy);
+      }
+      return true;
+    } else if (CommandData.commandType == CommandData.CommandType.Stop) {
+      stopUnits();
       return true;
     }
 
     return false;
+  }
+
+  /** 让选中单位立即停下（清目标/速度/寻路）。 */
+  private void stopUnits() {
+    synchronized (WorldData.moveunits) {
+      for (Unit u : CommandData.checkedUnits) {
+        if (u == null) continue;
+        u.speedX = 0;
+        u.speedY = 0;
+        u.targetX = u.x;
+        u.targetY = u.y;
+        u.path = null;
+        u.pathed = false;
+        WorldData.moveunits.remove(u);
+      }
+    }
   }
 
   private void toggleUnitSelection(Unit u) {

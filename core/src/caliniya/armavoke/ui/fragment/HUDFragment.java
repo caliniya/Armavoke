@@ -4,8 +4,14 @@ import arc.Core;
 import arc.Events;
 import arc.math.Interp;
 import arc.scene.actions.Actions;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.scene.Element;
 import arc.scene.event.Touchable;
+import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
+import caliniya.armavoke.type.Unit;
 import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
@@ -16,6 +22,7 @@ import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.io.*;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.Styles;
+import caliniya.armavoke.ui.windows.CommandInfoWindow;
 import arc.files.Fi;
 
 public class HUDFragment {
@@ -23,7 +30,11 @@ public class HUDFragment {
   private Table root;
   private Table rightContainer;
   private Table buildingPanel;
-  private Table commandPanel;;
+  private Table commandPanel;
+  private Table unitInfoTable;
+  private Button moveBtn, stopBtn;
+  private Element healthBarElement; // 复用的血条元素
+  private Unit selectedUnit; // 血条当前绑定的单位
 
   //  A左上  B左下
   public Table a, b;
@@ -104,24 +115,157 @@ public class HUDFragment {
     commandPanel = new Table();
     commandPanel.background(Styles.background);
 
-    commandPanel.add("[light]单位指挥[]").row();
-    commandPanel.add().height(10f).row();
+    // 顶部：指挥信息 + 清空选择
+    Table topRow = new Table();
+    topRow.defaults().size(90f, 40f).pad(2f);
+    topRow.add(new Button("指挥信息", () -> new CommandInfoWindow().build()));
+    topRow.add(new Button("清空", () -> clearSelection()));
+    commandPanel.add(topRow);
+    commandPanel.row();
+    commandPanel.add().height(6f).row();
 
-    Table basicRow = new Table();
-    basicRow.defaults().size(70f, 50f).pad(5f);
-    basicRow.button("攻击", () -> Log.info("攻击指令"));
-    basicRow.button("移动", () -> Log.info("移动指令"));
-    basicRow.button("防守", () -> Log.info("防守指令"));
-    commandPanel.add(basicRow).row();
+    // 单位信息区（动态刷新）
+    unitInfoTable = new Table();
+    commandPanel.add(unitInfoTable).growX();
+    commandPanel.row();
+    commandPanel.add().height(6f).row();
 
-    Table advRow = new Table();
-    advRow.defaults().size(70f, 50f).pad(5f);
-    advRow.button("巡逻", () -> Log.info("巡逻指令"));
-    advRow.button("技能", () -> Log.info("打开单位技能树"));
-    advRow.button("编队", () -> Log.info("编队管理"));
-    commandPanel.add(advRow).row();
+    // 直接指挥行（单选，按下高亮）
+    Table directRow = new Table();
+    directRow.defaults().size(85f, 44f).pad(3f);
+    moveBtn = new Button("移动", () -> setCommand(CommandData.CommandType.Move));
+    stopBtn = new Button("停止", () -> setCommand(CommandData.CommandType.Stop));
+    moveBtn.setChecked(true); // 默认移动模式
+    directRow.add(moveBtn);
+    directRow.add(stopBtn);
+    commandPanel.add(directRow);
+    commandPanel.row();
+    commandPanel.add().height(6f).row();
 
-    commandPanel.add("[gray]选中单位状态信息区域[]").padTop(10f);
+    // 单位状态行（占位，未来实现）
+    Table stateRow = new Table();
+    stateRow.defaults().size(85f, 44f).pad(3f);
+    stateRow.button("待命", () -> Log.info("指令：原地待命（未实现）"));
+    stateRow.button("停火", () -> Log.info("指令：停火（未实现）"));
+    commandPanel.add(stateRow);
+
+    refreshCommand();
+  }
+
+  /** 清空当前选中的单位列表。 */
+  private void clearSelection() {
+    for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
+      if (u != null) u.isSelected = false;
+    }
+    CommandData.checkedUnits.clear();
+    CommandData.commandType = CommandData.CommandType.Move; // 恢复默认移动模式
+    moveBtn.setChecked(true);
+    stopBtn.setChecked(false);
+    refreshCommand();
+  }
+
+  /** 切换直接指挥状态（单选：点中高亮，再点取消，切换时其他自动关）。 */
+  private void setCommand(CommandData.CommandType type) {
+    CommandData.commandType =
+        (CommandData.commandType == type) ? CommandData.CommandType.None : type;
+    moveBtn.setChecked(CommandData.commandType == CommandData.CommandType.Move);
+    stopBtn.setChecked(CommandData.commandType == CommandData.CommandType.Stop);
+    refreshCommand();
+  }
+
+  /** 刷新指挥面板：选中单位信息 + 当前指令状态。 */
+  public void refreshCommand() {
+    if (unitInfoTable == null) return;
+    unitInfoTable.clearChildren();
+
+    if (CommandData.checkedUnits.isEmpty()) {
+      selectedUnit = null;
+      unitInfoTable.add("[gray]未选择单位[]").left().pad(2f);
+    } else if (CommandData.checkedUnits.size == 1) {
+      caliniya.armavoke.type.Unit u = CommandData.checkedUnits.first();
+      selectedUnit = u;
+      unitInfoTable.add("[light]" + u.type.name + "[]").left().pad(2f).row();
+      // 血条横向扩张占满面板宽度
+      unitInfoTable.add(healthBar()).growX().height(10f).left().pad(2f).row();
+    } else {
+      selectedUnit = null;
+      for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
+        unitInfoTable.add("[light]" + u.type.name + "[]").left().pad(1f).row();
+      }
+    }
+
+    // 当前指令状态提示
+    unitInfoTable.row();
+    String cmdText =
+        CommandData.commandType == CommandData.CommandType.Move
+            ? "[sky]移动指令中：点地图目标[]"
+            : CommandData.commandType == CommandData.CommandType.Stop
+                ? "[sky]停止指令中：点击执行[]"
+                : "[gray]无指令[]";
+    unitInfoTable.add(cmdText).left().padTop(4f);
+  }
+
+  /** 整合血条元素（复用一个实例，绘制时读取 selectedUnit）。 */
+  private Element healthBar() {
+    if (healthBarElement == null) {
+      healthBarElement =
+          new Element() {
+            {
+              setSize(140f, 10f);
+            }
+
+            @Override
+            public void draw() {
+              if (selectedUnit == null) return;
+              float x = this.x;
+              float y = this.y;
+              float w = getWidth();
+              float h = getHeight();
+
+              Unit u = selectedUnit;
+              float core = Math.max(0f, u.health);
+              float coreMax = Math.max(0f, u.maxHealth);
+              float armor = Math.max(0f, u.armor);
+              float armorMax = Math.max(0f, u.armorMax);
+              float shield = Math.max(0f, u.totalShield());
+              float shieldMax = Math.max(0f, u.totalShieldMax());
+
+        float totalMax = coreMax + armorMax + shieldMax;
+        if (totalMax <= 0f) return;
+
+        // 底色
+        Draw.color(Color.darkGray);
+        Fill.rect(x + w / 2f, y + h / 2f, w, h);
+
+        // 核心段（红，最左）
+        float coreW = w * coreMax / totalMax;
+        if (coreW > 0f && core > 0f) {
+          float fw = coreW * (core / coreMax);
+          Draw.color(Color.scarlet);
+          Fill.rect(x + fw / 2f, y + h / 2f, fw, h);
+        }
+
+        // 护甲段（白，中）
+        float armorW = w * armorMax / totalMax;
+        if (armorW > 0f && armor > 0f) {
+          float fw = armorW * (armor / armorMax);
+          Draw.color(Color.lightGray);
+          Fill.rect(x + coreW + fw / 2f, y + h / 2f, fw, h);
+        }
+
+        // 护盾段（蓝，右）
+        float shieldW = w * shieldMax / totalMax;
+        if (shieldW > 0f && shield > 0f) {
+          float fw = shieldW * (shield / shieldMax);
+          Draw.color(Color.sky);
+          Fill.rect(x + coreW + armorW + fw / 2f, y + h / 2f, fw, h);
+        }
+
+              Draw.color();
+            }
+          };
+    }
+    return healthBarElement;
   }
 
   private void updateRightPanel() {
@@ -131,10 +275,15 @@ public class HUDFragment {
 
     currentPanel.clearActions();
 
-    rightContainer.add(currentPanel);
+    Cell<Table> cell = rightContainer.add(currentPanel);
 
     currentPanel.pack();
-    float height = currentPanel.getPrefHeight();
+    
+    float minW = Core.scene.getWidth() / 4f;
+    float minH = Core.scene.getHeight() / 3f;
+    cell.minSize(minW, minH);
+
+    float height = Math.max(minH, currentPanel.getPrefHeight());
 
     currentPanel.setTranslation(0, -height);
     currentPanel.addAction(Actions.translateBy(0, height, 0.3f, Interp.fade));

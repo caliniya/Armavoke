@@ -16,6 +16,14 @@ public class CommandData {
   public static Ar<Unit> checkedUnits = new Ar<Unit>();
   public static boolean commanding;
 
+  /** 指挥状态（直接指挥行单选）。 */
+  public enum CommandType {
+    None, Move, Stop
+  }
+
+  /** 当前指挥状态（默认移动模式）。 */
+  public static CommandType commandType = CommandType.Move;
+
   // 初始化，也包括重置数据
   public static void init() {
     checkedUnits.clear();
