@@ -12,6 +12,9 @@ import caliniya.armavoke.core.meta.stat.*;
  */
 public class DataWindow extends Window {
 
+  /** 每层缩进的字符（1 个全角空格 = 1 个汉字宽度）。若 1 层不够醒目，改成 {@code "\u3000\u3000"}。 */
+  static final String INDENT = "\u3000\u3000";
+
   private StatStack stack;
 
   public DataWindow(StatStack data) {
@@ -32,7 +35,7 @@ public class DataWindow extends Window {
 
       // 分组标题（none 组为类型名称/描述等顶部信息，不显示空标题）
       if (type != StatType.none) {
-        t.add("  " + "[#03ECED]" + type.localizedName + "[]")
+        t.add("   " + "[#03ECED]" + type.localizedName + "[]")
             .left()
             .padTop(12)
             .padBottom(4)
@@ -44,20 +47,29 @@ public class DataWindow extends Window {
       String lastGroup = null;
       for (StatStack.StatEntry e : items) {
         if (e.group == null) {
-          t.add("      " + e.data.data).left().padLeft(16).padBottom(2).align(Align.left);
+          // 层级已由 StatStack 计算好：none 组名称/描述 0，普通条目 1，护甲抗性 2
+          t.add("   " + indent(e.level) + e.data.data).left().padBottom(2).align(Align.left);
           t.row();
         } else {
           if (!e.group.equals(lastGroup)) {
-            t.add("    " + "[light]" + e.group + "[]").left().padLeft(8).padTop(2).padBottom(2);
+            // 能力名：层 1
+            t.add("   " + indent(1) + "[light]" + e.group + "[]").left().padTop(2).padBottom(2);
             t.row();
             lastGroup = e.group;
           }
-          // 次级条目（如抗性列表）在文本前加 4 个字符做稳定缩进
-          String text = e.indent > 0 ? "        " + e.data.data : "      " + e.data.data;
-          t.add(text).left().padLeft(28).padBottom(1).align(Align.left);
+          // 能力参数 2 / 护盾抗性 3，层级已在 StatStack 计算
+          t.add("   " + indent(e.level) + e.data.data).left().padBottom(1).align(Align.left);
           t.row();
         }
       }
     }
+  }
+
+  /** 拼接指定层数的缩进字符。 */
+  private static String indent(int level) {
+    if (level <= 0) return "";
+    StringBuilder sb = new StringBuilder(level);
+    for (int i = 0; i < level; i++) sb.append(INDENT);
+    return sb.toString();
   }
 }

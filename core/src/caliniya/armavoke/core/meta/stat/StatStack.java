@@ -17,14 +17,25 @@ public class StatStack {
     public final Stat stat;
     public final String group; // 能力名（null = 分组直属）
     public final StatData data;
-    public final int indent; // 缩进层级（0 = 组内普通条目，1 = 抗性等次级条目）
 
-    public StatEntry(StatType type, Stat stat, String group, StatData data, int indent) {
+    /**
+     * 渲染层级（由添加方在 add 时计算好，渲染端只读）：
+     *
+     * <pre>
+     * 0 = 头部信息（类型名称/描述）与分组标题
+     * 1 = 分组项名称（能力名）与无分组条目（核心容量等）
+     * 2 = 有分组条目（能力参数）与无分组次级条目（护甲抗性）
+     * 3 = 有分组次级条目（护盾抗性）
+     * </pre>
+     */
+    public final int level;
+
+    public StatEntry(StatType type, Stat stat, String group, StatData data, int level) {
       this.type = type;
       this.stat = stat;
       this.group = group;
       this.data = data;
-      this.indent = indent;
+      this.level = level;
     }
   }
 
@@ -38,7 +49,9 @@ public class StatStack {
    * @param group 能力名等子组标题（null 则直接显示在分组下）
    */
   public StatStack add(Stat stat, float value, StatUnit unit, String group) {
-    entries.add(new StatEntry(stat.type, stat, group, new StatData(stat, value, unit), 0));
+    entries.add(
+        new StatEntry(
+            stat.type, stat, group, new StatData(stat, value, unit), levelOf(stat.type, group, 0)));
     return this;
   }
 
@@ -53,10 +66,22 @@ public class StatStack {
     return addRaw(type, text, group, 0);
   }
 
-  /** 带缩进层级的原始文本条目（indent 1 起为次级条目）。 */
+  /** 带次级标志的原始文本条目（indent 1 = 次级条目，如抗性列表）。 */
   public StatStack addRaw(StatType type, String text, String group, int indent) {
-    entries.add(new StatEntry(type, null, group, new StatData(text), indent));
+    entries.add(new StatEntry(type, null, group, new StatData(text), levelOf(type, group, indent)));
     return this;
+  }
+
+  /**
+   * 计算渲染层级。
+   *
+   * @param type 所属统计组（none = 头部信息，强制层 0）
+   * @param group 能力名等子组标题（null = 无分组条目）
+   * @param indent 次级标志（1 = 次级条目）
+   */
+  private static int levelOf(StatType type, String group, int indent) {
+    if (type == StatType.none) return 0;
+    return (group != null ? 2 : 1) + (indent > 0 ? 1 : 0);
   }
 
   /**
