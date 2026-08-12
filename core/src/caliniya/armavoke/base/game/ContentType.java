@@ -49,7 +49,9 @@ public class ContentType {
     stat = new StatStack();
 
     stat.addRaw(StatType.none, localizedName, null);
-    stat.addRaw(StatType.none, description, null);
+    if (description != null) {
+      stat.addRaw(StatType.none, description, null);
+    }
 
     if (register) {
       // 注册时会自动分配 ID

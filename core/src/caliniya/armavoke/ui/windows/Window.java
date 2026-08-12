@@ -13,8 +13,6 @@ import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import caliniya.armavoke.ui.Button;
 
-import javax.swing.JFrame;
-
 public class Window {
 
   public Table window;
@@ -30,6 +28,9 @@ public class Window {
 
   /** 非全屏时窗口最大扩张到屏幕宽/高的比例（0~1，默认 60%）。 */
   public float maxExpand = 0.6f;
+
+  /** 是否显示全屏切换按钮（默认打开；某些小弹窗如暂停菜单/进度条可关闭）。 */
+  public boolean showFullButton = true;
 
   /** 是否为模态窗口。模态窗口会显示暗色遮罩并阻断背景所有输入。 */
   public boolean modal = false;
@@ -151,16 +152,18 @@ public class Window {
 
     titleTable.add(titleLabel).growX().fillX().left().padLeft(10f);
 
-    // 全屏切换按钮：全屏 ↔ 还原为最大 60%
-    Button fullBtn =
-        new Button(
-            fullscreen ? "@window.restore" : "@window.fullscreen",
-            () -> {
-              fullscreen = !fullscreen;
-              build();
-            });
-    // 与关闭按钮保持间隔（屏幕宽度的 1/32）
-    titleTable.add(fullBtn).padRight(5f).align(Align.topRight);
+    // 全屏切换按钮（可选，默认显示）：全屏 ↔ 还原为最大 60%
+    if (showFullButton) {
+      Button fullBtn =
+          new Button(
+              fullscreen ? "@window.restore" : "@window.fullscreen",
+              () -> {
+                fullscreen = !fullscreen;
+                build();
+              });
+      // 与关闭按钮保持间隔
+      titleTable.add(fullBtn).padRight(5f).align(Align.topRight);
+    }
 
     Button closeBtn = new Button("@close", () -> remove());
     titleTable.add(closeBtn).align(Align.topRight);

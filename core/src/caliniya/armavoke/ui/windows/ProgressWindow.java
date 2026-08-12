@@ -67,6 +67,7 @@ public class ProgressWindow extends Window {
     this.description = description == null ? "" : description;
     this.w = 440f;
     this.h = 190f;
+    showFullButton = false; // 进度提示弹窗不需要全屏
   }
 
   /**

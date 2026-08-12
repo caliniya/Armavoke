@@ -3,6 +3,7 @@ package caliniya.armavoke.content;
 import arc.util.Log;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.ability.ShieldFieldAbility;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.system.render.*;
@@ -40,9 +41,17 @@ public class UnitTypes {
                 new ShieldFieldAbility(500, 200) {
                   {
                     this.regen = 10;
-                    this.cost = 3;
+                    this.energyCost = 3;
+                    this.resist[DamageType.Energy.ordinal()] = 0.6f;
                   }
                 });
+                this.abilities.add(
+                  new ShieldAbility(200f){{
+                    this.regen = 10;
+                    this.energyCost = 3;
+                    this.resist[DamageType.Thermal.ordinal()] = 0.6f;
+                  }}
+                );
           }
         };
 

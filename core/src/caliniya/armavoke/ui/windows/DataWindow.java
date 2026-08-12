@@ -30,13 +30,15 @@ public class DataWindow extends Window {
       stack.getEntries(type, items::add);
       if (items.isEmpty()) continue;
 
-      // 分组标题
-      t.add("[#03ECED]" + type.localizedName + "[]")
-          .left()
-          .padTop(12)
-          .padBottom(4)
-          .labelAlign(Align.left);
-      t.row();
+      // 分组标题（none 组为类型名称/描述等顶部信息，不显示空标题）
+      if (type != StatType.none) {
+        t.add("[#03ECED]" + type.localizedName + "[]")
+            .left()
+            .padTop(12)
+            .padBottom(4)
+            .labelAlign(Align.left);
+        t.row();
+      }
 
       // 无分组项直接显示；带分组（能力名）的先显示标题再缩进参数
       String lastGroup = null;

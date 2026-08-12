@@ -32,7 +32,7 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   public float regenFrame;
 
   /** 开启时每秒消耗的能量（以秒为单位设计）。 */
-  public float cost;
+  public float energyCost;
 
   /** 开启时每帧消耗的能量（= cost / 60）。 */
   public float costFrame;
@@ -75,7 +75,7 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   /** 把"每秒"数值同步到"每帧"（update 时再同步一次以支持外部改字段）。 */
   private void syncFrames() {
     regenFrame = regen / 60f;
-    costFrame = cost / 60f;
+    costFrame = energyCost / 60f;
   }
 
   @Override
@@ -166,7 +166,7 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   /** 护盾耗能速率（每秒设计值）。 */
   @Override
   public float energyCost() {
-    return cost;
+    return energyCost;
   }
 
   /** 当前护盾比例（0 ~ 1）。 */
@@ -180,7 +180,7 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
     stack.add(Stat.shield, max, StatUnit.none, localizedName);
     stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, localizedName);
     stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
-    stack.add(Stat.shieldCost, cost, StatUnit.perSecond, localizedName);
+    stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond, localizedName);
     stack.add(Stat.radius, radius, StatUnit.none, localizedName);
     stack.addResists(StatType.function, "stat.shieldResist", resist, localizedName);
   }

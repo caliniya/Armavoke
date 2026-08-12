@@ -22,6 +22,7 @@ public class PauseWindow extends Window {
     w = Core.graphics.getWidth() / 2f;
     h = Core.graphics.getHeight() / 2f;
     modal = true;
+    showFullButton = false; // 暂停菜单不需要全屏
   }
 
   @Override
