@@ -47,6 +47,7 @@ public class Contents {
     items = getByType(CType.Item).toArray(ItemType.class);
     Blocks.load();
     UnitTypes.load();
+    Enhancements.load();
     Stars.load();
     for (Ar<ContentType> types : contentByTypes) {
       types.each(t -> t.load());

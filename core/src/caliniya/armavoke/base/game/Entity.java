@@ -9,8 +9,8 @@ import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.ability.api.Shield;
-import caliniya.armavoke.type.enhance.*;
-import caliniya.armavoke.type.enhance.api.*;
+import caliniya.armavoke.type.Enhancement;
+import caliniya.armavoke.type.enhance.api.Updatable;
 import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
@@ -123,13 +123,13 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public void addEnhancement(Enhancement enh) {
     if (enh == null) return;
     enh.entity = this;
-    enh.rebind(this);
+    enh.type.rebind(enh);
     enhancements.add(enh);
     if (enh instanceof Updatable u) {
       updatableEnhancements.add(u);
     }
     if (enh.enabled) {
-      enh.onEnable();
+      enh.type.onEnable(enh);
     }
   }
 

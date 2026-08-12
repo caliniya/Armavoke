@@ -23,7 +23,6 @@ import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.type.ability.ForceFieldAbility;
 import caliniya.armavoke.type.ability.ShieldAbility;
-import caliniya.armavoke.type.enhance.Enhancement;
 
 public class UnitType extends ContentType implements DrawType<Unit>, TechNodeContent {
 

@@ -12,7 +12,8 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.ability.Ability;
-import caliniya.armavoke.type.enhance.Enhancement;
+import caliniya.armavoke.type.Enhancement;
+import caliniya.armavoke.type.enhance.EnhancementType;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.base.type.*;
@@ -357,10 +358,10 @@ public class Unit extends Entity {
     for (Ability a : abilities) {
       a.write(w);
     }
-    // 强化模组（运行时安装）：类型名 + 各自数据
+    // 强化模组（运行时安装）：类型 internalName + 实例数据
     w.i(enhancements.size);
     for (Enhancement enh : enhancements) {
-      w.str(enh.getClass().getName());
+      w.str(enh.type.internalName);
       enh.write(w);
     }
   }
@@ -394,16 +395,17 @@ public class Unit extends Entity {
       abilities.get(i).read(r);
     }
 
-    // 强化模组：按类型名重建实例 → 读数据 → 完整挂载（rebind 恢复绑定）
+    // 强化模组：按类型 internalName 找类型 → create() 重建实例 → 读数据 → 完整挂载
     int enhCount = r.i();
     for (int i = 0; i < enhCount; i++) {
-      String cls = r.str();
-      Enhancement enh = Enhancement.create(cls);
-      if (enh != null) {
+      String name = r.str();
+      EnhancementType t = Contents.get(name, EnhancementType.class);
+      if (t != null) {
+        Enhancement enh = t.create();
         enh.read(r);
         addEnhancement(enh);
       } else {
-        Log.warn("Unknown enhancement type in save: @", cls);
+        Log.warn("Unknown enhancement in save: @", name);
       }
     }
 

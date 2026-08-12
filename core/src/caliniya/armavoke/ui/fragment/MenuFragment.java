@@ -23,7 +23,7 @@ import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Map;
 import caliniya.armavoke.map.Maps;
 import caliniya.armavoke.system.Systems;
-import caliniya.armavoke.type.enhance.ShieldBoostEnhancement;
+import caliniya.armavoke.type.enhance.shield.ShieldBoostEnhancementType;
 import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
@@ -76,17 +76,17 @@ public class MenuFragment {
 
                         // 两个测试单位，各自运行时安装强化模组（出厂无模组，由外部"安装"）
                         Unit A = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
-                        A.addEnhancement(new ShieldBoostEnhancement());
+                        A.addEnhancement(Enhancements.shieldBoost.create());
 
                         Unit B = UnitTypes.test.create(TeamTypes.Mutex, 400, 100);
-                        ShieldBoostEnhancement b1 = new ShieldBoostEnhancement();
-                        b1.maxStrengthBonus = 2f;
-                        b1.kineticResistBonus = 0.1f;
-                        B.addEnhancement(b1);
-                        ShieldBoostEnhancement b2 = new ShieldBoostEnhancement();
-                        b2.maxStrengthBonus = 0.5f;
-                        b2.kineticResistBonus = 0.4f;
-                        B.addEnhancement(b2);
+                        ShieldBoostEnhancementType b1t = new ShieldBoostEnhancementType(false);
+                        b1t.maxStrengthBonus = 2f;
+                        b1t.kineticResistBonus = 0.1f;
+                        B.addEnhancement(b1t.create());
+                        ShieldBoostEnhancementType b2t = new ShieldBoostEnhancementType(false);
+                        b2t.maxStrengthBonus = 0.5f;
+                        b2t.kineticResistBonus = 0.4f;
+                        B.addEnhancement(b2t.create());
 
                         // 生成随机测试建筑
                         int padding = 5;
