@@ -18,10 +18,10 @@ public class UnitTypes {
     test =
         new UnitType("testunit") {
           {
-            //this.armor = 500;
+            // this.armor = 500;
             this.armorMax = 500;
             this.armorValue = 30;
-            //this.energy = 100;
+            // this.energy = 100;
             this.energyMax = 100;
             this.energyRegen = 10;
             // 类型级演示数据：护甲对动能 50% 抗性（DataWindow 可展示）
@@ -45,13 +45,14 @@ public class UnitTypes {
                     this.resist[DamageType.Energy.ordinal()] = 0.6f;
                   }
                 });
-                this.abilities.add(
-                  new ShieldAbility(200f){{
+            this.abilities.add(
+                new ShieldFieldAbility(200f, 195f) {
+                  {
                     this.regen = 10;
                     this.energyCost = 3;
                     this.resist[DamageType.Thermal.ordinal()] = 0.6f;
-                  }}
-                );
+                  }
+                });
           }
         };
 

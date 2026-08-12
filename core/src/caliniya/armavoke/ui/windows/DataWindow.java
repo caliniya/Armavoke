@@ -32,7 +32,7 @@ public class DataWindow extends Window {
 
       // 分组标题（none 组为类型名称/描述等顶部信息，不显示空标题）
       if (type != StatType.none) {
-        t.add("[#03ECED]" + type.localizedName + "[]")
+        t.add("  " + "[#03ECED]" + type.localizedName + "[]")
             .left()
             .padTop(12)
             .padBottom(4)
@@ -44,15 +44,17 @@ public class DataWindow extends Window {
       String lastGroup = null;
       for (StatStack.StatEntry e : items) {
         if (e.group == null) {
-          t.add(e.data.data).left().padLeft(16).padBottom(2).align(Align.left);
+          t.add("      " + e.data.data).left().padLeft(16).padBottom(2).align(Align.left);
           t.row();
         } else {
           if (!e.group.equals(lastGroup)) {
-            t.add("[light]" + e.group + "[]").left().padLeft(8).padTop(2).padBottom(2);
+            t.add("    " + "[light]" + e.group + "[]").left().padLeft(8).padTop(2).padBottom(2);
             t.row();
             lastGroup = e.group;
           }
-          t.add(e.data.data).left().padLeft(28 + e.indent * 16).padBottom(1).align(Align.left);
+          // 次级条目（如抗性列表）在文本前加 4 个字符做稳定缩进
+          String text = e.indent > 0 ? "        " + e.data.data : "      " + e.data.data;
+          t.add(text).left().padLeft(28).padBottom(1).align(Align.left);
           t.row();
         }
       }
