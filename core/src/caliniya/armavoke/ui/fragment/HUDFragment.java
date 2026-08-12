@@ -295,22 +295,14 @@ public class HUDFragment {
 
   private void updateRightPanel() {
     rightContainer.clearChildren();
-
     Table currentPanel = CommandData.commanding ? commandPanel : buildingPanel;
-
     currentPanel.clearActions();
-
     Cell<Table> cell = rightContainer.add(currentPanel).bottom();
     
-    rightContainer.pack();
-    //currentPanel.pack();
-
     float minW = Core.scene.getWidth() / 5f;
-    float minH = Core.scene.getHeight() / 4f;
-    cell.minSize(minW, minH);
-
-    float height = Math.max(minH, currentPanel.getPrefHeight());
-
+    cell.width(minW);
+    
+    float height = currentPanel.getPrefHeight();
     currentPanel.setTranslation(0, -height);
     currentPanel.addAction(Actions.translateBy(0, height, 0.3f, Interp.fade));
   }
