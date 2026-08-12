@@ -34,10 +34,13 @@ public class UnitTypes {
                   {
                     mirror = true;
                     x = 50;
-                    bullet = new BulletType();
+                    bullet = new BulletType(){{
+                      this.knock = 100f;
+                    }};
                     rotate = true;
                   }
                 });
+                /*
             this.abilities.add(
                 new ShieldFieldAbility(500, 200) {
                   {
@@ -54,6 +57,7 @@ public class UnitTypes {
                     this.resist[DamageType.Thermal.ordinal()] = 0.6f;
                   }
                 });
+                */
             // 过热能力演示：储热 100，每发 10，散热 20/秒
             this.abilities.add(
                 new HeatAbility(100f) {

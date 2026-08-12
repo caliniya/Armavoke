@@ -33,6 +33,10 @@ public class Unit extends Entity {
 
   // --- 物理属性 ---
   public volatile float speedX, speedY, angle;
+
+  /** 击退速度衰减速率（0~1，越大停得越快）。 */
+  public float knockDamp = 0.1f;
+
   public float rotationSpeed;
   public float rotation;
   public float angleToTarget, distToTarget;
@@ -220,10 +224,19 @@ public class Unit extends Entity {
 
   @Override
   public void update(float dt) {
+    // 击退冲量：复制副本 → 施加位移 → 平滑衰减（写回共享字段）
+    float kx = knockX, ky = knockY;
+    if (kx != 0f || ky != 0f) {
+      x += kx * dt;
+      y += ky * dt;
+      knockX = Mathf.lerpDelta(knockX, 0f, knockDamp);
+      knockY = Mathf.lerpDelta(knockY, 0f, knockDamp);
+      velocityDirty = true;
+    }
     updateBase(dt);
-    
-    if(locked) return;
-    
+
+    if (locked) return;
+
     float oldX = this.x;
     float oldY = this.y;
     float oldRot = this.rotation;
@@ -340,8 +353,7 @@ public class Unit extends Entity {
 
   /** 是否过热锁定（单位附加了被锁定的 HeatAbility）。 */
   public boolean overheated() {
-    HeatAbility h = getAbility(HeatAbility.class);
-    return h != null && locked;
+    return locked;
   }
 
   public void impuse(float knockX, float knockY) {
@@ -446,6 +458,11 @@ public class Unit extends Entity {
     }
     sb.append("]");
     Log.info("@", sb.toString());
+  }
+
+  public void knock(float dir, float force) {
+    knockX += Mathf.cosDeg(dir) * force;
+    knockY += Mathf.sinDeg(dir) * force;
   }
 
   public void updateTeamData() {

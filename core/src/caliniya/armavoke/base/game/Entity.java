@@ -1,5 +1,6 @@
 package caliniya.armavoke.base.game;
 
+import arc.math.Mathf;
 import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
@@ -103,6 +104,18 @@ public abstract class Entity implements Poolable, QuadTreeObject {
         b.type.bypassArmor,
         b.type.breakShield,
         b.type.bypassShield);
+
+    // 动能击退：沿子弹方向施加冲量（力度由 BulletType.knockbackForce 配置）
+    if (b.type.damageType.knockback && b.type.knock > 0f) {
+      knock(b.rotation, b.type.knock);
+    }
+  }
+
+  /** 击退冲量分量（后台子弹线程写、主线程读，volatile 保证可见性）。 */
+  public volatile float knockX, knockY;
+
+  /** 施加击退：方向（角度）+ 击退量。命中时调用，内部一次三角计算。很显然建筑不能被击退 */
+  public void knock(float dir, float force) {
   }
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */

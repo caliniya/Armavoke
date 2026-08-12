@@ -33,6 +33,9 @@ public class BulletType {
   /** 穿盾：直接穿过护盾层。 */
   public boolean bypassShield;
 
+  /** 击退力度（命中时沿子弹方向给目标的冲量；0 = 不击退）。 */
+  public float knock = 0f;
+
   public float lifetime = 600f;
   public float size = 60f;
 
