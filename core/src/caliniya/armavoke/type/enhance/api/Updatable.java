@@ -1,4 +1,4 @@
-package caliniya.armavoke.type.enhance;
+package caliniya.armavoke.type.enhance.api;
 
 import caliniya.armavoke.base.game.Entity;
 

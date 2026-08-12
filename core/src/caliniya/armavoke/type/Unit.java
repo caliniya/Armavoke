@@ -112,9 +112,6 @@ public class Unit extends Entity {
     this.armor = this.armorMax;
 
     this.type.abilities.each(a -> this.addAbility(a.copy()));
-    // 强化模组深拷贝挂载（绑定能力/实体，初始开启则应用）
-    enhancements.clear();
-    this.type.enhancements.each(e -> this.addEnhancement(e.copy()));
 
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {
@@ -360,6 +357,12 @@ public class Unit extends Entity {
     for (Ability a : abilities) {
       a.write(w);
     }
+    // 强化模组（运行时安装）：类型名 + 各自数据
+    w.i(enhancements.size);
+    for (Enhancement enh : enhancements) {
+      w.str(enh.getClass().getName());
+      enh.write(w);
+    }
   }
 
   @Override
@@ -391,6 +394,19 @@ public class Unit extends Entity {
       abilities.get(i).read(r);
     }
 
+    // 强化模组：按类型名重建实例 → 读数据 → 完整挂载（rebind 恢复绑定）
+    int enhCount = r.i();
+    for (int i = 0; i < enhCount; i++) {
+      String cls = r.str();
+      Enhancement enh = Enhancement.create(cls);
+      if (enh != null) {
+        enh.read(r);
+        addEnhancement(enh);
+      } else {
+        Log.warn("Unknown enhancement type in save: @", cls);
+      }
+    }
+
     this.speedX = 0;
     this.speedY = 0;
 
@@ -402,6 +418,22 @@ public class Unit extends Entity {
     WorldData.moveunits.add(this);
     WorldData.units.move(this, x, y);
     updateHitbox();
+    // TEST 临时：创建时打印自身能力与模组信息（游戏内暂无展示处）
+    StringBuilder sb = new StringBuilder("[单位创建] " + type.getIdentity());
+    sb.append(" 能力[");
+    for (int i = 0; i < abilities.size; i++) {
+      if (i > 0) sb.append(", ");
+      sb.append(abilities.get(i).localizedName);
+    }
+    sb.append("] 模组[");
+    for (int i = 0; i < enhancements.size; i++) {
+      if (i > 0) sb.append(", ");
+      Enhancement enh = enhancements.get(i);
+      sb.append(enh.getClass().getSimpleName());
+      sb.append(enh.enabled ? "(开)" : "(关)");
+    }
+    sb.append("]");
+    Log.info("@", sb.toString());
   }
 
   public void updateTeamData() {

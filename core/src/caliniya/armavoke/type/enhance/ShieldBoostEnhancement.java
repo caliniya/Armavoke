@@ -6,13 +6,13 @@ import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.ability.ShieldFieldAbility;
 import caliniya.armavoke.type.ability.api.Shield;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.type.enhance.api.*;
 
-/**
- * 护盾强化模组（示例）：绑定实体已有的护盾能力（单体盾/力场盾），
- * <b>开启时提高最大强度与动能抗性，关闭时恢复原值</b>。
- */
-public class ShieldBoostEnhancement<T extends Ability & Shield> extends Enhancement implements AbilityBind<T> {
+/** 护盾强化模组（示例）：绑定实体已有的护盾能力（单体盾/力场盾）， <b>开启时提高最大强度与动能抗性，关闭时恢复原值</b>。 */
+public class ShieldBoostEnhancement<T extends Ability & Shield> extends Enhancement
+    implements AbilityBind<T> {
 
   /** 开启时增加的最大护盾强度。 */
   public float maxStrengthBonus = 1f;
@@ -26,7 +26,34 @@ public class ShieldBoostEnhancement<T extends Ability & Shield> extends Enhancem
 
   @Override
   public void bindAbility(T s) {
-    ability = (Ability)s;
+    ability = (Ability) s;
+    bound = ability != null;
+  }
+
+  /** 读档/挂载后恢复绑定：从实体重新查找护盾能力（单体盾优先，否则力场盾）。 */
+  @Override
+  public void rebind(Entity e) {
+    ShieldAbility sa = e.getAbility(ShieldAbility.class);
+    if (sa != null) {
+      ability = sa;
+    } else {
+      ability = e.getAbility(ShieldFieldAbility.class);
+    }
+    bound = ability != null;
+  }
+
+  @Override
+  public void write(Writes w) {
+    super.write(w);
+    w.f(maxStrengthBonus);
+    w.f(kineticResistBonus);
+  }
+
+  @Override
+  public void read(Reads r) {
+    super.read(r);
+    maxStrengthBonus = r.f();
+    kineticResistBonus = r.f();
   }
 
   @Override

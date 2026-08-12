@@ -119,11 +119,18 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   /** 只需每帧更新的强化模组（实现 {@link Updatable} 接口的），避免空转。 */
   public Ar<Updatable> updatableEnhancements = new Ar<>();
 
-  /**
-   * 挂载一个强化模组：绑定实体 → 绑定能力 → 入列表 → 需要每帧则入 updatable 列表 → 初始开启则应用。
-   */
+  /** 挂载一个强化模组（运行时安装/读档恢复）：绑实体 → 恢复绑定 → 入列表 → 需要每帧则入 updatable 列表 → 初始开启则应用。 */
   public void addEnhancement(Enhancement enh) {
+    if (enh == null) return;
+    enh.entity = this;
+    enh.rebind(this);
     enhancements.add(enh);
+    if (enh instanceof Updatable u) {
+      updatableEnhancements.add(u);
+    }
+    if (enh.enabled) {
+      enh.onEnable();
+    }
   }
 
   public <T extends Ability> T getAbility(Class<T> S) {
@@ -139,8 +146,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float totalShield() {
     float total = 0f;
     for (Ability a : abilities) {
-      if(a instanceof Shield s) {
-      	total += s.capacity();
+      if (a instanceof Shield s) {
+        total += s.capacity();
       }
     }
     return total;
@@ -157,8 +164,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public float totalShieldMax() {
     float total = 0f;
     for (Ability a : abilities) {
-      if(a instanceof Shield s) {
-      	total += s.capacityMax();
+      if (a instanceof Shield s) {
+        total += s.capacityMax();
       }
     }
     return total;

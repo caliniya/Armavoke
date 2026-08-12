@@ -73,7 +73,20 @@ public class MenuFragment {
                         WorldData.initWorld(100, 100, true);
                         Data.loadSystems();
                         Systems.EP.init();
-                        Unit U = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
+
+                        // 两个测试单位，各自运行时安装强化模组（出厂无模组，由外部"安装"）
+                        Unit A = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
+                        A.addEnhancement(new ShieldBoostEnhancement());
+
+                        Unit B = UnitTypes.test.create(TeamTypes.Mutex, 400, 100);
+                        ShieldBoostEnhancement b1 = new ShieldBoostEnhancement();
+                        b1.maxStrengthBonus = 2f;
+                        b1.kineticResistBonus = 0.1f;
+                        B.addEnhancement(b1);
+                        ShieldBoostEnhancement b2 = new ShieldBoostEnhancement();
+                        b2.maxStrengthBonus = 0.5f;
+                        b2.kineticResistBonus = 0.4f;
+                        B.addEnhancement(b2);
 
                         // 生成随机测试建筑
                         int padding = 5;
@@ -120,30 +133,7 @@ public class MenuFragment {
                         Data.load(
                             Core.settings.getDataDirectory().child("map/space.aevs"),
                             () -> {
-                              // ===== 力场测试（力场外 vs 力场内）=====
-                              // 玩家单位 A（力场外 1700,1000）：子弹会被敌方力场拦截
-                              Unit playerA = UnitTypes.test.create(TeamTypes.Evoke, 1700, 1000);
-
-                              // 玩家单位 B（力场内 1050,1000）：子弹不受力场拦截
-                              Unit playerB = UnitTypes.test.create(TeamTypes.Evoke, 1050, 1000);
-                              // 敌方单位：护甲 30 + 满盾 500 + 护盾力场
-                              Unit enemy = UnitTypes.test.create(TeamTypes.Mutex, 1200, 1000);
-                              enemy.armorValue = 30;
-                              enemy.weapons.clear(); // 只挨打不还手，便于观察
-                              
-                              ShieldBoostEnhancement se = new ShieldBoostEnhancement();
-                              se.bindAbility(enemy.getAbility(ShieldFieldAbility.class));
-                              
-                              /*
-                              ShieldAbility shield = new ShieldAbility(500);
-                              shield.regen = 20;
-                              shield.energyCost = 5;
-                              enemy.add(shield);*/
-
-                              // 护盾力场：正六边形，半径 180，拦截进入的子弹
-
-                              Log.info(
-                                  "[力场测试] 敌方(1200,1000) 力场半径180；A(1700,1000)力场外、B(1050,1000)力场内");
+                              Log.info("[读档测试] 读档完成，查看上方 [单位创建] 日志确认能力与模组恢复");
                             });
                       }));
               menu.row();
