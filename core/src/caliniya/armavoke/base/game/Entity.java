@@ -298,6 +298,11 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     energyMax = 0;
     energyRegen = 0;
     java.util.Arrays.fill(armorResist, 0f);
+    for(Ability a : abilities) {
+    	if(a instanceof ForceField f) {
+    		ForceField.force.remove(f);
+    	}
+    }
     abilities.clear();
     enhancements.clear();
     updatableEnhancements.clear();

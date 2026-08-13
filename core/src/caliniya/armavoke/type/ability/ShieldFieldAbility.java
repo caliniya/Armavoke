@@ -21,7 +21,7 @@ import caliniya.armavoke.type.ability.api.*;
 /**
  * 力场护盾 在一片空间中拦截子弹
  *
- * <p> 按照标准的护盾机制执行
+ * <p>按照标准的护盾机制执行
  */
 public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
@@ -50,7 +50,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public float radius = 195f, rotation = 0f;
 
   public int sides = 6;
-  
+
   public Entity e;
 
   /** 护盾对各类伤害的百分比抗性（0~1），与单体护盾一致。 */
@@ -64,17 +64,16 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public boolean active = true;
 
   @Override
-  public Ability onCreate(Entity e) {
+  public ShieldFieldAbility onCreate(Entity e) {
     register();
     this.e = e;
-    return super.onCreate(e);
+    return (ShieldFieldAbility)super.onCreate(e);
   }
-  
+
   @Override
   public Entity owner() {
     return e;
   }
-  
 
   @Override
   public void setEnabled(boolean enabled) {
@@ -106,7 +105,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public float energyUse() {
     return active ? costFrame : 0;
   }
-  
+
   @Override
   public void update(Entity e, float dt) {
     if (!active) return;
@@ -139,7 +138,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public boolean onBullet(Bullet b) {
-    // 与单体护盾完全相同的结算：返回 0 = 完全拦截（子弹消失），>0 = 穿透（放行）
+    if (b.owner.team == e.team) {
+      return false;
+    }
     float remaining =
         applyDamage(e, b.type.damage, b.type.damageType, b.type.breakShield, b.type.bypassShield);
     return remaining <= 0f;
