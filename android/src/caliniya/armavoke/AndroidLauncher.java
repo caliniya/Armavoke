@@ -110,7 +110,7 @@ public class AndroidLauncher extends AndroidApplication {
     }
     //Log.level = Log.LogLevel.info;
     Log.info("Start-Android");
-    Log.info("Log Level :" + Log.level);
+    Log.info("Log Level : " + Log.level);
   }
 
   @Override
