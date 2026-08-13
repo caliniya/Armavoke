@@ -4,6 +4,7 @@ import arc.math.Mathf;
 import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
+import caliniya.armavoke.game.data.TeamData;
 import caliniya.armavoke.type.ability.*;
 import caliniya.armavoke.type.ability.api.*;
 import caliniya.armavoke.base.tool.Ar;
@@ -27,8 +28,10 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   // --- 公共状态 ---
   public volatile float health;
   public float maxHealth;
-  public int id;
-  public TeamTypes team;
+  public int id; 
+  
+  public volatile TeamTypes team;
+  public volatile TeamData teamData;
 
   // --- 公共组件 ---
   public ItemModule item;

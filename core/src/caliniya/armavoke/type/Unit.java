@@ -121,7 +121,7 @@ public class Unit extends Entity {
     // 当前护甲初始为满甲（无护甲时自然为 0）
     this.armor = this.armorMax;
 
-    this.type.abilities.each(a -> this.addAbility(a.copy().onCreate(this)));
+    this.type.abilities.each(a -> this.addAbility(a.copy()));
 
     // --- 初始化碰撞数据数组 ---
     if (type.hitbox != null) {

@@ -67,7 +67,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public ShieldFieldAbility onCreate(Entity e) {
     register();
     this.e = e;
-    return (ShieldFieldAbility)super.onCreate(e);
+    return (ShieldFieldAbility) super.onCreate(e);
   }
 
   @Override
@@ -138,6 +138,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public boolean onBullet(Bullet b) {
+    if (e.team == null || e == null || b.team == null) {
+      return false;
+    }
     if (b.owner.team == e.team) {
       return false;
     }
