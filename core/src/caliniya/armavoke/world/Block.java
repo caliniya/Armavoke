@@ -29,6 +29,12 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
   public int capacity = 100; // 物品容量，为0就是不能存
   public ItemType[] allowItem = Contents.items; // 能存的,默认啥都能存一百
 
+  /** 液体容量（0 = 不能存液体）。 */
+  public float liquidCapacity;
+
+  /** 电力电池容量（0 = 不能存电力）。 */
+  public float powerCapacity;
+
   public TextureRegion region; // 主贴图
 
   // --- 形状定义 ---
@@ -64,8 +70,8 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
     float rotation = b.angle * 90f;
     Draw.rect(region, b.x, b.y, rotation);
   }
-  
-  public void drawDebug(Building b){
+
+  public void drawDebug(Building b) {
     Draw.color(Color.green);
     Lines.stroke(4f);
     // 绘制基于 size 的包围盒
@@ -84,7 +90,8 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
     }
 
     // 4. 绘制旋转角度 (青色文字)
-    Fonts.def.draw(b.x + "   "+b.y, b.x + b.block.psize / 2f, b.y + b.block.psize + 10f, Align.center);
+    Fonts.def.draw(
+        b.x + "   " + b.y, b.x + b.block.psize / 2f, b.y + b.block.psize + 10f, Align.center);
     Fonts.def.draw(
         Strings.format("" + b.health),
         b.x - b.block.size,
@@ -111,15 +118,14 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
   }
 
   /**
-   * 辅助方法：获取旋转后的形状偏移量
-   * 这用于确定建筑在当前角度下实际占据了哪些格子
+   * 辅助方法：获取旋转后的形状偏移量 这用于确定建筑在当前角度下实际占据了哪些格子
    *
    * @param angle 建筑当前角度 (0-3)
    * @param baseOffsets 原始形状偏移 (通常是 block.shapeOffsets)
    * @return 旋转后的新偏移量数组
    */
   public static int[] getRotatedOffsets(int angle, int[] baseOffsets) {
-    if (baseOffsets == null) return (int[])null;
+    if (baseOffsets == null) return (int[]) null;
 
     int[] rotated = baseOffsets.clone();
 

@@ -60,6 +60,12 @@ public class Building extends Entity {
       this.item = new ItemModule(block.capacity);
       this.item.setFilter(block.allowItem);
     }
+    if (this.liquid == null && block.liquidCapacity > 0) {
+      this.liquid = new LiquidModule(block.liquidCapacity);
+    }
+    if (this.power == null && block.powerCapacity > 0) {
+      this.power = new PowerModule(block.powerCapacity);
+    }
 
     // 计算旋转后的形状数据
     if (block.shapeOffsets != null) {
@@ -160,6 +166,18 @@ public class Building extends Entity {
 
     block.write(this, w);
     item.write(w);
+    if (liquid != null) {
+      w.bool(true);
+      liquid.write(w);
+    } else {
+      w.bool(false);
+    }
+    if (power != null) {
+      w.bool(true);
+      power.write(w);
+    } else {
+      w.bool(false);
+    }
   }
 
   /** 读取存档数据 */
@@ -184,6 +202,14 @@ public class Building extends Entity {
     }
 
     item.read(r);
+    if (r.bool()) {
+      if (this.liquid == null) this.liquid = new LiquidModule(block.liquidCapacity);
+      liquid.read(r);
+    }
+    if (r.bool()) {
+      if (this.power == null) this.power = new PowerModule(block.powerCapacity);
+      power.read(r);
+    }
 
     this.x = tx * WorldData.TILE_SIZE + block.psize / 2;
     this.y = ty * WorldData.TILE_SIZE + block.psize / 2;

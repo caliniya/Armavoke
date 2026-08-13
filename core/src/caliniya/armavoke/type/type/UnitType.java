@@ -38,8 +38,10 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
 
-  // 单位的物品容量，使用通用的物品模块规则
+  // 单位的容量，使用通用的模块规则
   public int itemCap = 50;
+  public float liquidCap;
+  public float powerCap;
 
   // 防护（类型默认，实例可覆盖）
   public float armorMax; // 护甲容量上限

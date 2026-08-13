@@ -71,6 +71,8 @@ public class Unit extends Entity {
     u.x = x;
     u.y = y;
     u.item = new ItemModule(type.itemCap);
+    if (type.liquidCap > 0) u.liquid = new LiquidModule(type.liquidCap);
+    if (type.powerCap > 0) u.power = new PowerModule(type.powerCap);
     u.init();
     u.id = Entities.assignID();
     u.updateTeamData();
@@ -83,6 +85,8 @@ public class Unit extends Entity {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
     u.item = new ItemModule(type.itemCap);
+    if (type.liquidCap > 0) u.liquid = new LiquidModule(type.liquidCap);
+    if (type.powerCap > 0) u.power = new PowerModule(type.powerCap);
     u.init();
     return u;
   }
@@ -371,6 +375,18 @@ public class Unit extends Entity {
   @Override
   public void write(Writes w) {
     item.write(w);
+    if (liquid != null) {
+      w.bool(true);
+      liquid.write(w);
+    } else {
+      w.bool(false);
+    }
+    if (power != null) {
+      w.bool(true);
+      power.write(w);
+    } else {
+      w.bool(false);
+    }
     w.f(x);
     w.f(y);
     w.f(rotation);
@@ -397,6 +413,14 @@ public class Unit extends Entity {
   @Override
   public void read(Reads r) {
     item.read(r);
+    if (r.bool()) {
+      if (liquid == null) liquid = new LiquidModule(type.liquidCap);
+      liquid.read(r);
+    }
+    if (r.bool()) {
+      if (power == null) power = new PowerModule(type.powerCap);
+      power.read(r);
+    }
     this.x = r.f();
     this.y = r.f();
     this.rotation = r.f();

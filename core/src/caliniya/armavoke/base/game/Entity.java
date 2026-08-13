@@ -15,6 +15,8 @@ import caliniya.armavoke.type.module.ItemModule;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.base.type.TeamTypes;
 import arc.util.io.*;
+import caliniya.armavoke.type.module.LiquidModule;
+import caliniya.armavoke.type.module.PowerModule;
 
 /** 游戏实体基类。 实现了 {@link QuadTreeObject} 以便放入 EntityGroup 的四叉树空间索引。 */
 public abstract class Entity implements Poolable, QuadTreeObject {
@@ -30,6 +32,9 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   // --- 公共组件 ---
   public ItemModule item;
+  public LiquidModule liquid;
+  public PowerModule power;
+  
 
   // 此实体所锁定的目标
   public Entity target;
@@ -298,6 +303,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     updatableEnhancements.clear();
     team = null;
     item = null;
+    liquid = null;
+    power = null;
     target = null;
   }
 }
