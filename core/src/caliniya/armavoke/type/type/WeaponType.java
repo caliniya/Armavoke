@@ -21,7 +21,7 @@ public class WeaponType implements Cloneable, DrawType<Weapon> {
   public float shootX = 0f, shootY = 0f;
 
   /** 每发热量（向单位添加的热量；单位无过热机制时忽略）。 */
-  public float heatPerShot = 20f;
+  public float heatPerShot = 2f;
 
   // 镜像控制
   public boolean mirror = true;
@@ -64,14 +64,14 @@ public class WeaponType implements Cloneable, DrawType<Weapon> {
     this.flipSprite = !this.flipSprite;
     this.isMirror = true;
   }
-
-  public WeaponType copy() {
+  
+  public WeaponType copy(){
     try {
-      return (WeaponType) this.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new RuntimeException(e);
+        return (WeaponType) super.clone();
+    } catch(CloneNotSupportedException e) {
+        throw new AssertionError(e);
     }
-  }
+}
 
   public void draw(Weapon w) {
     float wRot = w.owner.rotation + w.rotation;

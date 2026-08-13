@@ -25,11 +25,11 @@ public class HeatAbility extends Ability {
   public float heat;
   
   @Override
-  public Ability oncteate(Entity e) {
+  public Ability onCreate(Entity e) {
     e.heatSpeed = heatSpeed;
     e.heatable = true;
     e.heatMax = heatMax;
-    return super.oncteate(e);
+    return super.onCreate(e);
   }
   
 

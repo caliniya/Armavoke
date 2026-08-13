@@ -77,7 +77,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   /** 附加一个能力。 */
   public void addAbility(Ability ability) {
-    if (ability != null) abilities.add(ability.oncteate(this));
+    if (ability != null) abilities.add(ability.onCreate(this));
   }
 
   public Entity() {}

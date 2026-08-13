@@ -14,13 +14,14 @@ import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.ability.api.*;
 
 /**
- * 护盾力场：**空间拦截**进入力场的子弹（正多边形或圆形）。
+ * 力场护盾 在一片空间中拦截子弹
  *
- * <p>拦截时按子弹伤害扣减力场容量；容量耗尽或关闭后不再拦截（注册表自动注销）。
+ * <p> 按照标准的护盾机制执行
  */
 public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
@@ -63,10 +64,10 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public boolean active = true;
 
   @Override
-  public Ability oncteate(Entity e) {
+  public Ability onCreate(Entity e) {
     register();
     this.e = e;
-    return super.oncteate(e);
+    return super.onCreate(e);
   }
   
   @Override
@@ -138,8 +139,6 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public boolean onBullet(Bullet b) {
-    // 默认放行力场内部发射的子弹；interceptInternal 时拦截范围内所有子弹
-    if (b.owner != null && contains(b.owner.x, b.owner.y)) return false;
     // 与单体护盾完全相同的结算：返回 0 = 完全拦截（子弹消失），>0 = 穿透（放行）
     float remaining =
         applyDamage(e, b.type.damage, b.type.damageType, b.type.breakShield, b.type.bypassShield);
@@ -208,7 +207,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   @Override
   public void draw(Entity e) {
     if (!active || current <= 0f) return;
-    Draw.color(Color.sky, 0.4f);
+    Draw.color(Pal.light, 0.6f);
     if (sides <= 0) {
       Lines.circle(e.x, e.y, radius);
     } else {
@@ -228,8 +227,8 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public ShieldFieldAbility copy() {
-    // TODO: Implement this method
     ShieldFieldAbility a = (ShieldFieldAbility) super.copy();
+    // 数组需要手动深拷贝
     a.resist = resist.clone();
     return a;
   }

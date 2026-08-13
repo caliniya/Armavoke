@@ -33,7 +33,7 @@ public abstract class Ability implements Cloneable {
   }
 
   // 当一个能力被加入到实体的时候的回调，用于执行一些操作(比如立场类能力 应该在这一步将实体加入到列表)
-  public Ability oncteate(Entity e) {
+  public Ability onCreate(Entity e) {
     return this;
   }
 
