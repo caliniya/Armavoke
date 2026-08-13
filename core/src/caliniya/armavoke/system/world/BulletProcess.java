@@ -166,8 +166,8 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
     }
     toRemove.clear();
 
-    // 1. 移动所有子弹（更新位置到本帧新坐标）
-    activeBullets.each(
+    // 1. 移动所有子弹（写锁遍历：内部 activeBullets.move 需要写锁，避免读锁内升级写锁死锁）
+    activeBullets.eachWrited(
         b -> {
           b.time += delta;
           if (b.time >= b.type.lifetime) {

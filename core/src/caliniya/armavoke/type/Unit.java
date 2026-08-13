@@ -239,8 +239,7 @@ public class Unit extends Entity {
       knockX = Mathf.lerpDelta(knockX, 0f, knockDamp);
       knockY = Mathf.lerpDelta(knockY, 0f, knockDamp);
       velocityDirty = true;
-      // 立即更新四叉树位置与碰撞盒（oldX 在击退后才记录，moving 判定会漏掉击退）
-      WorldData.units.move(this, x, y);
+      // 四叉树位置由 GameProcess 遍历后统一短写锁更新（避免读锁内写锁）
       updateHitbox();
     }
     updateBase(dt);
@@ -292,7 +291,7 @@ public class Unit extends Entity {
       updateHitbox();
     }
     if (moving) {
-      WorldData.units.move(this, x, y);
+      velocityDirty = true; // 标记：由 GameProcess 统一更新四叉树
     }
   }
 

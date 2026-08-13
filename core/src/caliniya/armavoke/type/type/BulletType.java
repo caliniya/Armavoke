@@ -60,6 +60,7 @@ public class BulletType {
 
   /** 子弹绘制逻辑 */
   public void draw(Bullet b) {
+    if(b.id <= 0) return;
     if (region == null) return;
 
     // 1. 绘制背层 (光晕)

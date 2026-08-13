@@ -35,8 +35,9 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
       e.kill();
     }
     freshKilled.clear();
-    
-    // 不能在迭代器中进行写操作，因为这样会死锁
+
+    // 读锁遍历执行逻辑（update 只更新位置字段，不写四叉树，避免读锁内写锁死锁）
+    Ar<Unit> moved = new Ar<>();
     WorldData.units.each(
         u -> {
           if (u == null) return;
@@ -47,8 +48,14 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
             u.update(Time.delta);
             u.canShoot = true;
             u.updateWeapons(Time.delta);
+            if (u.velocityDirty) moved.add(u);
           }
         });
+    // 对位置变化的单位逐个短暂写锁更新四叉树（写锁不长时间持有，读方几乎不阻塞）
+    for (Unit u : moved) {
+      WorldData.units.move(u, u.x, u.y);
+      u.velocityDirty = false;
+    }
     for (Unit u : deadUnits) {
       u.kill();
     }
