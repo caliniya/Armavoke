@@ -37,6 +37,7 @@ public class UnitTypes {
                     bullet =
                         new BulletType() {
                           {
+                            this.damage = 1f;
                             this.knock = 1f;
                           }
                         };
@@ -59,7 +60,7 @@ public class UnitTypes {
             this.abilities.add(
                 new HeatAbility(100f) {
                   {
-                    this.heatSpeed = 10f;
+                    this.heatSpeed = 50f;
                   }
                 });
           }

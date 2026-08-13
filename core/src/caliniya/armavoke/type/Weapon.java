@@ -41,17 +41,17 @@ public class Weapon {
 
   // 如果第2个参数为假 说明单位武器被瘫痪 不能射击
   public void update(float dt, boolean can) {
-    if(owner.locked) return;
+    // 武器挂载点位置始终跟随单位（过热锁定时被击退，武器也要跟着移动）
+    wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
+    wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
+
+    if (owner.locked) return; // 锁定：不开火不转向，但位置已更新
     // 冷却逻辑
     if (reloadTimer > 0) {
       reloadTimer -= dt;
     }
 
     if (!can) return;
-
-    // 计算武器挂载点的世界坐标
-    wx = owner.x + Angles.trnsx(owner.rotation, type.x, type.y);
-    wy = owner.y + Angles.trnsy(owner.rotation, type.x, type.y);
 
     // 旋转逻辑
     if (rotate) {
@@ -100,7 +100,7 @@ public class Weapon {
 
   private void shoot(float wx, float wy, float angle) {
     this.reloadTimer = type.reload;
-    
+
     owner.addHeat(type.heatPerShot);
 
     // 计算枪口位置 (基于传入的最终射击角度)

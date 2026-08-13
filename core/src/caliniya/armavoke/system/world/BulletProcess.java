@@ -202,14 +202,13 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
     // 力场拦截：力场护盾在空间上拦截子弹
     interceptBullets();
 
-    // 批量删除：归还对象池 → 从 EntityAr 注销 → 回收 ID
+    // 批量删除：先从 EntityAr 注销 + 回收 ID（暂不归还对象池，
+    // 避免渲染线程在缓冲交换前读到已 free 的子弹——free 后坐标被 reset 成 0,0 会闪出幽灵子弹）
     toRemove.each(
         b -> {
-          b.remove(); // Pools.free
           activeBullets.remove(b);
           recycleBulletId(b.id);
         });
-    toRemove.clear();
 
     // 更新渲染缓冲区并交换
     renderBuffer.clear();
@@ -221,6 +220,10 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       WorldData.bullets = renderBuffer;
       renderBuffer = temp;
     }
+
+    // 交换完成后再归还对象池（渲染已切换到不含这些子弹的新缓冲）
+    toRemove.each(b -> b.remove());
+    toRemove.clear();
   }
 
   /**
