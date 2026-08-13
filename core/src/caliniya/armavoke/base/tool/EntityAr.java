@@ -106,6 +106,9 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     writeLock.lock();
     try {
       for (T entity : entities) {
+        if(idMap.containsKey(idGetter.get(entity))) {
+        	continue;
+        }
         array.add(entity);
         tree.insert(entity);
 

@@ -39,6 +39,7 @@ public class UnitTypes {
                           {
                             this.damage = 1f;
                             this.knock = 1f;
+                            this.speed = 1f;
                           }
                         };
                     rotate = true;

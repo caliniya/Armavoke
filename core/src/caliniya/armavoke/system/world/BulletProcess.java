@@ -59,7 +59,7 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   private final EntityAr<Bullet> pendingBullets = new EntityAr<>(b -> b.id);
 
   /** 活跃子弹列表（逻辑线程专用） */
-  private final EntityAr<Bullet> activeBullets = new EntityAr<>(b -> b.id);
+  public final EntityAr<Bullet> activeBullets = new EntityAr<>(b -> b.id);
 
   /** 渲染缓冲区（与 WorldData.bullets 交换） */
   private EntityAr<Bullet> renderBuffer = new EntityAr<>(b -> b.id);
@@ -165,13 +165,16 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       pendingBullets.clear();
     }
     toRemove.clear();
+    
+    // 力场拦截：力场护盾在空间上拦截子弹
+    interceptBullets();
 
     // 更新所有子弹
     activeBullets.each(
         b -> {
           b.time += delta;
           if (b.time >= b.type.lifetime) {
-            b.type.despawn(b);
+            //b.type.despawn(b);
             toRemove.add(b);
             return;
           }
@@ -190,7 +193,6 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
                 float prevHealth = e.health;
                 b.type.hit(b, e);
                 toRemove.add(b);
-                // 目标刚被击杀，立即入队，避免 GameProcess 错过 health=0 的瞬间
                 if (prevHealth > 0 && e.health <= 0) {
                   synchronized (KILL_LOCK) {
                     freshKills.add(e);
@@ -198,9 +200,6 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
                 }
               });
         });
-
-    // 力场拦截：力场护盾在空间上拦截子弹
-    interceptBullets();
 
     // 批量删除：先从 EntityAr 注销 + 回收 ID（暂不归还对象池，
     // 避免渲染线程在缓冲交换前读到已 free 的子弹——free 后坐标被 reset 成 0,0 会闪出幽灵子弹）
@@ -257,7 +256,7 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
             aabbRect.width,
             aabbRect.height,
             b -> {
-              if (toRemove.contains(b, true)) return; // 已被命中/拦截
+              if (toRemove.contains(b)) return; // 已被命中/拦截
               if (field.contains(b.x, b.y)) {
                 if (field.onBullet(b)) {
                   toRemove.add(b);

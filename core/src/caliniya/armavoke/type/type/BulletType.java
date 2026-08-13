@@ -9,6 +9,7 @@ import arc.util.ArcRuntimeException;
 import arc.util.Log;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.system.Systems;
 import caliniya.armavoke.type.ability.ShieldAbility;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.*;
@@ -75,9 +76,6 @@ public class BulletType {
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
     target.hit(b);
-    if(b.team == null) {
-    	throw new ArcRuntimeException("好！");
-    }
   }
 
   /** 命中墙壁/消失时的回调 */

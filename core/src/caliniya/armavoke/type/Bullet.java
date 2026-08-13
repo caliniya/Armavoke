@@ -77,6 +77,7 @@ public class Bullet implements Poolable, QuadTreeObject {
     // type = null;
     owner = null;
     team = null;
+    id = 0;
     x = 0;
     y = 0;
     velX = 0;
