@@ -165,17 +165,14 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
       pendingBullets.clear();
     }
     toRemove.clear();
-    
-    // 力场拦截：力场护盾在空间上拦截子弹
-    interceptBullets();
 
-    // 更新所有子弹
+    // 1. 移动所有子弹（更新位置到本帧新坐标）
     activeBullets.each(
         b -> {
           b.time += delta;
           if (b.time >= b.type.lifetime) {
-            //b.type.despawn(b);
-            toRemove.add(b);
+            // b.type.despawn(b);
+            if (!toRemove.contains(b)) toRemove.add(b);
             return;
           }
 
@@ -184,15 +181,24 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
           b.x = nextX;
           b.y = nextY;
           activeBullets.move(b, nextX, nextY);
+        });
+
+    // 2. 力场拦截（用移动后的新位置，拦截进入力场的子弹）
+    interceptBullets();
+
+    // 3. 命中检测（只对未被拦截/未过期的剩余子弹）
+    activeBullets.each(
+        b -> {
+          if (toRemove.contains(b)) return; // 已拦截/已过期
           Entities.closestEnemy(
               b.team,
-              nextX,
-              nextY,
+              b.x,
+              b.y,
               b.type.size,
               e -> {
                 float prevHealth = e.health;
                 b.type.hit(b, e);
-                toRemove.add(b);
+                if (!toRemove.contains(b)) toRemove.add(b);
                 if (prevHealth > 0 && e.health <= 0) {
                   synchronized (KILL_LOCK) {
                     freshKills.add(e);

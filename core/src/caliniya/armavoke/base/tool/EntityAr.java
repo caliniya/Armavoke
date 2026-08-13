@@ -106,8 +106,8 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     writeLock.lock();
     try {
       for (T entity : entities) {
-        if(idMap.containsKey(idGetter.get(entity))) {
-        	continue;
+        if (idMap.containsKey(idGetter.get(entity))) {
+          continue;
         }
         array.add(entity);
         tree.insert(entity);
@@ -187,15 +187,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
   }
 
   public void move(T entity, float newX, float newY) {
-    Rect rect = new Rect();
-    entity.hitbox(rect);
-
-    // 如果还在同一个节点范围内，只更新位置不重建树
-    if (rect.contains(newX, newY)) {
-      return;
-    }
-
-    // 跨节点了，需要重建
+    // 总是重建四叉树节点（位置已由调用方更新），保证 intersect 查询可靠
     writeLock.lock();
     try {
       tree.remove(entity);
@@ -301,7 +293,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
       readLock.unlock();
     }
   }
-  
+
   // 有写操作的遍历
   public void eachWrited(Cons<? super T> cons) {
     writeLock.lock();
@@ -314,7 +306,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     }
   }
 
-  /** 遍历满足谓词的实体 ，不能写*/
+  /** 遍历满足谓词的实体 ，不能写 */
   public void each(Boolf<T> filter, Cons<? super T> cons) {
     readLock.lock();
     try {

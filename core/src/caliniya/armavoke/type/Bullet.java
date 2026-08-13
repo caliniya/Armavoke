@@ -21,6 +21,9 @@ public class Bullet implements Poolable, QuadTreeObject {
 
   public int id;
 
+  /** 子弹对象池锁：创建（其他线程）与移除（BulletProcess 线程）跨线程操作 Pools，加锁防竞争。 */
+  private static final Object poolLock = new Object();
+
   protected Bullet() {}
 
   /** 工厂方法 */
@@ -32,7 +35,10 @@ public class Bullet implements Poolable, QuadTreeObject {
       float angle,
       float velocityX,
       float velocityY) {
-    Bullet b = Pools.obtain(Bullet.class, Bullet::new);
+    Bullet b;
+    synchronized (poolLock) {
+      b = Pools.obtain(Bullet.class, Bullet::new);
+    }
     b.init(type, owner, x, y, angle, velocityX, velocityY);
     return b;
   }
@@ -84,8 +90,10 @@ public class Bullet implements Poolable, QuadTreeObject {
     velY = 0;
     time = 0;
   }
-  
+
   public void remove() {
-    Pools.free(this);
+    synchronized (poolLock) {
+      Pools.free(this);
+    }
   }
 }
