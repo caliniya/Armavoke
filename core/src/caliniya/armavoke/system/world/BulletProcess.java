@@ -241,7 +241,7 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
 
       for (int i = 0; i < list.size; i++) {
         ForceField field = list.get(i);
-        if (field == null || !field.isActive()) {
+        if (field == null) {
           if (toCleanup == null) toCleanup = new Ar<>(false, 4);
           toCleanup.add(field);
           continue;

@@ -37,10 +37,11 @@ public class UnitTypes {
                     bullet =
                         new BulletType() {
                           {
-                            this.knock = 100f;
+                            this.knock = 1f;
                           }
                         };
                     rotate = true;
+                    this.reload = 10f;
                   }
                 });
 

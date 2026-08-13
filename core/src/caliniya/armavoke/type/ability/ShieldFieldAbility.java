@@ -65,6 +65,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   @Override
   public Ability oncteate(Entity e) {
     register();
+    this.e = e;
     return super.oncteate(e);
   }
   
@@ -104,8 +105,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public float energyUse() {
     return active ? costFrame : 0;
   }
-
-  protected void updateField(Entity e, float dt) {
+  
+  @Override
+  public void update(Entity e, float dt) {
     if (!active) return;
     syncFrames();
     if (costFrame > 0 && e.energy <= 0) {
