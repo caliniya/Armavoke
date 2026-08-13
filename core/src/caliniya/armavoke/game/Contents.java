@@ -31,6 +31,9 @@ public class Contents {
   /** 已注册的物品类型内容总数。 */
   public static int totalItemCount = 0;
 
+  /** 已注册的液体类型内容总数。 */
+  public static int totalLiquidCount = 0;
+
   static {
     int typeCount = CType.values().length;
     contentByTypes = new Ar[typeCount];
@@ -42,6 +45,7 @@ public class Contents {
   /** 初始化内容 */
   public static void load() {
     Items.load();
+    Liquids.load();
     Floors.load();
     ENVBlocks.load();
     items = getByType(CType.Item).toArray(ItemType.class);
@@ -79,6 +83,8 @@ public class Contents {
 
     if (content.type == CType.Item) {
       totalItemCount++;
+    } else if (content.type == CType.Liquid) {
+      totalLiquidCount++;
     }
   }
 
@@ -152,5 +158,6 @@ public class Contents {
       list.clear();
     }
     totalItemCount = 0;
+    totalLiquidCount = 0;
   }
 }

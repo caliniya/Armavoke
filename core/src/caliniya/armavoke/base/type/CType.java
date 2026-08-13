@@ -12,6 +12,7 @@ public enum CType {
   ENVBlock(ENVBlock.class),
   Unit(UnitType.class),
   Item(ItemType.class),
+  Liquid(LiquidType.class),
   StarNode(StarNode.class),
   Enhance(EnhancementType.class);
 
