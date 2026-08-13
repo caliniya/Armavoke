@@ -62,6 +62,7 @@ public class UnitRender extends System<UnitRender> {
     }
     temp.each(
         b -> {
+          if (b.recycled) return;
           if (shouldDraw(b.x, b.y, b.type.size)) {
             b.type.draw(b);
           }

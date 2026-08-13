@@ -20,6 +20,9 @@ public class Bullet implements Poolable, QuadTreeObject {
   public float time = 0f;
 
   public int id;
+  
+  /** 是否已回收（volatile 线程间可见；防 double-free + 渲染跳过已回收子弹）。 */
+  public volatile boolean recycled;
 
   /** 子弹对象池锁：创建（其他线程）与移除（BulletProcess 线程）跨线程操作 Pools，加锁防竞争。 */
   private static final Object poolLock = new Object();
@@ -80,7 +83,9 @@ public class Bullet implements Poolable, QuadTreeObject {
   @Override
   public void reset() {
     // 邪修就是保留自身的类型信息，反正创建的时候总是会覆盖的
+    // 原生对象池是不安全的，这很烦
     // type = null;
+    recycled = false;
     owner = null;
     team = null;
     id = 0;
@@ -92,6 +97,8 @@ public class Bullet implements Poolable, QuadTreeObject {
   }
 
   public void remove() {
+    if (recycled) return;
+    recycled = true;
     synchronized (poolLock) {
       Pools.free(this);
     }
