@@ -42,6 +42,6 @@ public class LiquidType extends ContentType implements TechNodeContent {
   }
 
   public void load() {
-    icon = Core.atlas.find(name);
+    //icon = Core.atlas.find(name);
   }
 }

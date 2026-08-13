@@ -3,6 +3,9 @@ package caliniya.armavoke.type.ability;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.Mathf;
+import arc.math.geom.Intersector;
+import arc.math.geom.Rect;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.stat.Stat;
@@ -12,14 +15,14 @@ import caliniya.armavoke.core.meta.stat.StatUnit;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.type.Bullet;
-import caliniya.armavoke.type.ability.api.Shield;
+import caliniya.armavoke.type.ability.api.*;
 
 /**
  * 护盾力场：**空间拦截**进入力场的子弹（正多边形或圆形）。
  *
  * <p>拦截时按子弹伤害扣减力场容量；容量耗尽或关闭后不再拦截（注册表自动注销）。
  */
-public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
+public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   /** 最大力场容量。 */
   public float max;
@@ -42,6 +45,13 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   /** 最大护盾强度（满盾时的强度，默认 2）。 */
   public float maxStrength = 2f;
 
+  // 半径旋转边数(边数为零就是圆形)
+  public float radius = 195f, rotation = 0f;
+
+  public int sides = 6;
+  
+  public Entity e;
+
   /** 护盾对各类伤害的百分比抗性（0~1），与单体护盾一致。 */
   public float[] resist = new float[DamageType.values().length];
 
@@ -53,17 +63,22 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   public boolean active = true;
 
   @Override
+  public Ability oncteate(Entity e) {
+    register();
+    return super.oncteate(e);
+  }
+  
+  @Override
+  public Entity owner() {
+    return e;
+  }
+  
+
+  @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
     this.active = enabled;
   }
-
-  /**
-   * 是否拦截力场内部发射的子弹。
-   *
-   * <p>false（默认）：放行内部发射的子弹，支持"逼近敌人穿盾输出"； true：拦截范围内所有子弹，适合庇护/压制型力场（贴脸压制敌人火力、保护友军）。
-   */
-  public boolean interceptInternal = false;
 
   public ShieldFieldAbility(float max, float radius) {
     super("shieldfield");
@@ -93,13 +108,11 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   protected void updateField(Entity e, float dt) {
     if (!active) return;
     syncFrames();
-    // 能量扣减由 Entity.updateBase 统一按净回复处理
     if (costFrame > 0 && e.energy <= 0) {
       active = false; // 能量耗尽自动关闭
       return;
     }
     current = Math.min(max, current + regenFrame * dt);
-    // 力场保持静止（如需旋转可手动设置 rotation）
   }
 
   /** 减伤机制（与单体护盾一致）：按护盾强度百分比减伤， 支持破盾（无视强度减伤）与穿盾（直接穿过）。 */
@@ -122,21 +135,24 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
   }
 
   @Override
-  public boolean onBullet(Entity e, Bullet b) {
+  public boolean onBullet(Bullet b) {
     // 默认放行力场内部发射的子弹；interceptInternal 时拦截范围内所有子弹
-    if (!interceptInternal && b.owner != null && contains(e, b.owner.x, b.owner.y)) return false;
+    if (b.owner != null && contains(b.owner.x, b.owner.y)) return false;
     // 与单体护盾完全相同的结算：返回 0 = 完全拦截（子弹消失），>0 = 穿透（放行）
     float remaining =
         applyDamage(e, b.type.damage, b.type.damageType, b.type.breakShield, b.type.bypassShield);
     return remaining <= 0f;
   }
 
-  @Override
   public float capacity() {
     return active ? current : 0f;
   }
 
   @Override
+  public void hitbox(Rect out) {
+    out.set(e.x - radius, e.y - radius, radius * 2f, radius * 2f);
+  }
+
   public float capacityMax() {
     return max;
   }
@@ -197,6 +213,15 @@ public class ShieldFieldAbility extends ForceFieldAbility implements Shield {
       Lines.poly(e.x, e.y, sides, radius, rotation);
     }
     Draw.color();
+  }
+
+  /** 点是否在力场内（正多边形或圆形）。 */
+  @Override
+  public boolean contains(float x, float y) {
+    if (sides <= 0) {
+      return Mathf.dst2(e.x, e.y, x, y) <= radius * radius;
+    }
+    return Intersector.isInRegularPolygon(sides, e.x, e.y, radius, rotation, x, y);
   }
 
   @Override

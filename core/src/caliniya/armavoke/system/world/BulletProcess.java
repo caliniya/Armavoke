@@ -4,7 +4,8 @@ import arc.Core;
 import arc.math.geom.Rect;
 import arc.util.ArcRuntimeException;
 import arc.util.Log;
-import caliniya.armavoke.type.ability.ForceFieldAbility;
+import caliniya.armavoke.type.ability.*;
+import caliniya.armavoke.type.ability.api.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.tool.EntityAr;
@@ -234,20 +235,19 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
   private int interceptFrames = 0;
 
   private void interceptBullets() {
-    synchronized (ForceFieldAbility.entities) {
-      Ar<Entity> list = ForceFieldAbility.entities;
-      Ar<Entity> toCleanup = null;
+    synchronized (ForceField.force) {
+      Ar<ForceField> list = ForceField.force;
+      Ar<ForceField> toCleanup = null;
 
       for (int i = 0; i < list.size; i++) {
-        Entity e = list.get(i);
-        ForceFieldAbility field = e == null ? null : e.getAbility(ForceFieldAbility.class);
-        if (e == null || e.health <= 0f || field == null || !field.isActive()) {
+        ForceField field = list.get(i);
+        if (field == null || !field.isActive()) {
           if (toCleanup == null) toCleanup = new Ar<>(false, 4);
-          toCleanup.add(e);
+          toCleanup.add(field);
           continue;
         }
 
-        field.hitbox(e, aabbRect);
+        field.hitbox(aabbRect);
         activeBullets.intersect(
             aabbRect.x,
             aabbRect.y,
@@ -255,18 +255,16 @@ public class BulletProcess extends caliniya.armavoke.system.System<BulletProcess
             aabbRect.height,
             b -> {
               if (toRemove.contains(b, true)) return; // 已被命中/拦截
-              if (field.contains(e, b.x, b.y)) {
-                if (field.onBullet(e, b)) {
+              if (field.contains(b.x, b.y)) {
+                if (field.onBullet(b)) {
                   toRemove.add(b);
-                  // TEST 临时：力场拦截日志
-                  Log.info("[力场] 拦截子弹 伤害=@ 力场余量=@", b.type.damage, field.capacity());
                 }
               }
             });
       }
 
       if (toCleanup != null) {
-        for (Entity e : toCleanup) list.remove(e, true);
+        for (ForceField f : toCleanup) list.remove(f, true);
       }
     }
   }
