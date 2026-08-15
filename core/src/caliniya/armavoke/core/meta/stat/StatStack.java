@@ -2,6 +2,7 @@ package caliniya.armavoke.core.meta.stat;
 
 import arc.Core;
 import arc.func.Cons;
+import arc.scene.ui.layout.Stack;
 import arc.struct.ObjectIntMap;
 import arc.struct.ObjectMap;
 import arc.struct.OrderedMap;
@@ -76,6 +77,10 @@ public class StatStack {
   private static String entryKey(String group, String currentName, String currentKey) {
     if (group == null) return null;
     return group.equals(currentName) && currentKey != null ? currentKey : group;
+  }
+
+  public StatStack add(Stat stat, float value) {
+    return add(stat, value, StatUnit.none);
   }
 
   public StatStack add(Stat stat, float value, StatUnit unit) {

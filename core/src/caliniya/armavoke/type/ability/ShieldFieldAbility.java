@@ -200,12 +200,18 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.shield, max, StatUnit.none, localizedName);
+    stack.add(Stat.shieldMax, max, StatUnit.none, localizedName);
     stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent, localizedName);
     stack.add(Stat.shieldRegen, regen, StatUnit.perSecond, localizedName);
     stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond, localizedName);
     stack.add(Stat.radius, radius, StatUnit.none, localizedName);
     stack.addResists(StatType.function, "stat.shieldResist", resist, localizedName);
+  }
+
+  @Override
+  public void statAbility(StatStack stat) {
+    stat.addRaw(StatType.none, localizedName, null);
+    stat.add(Stat.shield, current);
   }
 
   @Override

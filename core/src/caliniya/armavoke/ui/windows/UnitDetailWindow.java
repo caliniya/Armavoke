@@ -9,19 +9,27 @@ import arc.scene.Element;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.type.Unit;
+import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.type.Enhancement;
 import caliniya.armavoke.ui.Button;
+import caliniya.armavoke.game.Contents;
+import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.type.type.ItemType;
+import caliniya.armavoke.type.type.LiquidType;
 
 /** 单位详细信息窗口： 类型信息（名字 + DataWindow 按钮 + stats meta）、 血量/能量/护盾（数字 + 条形图，实时更新）、能力列表（可开关能力带开关按钮）。 */
 public class UnitDetailWindow extends Window {
 
   private final Unit unit;
 
+  public StatStack stst;
+
   public UnitDetailWindow(Unit unit) {
-    super(unit.type.name);
+    super(unit.type.localizedName);
     this.unit = unit;
+    this.stst = new StatStack();
   }
 
   @Override
@@ -36,91 +44,13 @@ public class UnitDetailWindow extends Window {
     nameRow
         .add(
             new Button(
-                Core.bundle.get("unitDetail.info"),
-                () -> new DataWindow(unit.type.stats()).build()))
+                Core.bundle.get("unitDetail.info"), () -> new DataWindow(unit.type.stat).build()))
         .size(84f, 36f)
         .padLeft(8f);
     t.add(nameRow).growX().left().row();
-
-    // 实例属性（数字 + 条形图，每帧实时刷新）
-    addStat(
-        t, Core.bundle.get("unitDetail.health"), u -> u.health, u -> u.maxHealth, Color.scarlet);
-    addStat(
-        t,
-        Core.bundle.get("unitDetail.shield"),
-        u -> u.totalShield(),
-        u -> u.totalShieldMax(),
-        Color.sky);
-    addStat(t, Core.bundle.get("unitDetail.armor"), u -> u.armor, u -> u.armorMax, Color.lightGray);
-    addStat(t, Core.bundle.get("unitDetail.energy"), u -> u.energy, u -> u.energyMax, Color.gold);
-    t.add().height(8f).row();
-
-    // 能力列表
-    t.add("[light]" + Core.bundle.get("unitDetail.abilities") + "[]").left().pad(2f).row();
-    if (unit.abilities.size == 0) {
-      t.add("[gray]" + Core.bundle.get("unitDetail.noAbilities") + "[]").left().pad(2f).row();
-    } else {
-      for (Ability a : unit.abilities) {
-        Table row = new Table();
-        row.left();
-        row.add("[gray]" + a.localizedName + "[]").left().pad(2f);
-        if (a.toggleable) {
-          row.add(
-                  new Button(
-                      a.enabled
-                          ? Core.bundle.get("unitDetail.disable")
-                          : Core.bundle.get("unitDetail.enable"),
-                      () -> {
-                        a.setEnabled(!a.enabled);
-                        main(this.main); // 刷新窗口内容
-                      }))
-              .size(64f, 36f)
-              .padLeft(6f);
-        } else {
-          row.add("[gray]" + Core.bundle.get("unitDetail.passive") + "[]").padLeft(6f);
-        }
-        t.add(row).growX().left().row();
-      }
-    }
-
-    // 模组列表（运行时安装的强化模组，可开关）
-    t.add("[light]" + Core.bundle.get("unitDetail.enhancements") + "[]").left().pad(2f).row();
-    if (unit.enhancements.size == 0) {
-      t.add("[gray]" + Core.bundle.get("unitDetail.noEnhancements") + "[]").left().pad(2f).row();
-    } else {
-      for (Enhancement enh : unit.enhancements) {
-        Table row = new Table();
-        row.left();
-        row.add("[gray]" + enh.type.localizedName + "[]").left().pad(2f);
-        row.add(
-                new Button(
-                    enh.enabled
-                        ? Core.bundle.get("unitDetail.disable")
-                        : Core.bundle.get("unitDetail.enable"),
-                    () -> {
-                      enh.setEnabled(!enh.enabled);
-                      main(this.main); // 刷新窗口内容
-                    }))
-            .size(64f, 36f)
-            .padLeft(6f);
-        t.add(row).growX().left().row();
-      }
-    }
-  }
-
-  /** 属性行：名称 + 数字 + 条形图，每帧更新。 */
-  private void addStat(Table t, String name, Floatf<Unit> cur, Floatf<Unit> max, Color color) {
-    Table row = new Table();
-    row.left();
-    row.add("[gray]" + name + "[]").width(50f).left();
-    Label value = new Label("");
-    row.add(value).width(90f).left();
-    Element barEl = bar(cur, max, color);
-    row.add(barEl).size(120f, 8f).left();
-    t.add(row).growX().left().row();
-
-    // 每帧刷新数值与条形图
-    value.update(() -> value.setText((int) cur.get(unit) + "/" + (int) max.get(unit)));
+    
+    
+    
   }
 
   /** 条形图元素：每帧读取最新值绘制。 */

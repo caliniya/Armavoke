@@ -4,6 +4,9 @@ import arc.math.Mathf;
 import arc.math.geom.QuadTree.QuadTreeObject;
 import arc.math.geom.Rect;
 import arc.util.pooling.Pool.Poolable;
+import caliniya.armavoke.core.meta.stat.Stat;
+import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.game.data.TeamData;
 import caliniya.armavoke.type.ability.*;
 import caliniya.armavoke.type.ability.api.*;
@@ -28,8 +31,8 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   // --- 公共状态 ---
   public volatile float health;
   public float maxHealth;
-  public int id; 
-  
+  public int id;
+
   public volatile TeamTypes team;
   public volatile TeamData teamData;
 
@@ -37,7 +40,6 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public ItemModule item;
   public LiquidModule liquid;
   public PowerModule power;
-  
 
   // 此实体所锁定的目标
   public Entity target;
@@ -63,13 +65,13 @@ public abstract class Entity implements Poolable, QuadTreeObject {
 
   // 当前热量与最大热量
   public float heat, heatMax = 0f;
-  
+
   public float heatSpeed = 0f;
 
   /** 这个实体是否具有过热能力 */
   public boolean heatable = false;
-  
-  /**实体当前是否处于锁定状态(可能但不限于是由于热量造成的)*/
+
+  /** 实体当前是否处于锁定状态(可能但不限于是由于热量造成的) */
   public boolean locked;
 
   /** 护甲对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
@@ -121,12 +123,11 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   public volatile float knockX, knockY;
 
   /** 施加击退：方向（角度）+ 击退量。命中时调用，内部一次三角计算。很显然建筑不能被击退 */
-  public void knock(float dir, float force) {
-  }
+  public void knock(float dir, float force) {}
 
   /** 每帧更新战斗基础属性：能量恢复 + 能力更新（护盾回充/耗能等）。 */
   public void updateBase(float dt) {
-    
+
     float cool = heatSpeed / 60f * dt;
     if (locked) {
       // 锁定期间持续散热，归零后恢复
@@ -139,7 +140,7 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     } else {
       heat = Math.max(0f, heat - cool);
     }
-    
+
     // 净回复 = 基础回复 - 所有激活能力的能耗（避免能量条在满值附近抖动）
     float use = 0f;
     for (Ability a : abilities) {
@@ -276,6 +277,17 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     }
   }
 
+  public void stat(StatStack stat) {
+    stat.add(Stat.health, health).add(Stat.armor, armor);
+    stat.add(Stat.shield, totalShield());
+    stat.add(Stat.energy, energy);
+    if (energyMax > 0) stat.add(Stat.energy, energy);
+    for (Ability a : abilities) {
+      a.statAbility(stst);
+    }
+    // if()
+  }
+
   /** 返回实体的碰撞盒尺寸（直径）。 子类应该覆盖此方法以提供准确的碰撞体大小。 默认返回 8 像素。 */
   public float hitboxSize() {
     return 8f;
@@ -301,10 +313,10 @@ public abstract class Entity implements Poolable, QuadTreeObject {
     energyMax = 0;
     energyRegen = 0;
     java.util.Arrays.fill(armorResist, 0f);
-    for(Ability a : abilities) {
-    	if(a instanceof ForceField f) {
-    		ForceField.force.remove(f);
-    	}
+    for (Ability a : abilities) {
+      if (a instanceof ForceField f) {
+        ForceField.force.remove(f);
+      }
     }
     abilities.clear();
     enhancements.clear();

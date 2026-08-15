@@ -70,11 +70,6 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
     return requirements; // ContentType 里的前置字段（默认 null）
   }
 
-  /** 类型统计信息（meta），用于详情窗口展示。 */
-  public StatStack stats() {
-    return stat;
-  }
-
   // 加载资源 (在 Assets 加载完成后调用)
   public void load() {
     this.speedt = (speed * WorldData.TILE_SIZE) / 60f;
@@ -84,13 +79,13 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       weapon.load(name);
     }
     // 基础
-    stat.add(Stat.health, health, StatUnit.none);
+    stat.add(Stat.healthMax, health, StatUnit.none);
     stat.add(Stat.speed, speed, StatUnit.tilesSecond);
     stat.add(Stat.rotateSpeed, rotationSpeend, StatUnit.degrees);
     stat.add(Stat.energyMax, energyMax, StatUnit.none);
     stat.add(Stat.energyRegen, energyRegen, StatUnit.perSecond);
     // 防护
-    stat.add(Stat.armor, armorMax, StatUnit.none);
+    stat.add(Stat.armorMax, armorMax, StatUnit.none);
     stat.add(Stat.armorValue, armorValue, StatUnit.none);
     stat.addResists(StatType.protect, "stat.armorResist", armorResist, null);
     abilities.each(

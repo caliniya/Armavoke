@@ -49,7 +49,8 @@ public abstract class Ability implements Cloneable {
 
   /** 向 StatStack 上报能力相关的类型参数（如护盾容量/强度/回充）。 */
   public void stats(StatStack stack) {}
-
+  
+  //运行时参数
   public void statAbility(StatStack stat) {}
 
   /** 每帧逻辑：回充、耗能、积累热量等。 */

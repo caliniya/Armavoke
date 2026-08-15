@@ -5,6 +5,7 @@ import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.core.meta.stat.Stat;
 import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
 
 /**
@@ -23,7 +24,7 @@ public class HeatAbility extends Ability {
 
   /** 当前热量。 */
   public float heat;
-  
+
   @Override
   public Ability onCreate(Entity e) {
     e.heatSpeed = heatSpeed;
@@ -31,7 +32,6 @@ public class HeatAbility extends Ability {
     e.heatMax = heatMax;
     return super.onCreate(e);
   }
-  
 
   public HeatAbility() {
     super("heat");
@@ -41,13 +41,13 @@ public class HeatAbility extends Ability {
     super("heat");
     this.heatMax = heatMax;
   }
-  
+
   // 对于过热锁定 只能在这里进行
   @Override
   public void update(Entity e, float dt) {
     heat = e.heat;
-    if(heat > heatMax) {
-    	e.locked = true;
+    if (heat > heatMax) {
+      e.locked = true;
     }
   }
 
@@ -57,13 +57,13 @@ public class HeatAbility extends Ability {
   }
 
   @Override
-  public void write(Entity e ,Writes w) {
+  public void write(Entity e, Writes w) {
     super.write(w);
     w.f(e.heat);
   }
 
   @Override
-  public void read(Entity e ,Reads r) {
+  public void read(Entity e, Reads r) {
     super.read(r);
     heat = r.f();
     e.locked = heat >= heatMax;
@@ -71,7 +71,13 @@ public class HeatAbility extends Ability {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.heat, heatMax, StatUnit.none, localizedName);
+    stack.add(Stat.heatMax, heatMax, StatUnit.none, localizedName);
     stack.add(Stat.heatSpeed, heatSpeed, StatUnit.perSecond, localizedName);
+  }
+
+  @Override
+  public void statAbility(StatStack stat) {
+    stat.addRaw(StatType.none, localizedName, null);
+    stat.add(Stat.heat, heat);
   }
 }

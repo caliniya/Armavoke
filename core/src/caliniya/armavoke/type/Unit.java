@@ -471,22 +471,6 @@ public class Unit extends Entity {
     WorldData.moveunits.add(this);
     WorldData.units.move(this, x, y);
     updateHitbox();
-    // TEST 临时：创建时打印自身能力与模组信息（游戏内暂无展示处）
-    StringBuilder sb = new StringBuilder("[单位创建] " + type.getIdentity());
-    sb.append(" 能力[");
-    for (int i = 0; i < abilities.size; i++) {
-      if (i > 0) sb.append(", ");
-      sb.append(abilities.get(i).localizedName);
-    }
-    sb.append("] 模组[");
-    for (int i = 0; i < enhancements.size; i++) {
-      if (i > 0) sb.append(", ");
-      Enhancement enh = enhancements.get(i);
-      sb.append(enh.getClass().getSimpleName());
-      sb.append(enh.enabled ? "(开)" : "(关)");
-    }
-    sb.append("]");
-    Log.info("@", sb.toString());
   }
 
   public void knock(float dir, float force) {
