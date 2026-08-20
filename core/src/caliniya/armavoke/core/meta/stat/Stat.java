@@ -12,6 +12,7 @@ public enum Stat {
   shield("shield"),
   heat("heat"),
   energy("energy"),
+  power("power"),
 
   // 基础
   healthMax("healthMax", StatType.general),

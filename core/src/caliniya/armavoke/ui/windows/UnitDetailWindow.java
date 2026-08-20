@@ -8,6 +8,7 @@ import arc.graphics.g2d.Fill;
 import arc.scene.Element;
 import arc.scene.ui.Label;
 import arc.scene.ui.layout.Table;
+import arc.util.Align;
 import caliniya.armavoke.type.Unit;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.core.meta.stat.StatStack;
@@ -48,9 +49,61 @@ public class UnitDetailWindow extends Window {
         .size(84f, 36f)
         .padLeft(8f);
     t.add(nameRow).growX().left().row();
-    
-    
-    
+
+    // 组装无分组运行时数据：实体（血量/护甲/护盾/能量/热量/电力）+ 能力 + 模组
+    stst.clear();
+    unit.stat(stst);
+    for (Enhancement enh : unit.enhancements) {
+      enh.type.stats(stst);
+    }
+
+    // 渲染：无分组条目直接平铺
+    stst.getAll(
+        e -> {
+          t.add("   " + e.data).left().padBottom(2).align(Align.left);
+          t.row();
+        });
+
+    // 物品数据显示区（TODO：由开发者补充，展示 unit.item / unit.liquid 各资源量）
+    // TODO 物品数据
+
+    // 可开关模组 + 能力（带开关按钮）
+    t.add().height(8f).row();
+    for (Enhancement enh : unit.enhancements) {
+      Table row = new Table();
+      row.left();
+      row.add("[gray]" + enh.type.localizedName + "[]").left().pad(2f);
+      row.add(
+              new Button(
+                  enh.enabled
+                      ? Core.bundle.get("unitDetail.disable")
+                      : Core.bundle.get("unitDetail.enable"),
+                  () -> {
+                    enh.setEnabled(!enh.enabled);
+                    main(this.main); // 刷新窗口内容
+                  }))
+          .size(64f, 36f)
+          .padLeft(6f);
+      t.add(row).growX().left().row();
+    }
+    for (Ability a : unit.abilities) {
+      if (!a.toggleable) continue;
+      Table row = new Table();
+      row.left();
+      row.add("[gray]" + a.localizedName + "[]").left().pad(2f);
+      row.add(
+              new Button(
+                  a.enabled
+                      ? Core.bundle.get("unitDetail.disable")
+                      : Core.bundle.get("unitDetail.enable"),
+                  () -> {
+                    a.setEnabled(!a.enabled);
+                    main(this.main); // 刷新窗口内容
+                  }))
+          .size(64f, 36f)
+          .padLeft(6f);
+      t.add(row).growX().left().row();
+    }
   }
 
   /** 条形图元素：每帧读取最新值绘制。 */

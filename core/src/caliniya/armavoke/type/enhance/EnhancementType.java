@@ -4,6 +4,8 @@ import caliniya.armavoke.base.api.TechNodeContent;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.type.Enhancement;
+import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.stat.StatType;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 
@@ -40,6 +42,14 @@ public abstract class EnhancementType extends ContentType implements TechNodeCon
 
   /** 关闭时恢复原值。 */
   public void onDisable(Enhancement e) {}
+
+  /** 上报类型数据（名称/描述，无分组，供详情窗口展示）。 */
+  public void stats(StatStack stack) {
+    stack.addRaw(StatType.none, localizedName, null);
+    if (description != null) {
+      stack.addRaw(StatType.none, description, null);
+    }
+  }
 
   /**
    * 序列化实体运行数据（复杂插件的独立状态，存于 {@code e.vars} 或实体字段）。

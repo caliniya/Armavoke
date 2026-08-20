@@ -278,14 +278,15 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   }
 
   public void stat(StatStack stat) {
-    stat.add(Stat.health, health).add(Stat.armor, armor);
+    stat.add(Stat.health, health);
+    stat.add(Stat.armor, armor);
     stat.add(Stat.shield, totalShield());
     stat.add(Stat.energy, energy);
-    if (energyMax > 0) stat.add(Stat.energy, energy);
+    if (heatable && heatMax > 0f) stat.add(Stat.heat, heat);
+    if (power != null) stat.add(Stat.power, power.power);
     for (Ability a : abilities) {
-      a.statAbility(stst);
+      a.statAbility(stat);
     }
-    // if()
   }
 
   /** 返回实体的碰撞盒尺寸（直径）。 子类应该覆盖此方法以提供准确的碰撞体大小。 默认返回 8 像素。 */
