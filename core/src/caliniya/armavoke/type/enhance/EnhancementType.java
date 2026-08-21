@@ -4,6 +4,7 @@ import caliniya.armavoke.base.api.TechNodeContent;
 import caliniya.armavoke.base.game.ContentType;
 import caliniya.armavoke.base.type.CType;
 import caliniya.armavoke.core.meta.stat.StatData;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.Enhancement;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatType;
@@ -46,7 +47,9 @@ public abstract class EnhancementType extends ContentType implements TechNodeCon
 
   /** 上报类型数据（名称/描述，无分组，供详情窗口展示）。 */
   public void stats(StatStack stack) {
-    stack.add(new StatData(localizedName).add(new StatData(description)));
+    stack.add(
+        new StatData(Pal.format(Pal.light, localizedName), StatType.function)
+            .add(new StatData(Pal.format(Pal.light, description)).setLevel(1)));
   }
 
   /**

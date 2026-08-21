@@ -6,6 +6,7 @@ import arc.struct.ObjectMap;
 import arc.struct.OrderedMap;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.core.meta.ui.Pal;
 
 /** 一个完整的信息组 */
 public class StatStack {
@@ -18,7 +19,7 @@ public class StatStack {
   static {
     cache = new ObjectMap<>();
     for (StatType s : StatType.values()) {
-      cache.put(s, new StatData(s.localizedName, 0));
+      cache.put(s, new StatData(Pal.format(Pal.light, s.localizedName), 0));
     }
   }
 
@@ -60,8 +61,18 @@ public class StatStack {
     return this;
   }
 
+  public StatStack add(String raw, int level) {
+    types.get(StatType.function).add(new StatData(raw, level));
+    return this;
+  }
+
   public StatStack add(String raw, StatType type) {
     types.get(type).add(new StatData(raw));
+    return this;
+  }
+
+  public StatStack add(String raw, int level, StatType type) {
+    types.get(type).add(new StatData(raw, level, type));
     return this;
   }
 

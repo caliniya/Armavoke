@@ -16,6 +16,8 @@ public class StatData {
   public float valueMax = -1f;
   // 用于指定的缩进指数
   public int level = 1;
+  // 是否显式设置过 level（add 时不再自动覆盖）
+  public boolean levelSet;
   // 单位
   public StatUnit unit;
   // 处理完毕后的值，应该是包含缩进的
@@ -105,7 +107,9 @@ public class StatData {
 
   /** 插入子元素：自动 level+1 并重新生成含缩进的 data。 */
   public StatData add(StatData child) {
-    child.level = this.level + 1;
+    if (!child.levelSet) {
+      child.level = this.level + 1;
+    }
     child.data = child.indent() + child.raw;
     datas.add(child);
     return this;
@@ -123,6 +127,7 @@ public class StatData {
 
   public StatData setLevel(int level) {
     this.level = level;
+    this.levelSet = true;
     this.data = indent() + raw;
     return this;
   }

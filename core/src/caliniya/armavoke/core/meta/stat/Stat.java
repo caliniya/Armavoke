@@ -19,17 +19,17 @@ public enum Stat {
   speed("speed", StatType.general, StatUnit.tilesSecond),
   rotateSpeed("rotateSpeed", StatType.general, StatUnit.degreesSecond),
   energyMax("energyMax", StatType.general),
-  energyRegen("energyRegen", StatType.general),
+  energyRegen("energyRegen", StatType.general, StatUnit.perSecond),
   // 防护
   armorMax("armorMax", StatType.protect),
   armorValue("armorValue", StatType.protect),
   // 支持
   shieldMax("shieldMax", StatType.function),
-  shieldStrength("shieldStrength", StatType.function),
-  shieldRegen("shieldRegen", StatType.function),
+  shieldStrength("shieldStrength", StatType.function, StatUnit.percent),
+  shieldRegen("shieldRegen", StatType.function, StatUnit.perSecond),
   heatMax("heatMax", StatType.function),
   shieldCost("shieldCost", StatType.function),
-  radius("radius", StatType.function, StatUnit.blocksSquared),
+  radius("radius", StatType.function, StatUnit.blocks),
   heatSpeed("heatSpeed", StatType.function, StatUnit.perSecond),
   heatPerShot("heatPerShot", StatType.function, StatUnit.perShot);
   public final String name, localizedName;

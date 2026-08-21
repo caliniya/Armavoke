@@ -163,7 +163,7 @@ public class ShieldAbility extends Ability implements Shield {
   public void stats(StatStack stack) {
 
     StatData group = StatData.with(Pal.format(Pal.light, localizedName), 1, StatType.function);
-    group.add(StatData.with(Pal.format(Pal.light, description)));
+    group.add(StatData.with(Pal.format(Pal.light, description)).setLevel(1));
 
     group
         .add(StatData.with(Stat.shieldMax, max))
@@ -178,7 +178,7 @@ public class ShieldAbility extends Ability implements Shield {
                         "stat.shieldResist",
                         t.localizedName,
                         StatUnit.percent.format(resist[t.ordinal()])))
-                .setLevel(4));
+                .setLevel(3));
       }
     }
     stack.add(group);

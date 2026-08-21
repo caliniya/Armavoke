@@ -74,7 +74,7 @@ public class HeatAbility extends Ability {
   public void stats(StatStack stack) {
     stack.add(
         StatData.with(Pal.format(Pal.light, localizedName), StatType.function)
-            .add(StatData.with(Pal.format(Pal.light, description)).setLevel(2))
+            .add(StatData.with(Pal.format(Pal.light, description)).setLevel(1))
             .add(StatData.with(Stat.heatMax, heatMax))
             .add(StatData.with(Stat.heatSpeed, heatSpeed)));
   }

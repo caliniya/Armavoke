@@ -7,6 +7,7 @@ import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.core.*;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatType;
+import caliniya.armavoke.core.meta.stat.StatUnit;
 import caliniya.armavoke.game.*;
 
 public class ContentType {
@@ -48,8 +49,8 @@ public class ContentType {
 
     stat = new StatStack();
 
-    stat.add(localizedName, StatType.none);
-    stat.add(description, StatType.none);
+    stat.add(localizedName, 0, StatType.none);
+    stat.add(description, 0, StatType.none);
 
     if (register) {
       // 注册时会自动分配 ID

@@ -51,6 +51,7 @@ public enum StatUnit {
     if (this == none) return Strings.autoFixed(value, 2);
     if (this == percent) return Strings.autoFixed(value * 100, 2) + localizedName;
     if (this == multiplier) return "×" + Strings.autoFixed(value, 2) + localizedName;
+    if (this == blocks) return String.format("%.2f", value / 32) + localizedName;
     if (this == bool)
       return value == 1f ? Core.bundle.get("statUnit.true") : Core.bundle.get("statUnit.false");
     return Strings.autoFixed(value, 2) + (space ? " " : "") + localizedName;
