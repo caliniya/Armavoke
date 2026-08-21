@@ -28,49 +28,11 @@ public class DataWindow extends Window {
     t.left();
     if (stack == null) return;
 
-    for (StatType type : StatType.values()) {
-      Ar<StatStack.StatEntry> items = new Ar<>();
-      stack.getEntries(type, items::add);
-      if (items.isEmpty()) continue;
-
-      // 分组标题（none 组为类型名称/描述等顶部信息，不显示空标题）
-      if (type != StatType.none) {
-        t.add("   " + "[#03ECED]" + type.localizedName + "[]")
-            .left()
-            .padTop(12)
-            .padBottom(4)
-            .labelAlign(Align.left);
-        t.row();
-      }
-
-      // 无分组项直接显示；带分组（能力名）的先显示标题再缩进参数
-      String lastGroup = null;
-      for (StatStack.StatEntry e : items) {
-        if (e.group == null) {
-          // 层级已由 StatStack 计算好：none 组名称/描述 0，普通条目 1，护甲抗性 2
-          t.add("   " + indent(e.level) + e.data.data).left().padBottom(2).align(Align.left);
+    // 完整遍历：所有 StatData 的 data 已含缩进，直接显示；跳过空内容（无分组空标题）
+    stack.eachFull(
+        d -> {
+          t.add(d.data).left().padBottom(2).align(Align.left);
           t.row();
-        } else {
-          // 去重用内部 groupKey（同能力实例合并，同名多实例各自成块），标题显示用 group（无编号）
-          if (!e.groupKey.equals(lastGroup)) {
-            // 能力名：层 1
-            t.add("   " + indent(1) + "[light]" + e.group + "[]").left().padTop(2).padBottom(2);
-            t.row();
-            lastGroup = e.groupKey;
-          }
-          // 能力参数 2 / 护盾抗性 3，层级已在 StatStack 计算
-          t.add("   " + indent(e.level) + e.data.data).left().padBottom(1).align(Align.left);
-          t.row();
-        }
-      }
-    }
-  }
-
-  /** 拼接指定层数的缩进字符。 */
-  private static String indent(int level) {
-    if (level <= 0) return "";
-    StringBuilder sb = new StringBuilder(level);
-    for (int i = 0; i < level; i++) sb.append(INDENT);
-    return sb.toString();
+        });
   }
 }

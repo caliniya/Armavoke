@@ -45,10 +45,11 @@ public abstract class EnhancementType extends ContentType implements TechNodeCon
 
   /** 上报类型数据（名称/描述，无分组，供详情窗口展示）。 */
   public void stats(StatStack stack) {
-    stack.addRaw(StatType.none, localizedName, null);
+    stack.groupStart(localizedName);
     if (description != null) {
-      stack.addRaw(StatType.none, description, null);
+      stack.addRaw(description);
     }
+    stack.groupEnd();
   }
 
   /**

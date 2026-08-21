@@ -4,8 +4,8 @@ import arc.Core;
 import caliniya.armavoke.base.tool.Ar;
 
 public enum Stat {
-  Name("name", StatType.none),
-  info("info", StatType.none),
+  Name("name"),
+  info("info"),
 
   health("health"),
   armor("armor"),
@@ -16,8 +16,8 @@ public enum Stat {
 
   // 基础
   healthMax("healthMax", StatType.general),
-  speed("speed", StatType.general),
-  rotateSpeed("rotateSpeed", StatType.general),
+  speed("speed", StatType.general, StatUnit.tilesSecond),
+  rotateSpeed("rotateSpeed", StatType.general, StatUnit.degreesSecond),
   energyMax("energyMax", StatType.general),
   energyRegen("energyRegen", StatType.general),
   // 防护
@@ -29,11 +29,12 @@ public enum Stat {
   shieldRegen("shieldRegen", StatType.function),
   heatMax("heatMax", StatType.function),
   shieldCost("shieldCost", StatType.function),
-  radius("radius", StatType.function),
-  heatSpeed("heatSpeed", StatType.function),
-  heatPerShot("heatPerShot", StatType.function);
+  radius("radius", StatType.function, StatUnit.blocksSquared),
+  heatSpeed("heatSpeed", StatType.function, StatUnit.perSecond),
+  heatPerShot("heatPerShot", StatType.function, StatUnit.perShot);
   public final String name, localizedName;
   public final StatType type;
+  public final StatUnit unit;
 
   Stat(String name) {
     this(name, StatType.none);
@@ -41,8 +42,13 @@ public enum Stat {
 
   // 表示某一种统计信息，例如生命
   Stat(String name, StatType type) {
+    this(name, type, StatUnit.none);
+  }
+
+  Stat(String name, StatType type, StatUnit unit) {
     this.name = name;
     this.type = type;
+    this.unit = unit;
     this.localizedName = Core.bundle.get("stat." + name);
   }
 

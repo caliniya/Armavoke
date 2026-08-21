@@ -57,10 +57,11 @@ public class UnitDetailWindow extends Window {
       enh.type.stats(stst);
     }
 
-    // 渲染：无分组条目直接平铺
-    stst.getAll(
-        e -> {
-          t.add("   " + e.data).left().padBottom(2).align(Align.left);
+    // 渲染：完整遍历所有 StatData（data 已含缩进），跳过空内容
+    stst.eachFull(
+        d -> {
+          if (d.data == null || d.data.trim().isEmpty()) return;
+          t.add(d.data).left().padBottom(2).align(Align.left);
           t.row();
         });
 
