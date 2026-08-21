@@ -1,9 +1,9 @@
 package caliniya.armavoke.type.ability.api;
 
 /**
- * 护盾契约：统一单体护盾与空间护盾（力场护盾）的**数据访问**接口。
+ * 护盾接口
  *
- * <p>只暴露护盾自身的数据（容量/强度/抗性/回充/耗能/比例）， 行为逻辑（减伤结算、能量消耗、 回充 tick）仍属于能力（{@code Ability}）范畴。
+ * <p> 通用护盾接口
  */
 public interface Shield {
 
@@ -30,4 +30,10 @@ public interface Shield {
 
   /** 当前护盾比例（0 ~ 1）。 */
   float percent();
+
+  /** 当前破盾冷却剩余时间（秒）；0 = 不在冷却。 */
+  float cooldown();
+
+  /** 破盾冷却总时长（秒）。 */
+  float cooldownMax();
 }

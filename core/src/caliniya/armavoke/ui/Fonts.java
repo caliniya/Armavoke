@@ -87,13 +87,13 @@ public class Fonts {
         new FreeTypeFontParameter() {
           {
             size = 24; // 基础字号
-            
+
             this.genMipMaps = true;
             this.hinting = FreeTypeFontGenerator.Hinting.none;
-            //this.gamma = 2f;
+            this.gamma = 2f;
 
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
+            shadowColor = Color.white;
+            shadowOffsetY = 1;
 
             incremental = true; // 增量加载：这对中文等字符集很大的语言至关重要
           }

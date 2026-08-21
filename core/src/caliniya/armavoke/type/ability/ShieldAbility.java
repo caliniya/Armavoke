@@ -56,6 +56,12 @@ public class ShieldAbility extends Ability implements Shield {
   /** 开关。 */
   public boolean active = true;
 
+  /** 破盾冷却总时长（秒）；破盾（容量归零）后需等待此时间才能重新回充。 */
+  public float cooldownMax;
+
+  /** 当前破盾冷却剩余时间（秒）；0 = 不在冷却。 */
+  public float cooldown;
+
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
@@ -90,7 +96,12 @@ public class ShieldAbility extends Ability implements Shield {
       active = false;
       return;
     }
-    current = Math.min(max, current + regenFrame * dt);
+    if (cooldown > 0) {
+      // 破盾冷却中：不回充，仅递减计时
+      cooldown = Math.max(0f, cooldown - dt);
+    } else {
+      current = Math.min(max, current + regenFrame * dt);
+    }
   }
 
   @Override
@@ -105,8 +116,11 @@ public class ShieldAbility extends Ability implements Shield {
     // 破盾：无视护盾强度减伤（全伤害扣盾，护盾掉得更快）
     float reduction = breakShield ? 1f : (1f / strength);
     float actual = damage * type.shieldMult * (1f - resist[type.ordinal()]) * reduction;
-    current -= actual;
-    if (current <= 0) current = 0;
+    // 破盾瞬间（从有盾到归零）触发一次冷却，避免冷却期间每帧刷新计时
+    if (current > 0 && current - actual <= 0) {
+      cooldown = cooldownMax;
+    }
+    current = Math.max(0f, current - actual);
 
     return 0; // 破盾溢出不传递
   }
@@ -159,6 +173,18 @@ public class ShieldAbility extends Ability implements Shield {
     return max <= 0 ? 0f : current / max;
   }
 
+  /** 当前破盾冷却剩余时间（秒）。 */
+  @Override
+  public float cooldown() {
+    return cooldown;
+  }
+
+  /** 破盾冷却总时长（秒）。 */
+  @Override
+  public float cooldownMax() {
+    return cooldownMax;
+  }
+
   @Override
   public void stats(StatStack stack) {
 
@@ -203,6 +229,7 @@ public class ShieldAbility extends Ability implements Shield {
     super.write(w);
     w.f(current);
     w.bool(active);
+    w.f(cooldown);
   }
 
   @Override
@@ -210,5 +237,6 @@ public class ShieldAbility extends Ability implements Shield {
     super.read(r);
     current = r.f();
     active = r.bool();
+    cooldown = r.f();
   }
 }
