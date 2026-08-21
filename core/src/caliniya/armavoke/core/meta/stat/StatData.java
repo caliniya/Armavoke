@@ -27,16 +27,19 @@ public class StatData {
   // 自身作为分组标题，该分组所属的内容 直接加入到自身
   public Ar<StatData> datas = new Ar<>();
 
-  public StatData(Stat stat, float value, StatUnit unit) {
-    this(stat, value, unit, 0, 0);
+  public StatData(Stat stat, float value) {
+    this(stat, value, stat.unit);
   }
 
-  public StatData(
-      Stat stat,
-      float value,
-      StatUnit unit,
-      int level,
-      float valueMax) {
+  public StatData(Stat stat, float value, float valueMax) {
+    this(stat, value, stat.unit, 1, valueMax);
+  }
+
+  public StatData(Stat stat, float value, StatUnit unit) {
+    this(stat, value, unit, 1, 0);
+  }
+
+  public StatData(Stat stat, float value, StatUnit unit, int level, float valueMax) {
     this.stat = stat;
     this.value = value;
     this.unit = unit;

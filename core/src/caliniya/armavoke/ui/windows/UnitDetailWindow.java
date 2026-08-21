@@ -51,14 +51,13 @@ public class UnitDetailWindow extends Window {
     t.add(nameRow).growX().left().row();
 
     // 组装无分组运行时数据：实体（血量/护甲/护盾/能量/热量/电力）+ 能力 + 模组
-    stst.clear();
     unit.stat(stst);
     for (Enhancement enh : unit.enhancements) {
       enh.type.stats(stst);
     }
 
     // 渲染：完整遍历所有 StatData（data 已含缩进），跳过空内容
-    stst.eachFull(
+    stst.each(
         d -> {
           if (d.data == null || d.data.trim().isEmpty()) return;
           t.add(d.data).left().padBottom(2).align(Align.left);

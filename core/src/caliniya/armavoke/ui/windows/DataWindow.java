@@ -29,7 +29,7 @@ public class DataWindow extends Window {
     if (stack == null) return;
 
     // 完整遍历：所有 StatData 的 data 已含缩进，直接显示；跳过空内容（无分组空标题）
-    stack.eachFull(
+    stack.each(
         d -> {
           t.add(d.data).left().padBottom(2).align(Align.left);
           t.row();

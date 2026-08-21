@@ -4,6 +4,7 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.core.meta.stat.Stat;
+import caliniya.armavoke.core.meta.stat.StatData;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
@@ -77,8 +78,6 @@ public class HeatAbility extends Ability {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.groupStart(localizedName);
-    stat.add(Stat.heat, heat);
-    stat.groupEnd();
+    stat.add(new StatData(Stat.heat , heat));
   }
 }

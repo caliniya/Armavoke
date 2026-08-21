@@ -28,19 +28,20 @@ public class StatStack {
     }
   }
 
+  public StatStack add(Stat stat, float value) {
+    return add(stat, value, stat.unit);
+  }
+
   public StatStack add(Stat stat, float value, StatUnit unit) {
-    types.get(stat.type).add(new StatData(stat, value, unit));
-    return this;
+    return add(stat, value, unit, 1, -1f);
   }
 
   public StatStack add(Stat stat, float value, StatUnit unit, float valueMax) {
-    add(stat, value, unit, 1, valueMax);
-    return this;
+    return add(stat, value, unit, 1, valueMax);
   }
 
   public StatStack add(Stat stat, float value, StatUnit unit, int level) {
-    add(stat, value, unit, level, -1f);
-    return this;
+    return add(stat, value, unit, level, -1f);
   }
 
   public StatStack add(Stat stat, float value, StatUnit unit, int level, float valueMax) {
@@ -52,9 +53,20 @@ public class StatStack {
     types.get(data.type).add(data);
     return this;
   }
+  
+  // 注意一下 我们默认是加在支持组里面
+  public StatStack add(String raw){
+    types.get(StatType.function).add(new StatData(raw));
+    return this;
+  }
+  
+  public StatStack add(String raw , StatType type){
+    types.get(type).add(new StatData(raw));
+    return this;
+  }
 
-  /** 完整遍历：递归提供全部 StatData（含 StatType 标题、无分组空标题、能力标题、参数）。 data 已含缩进，渲染端直接显示。 */
-  public void eachFull(Cons<StatData> cons) {
+  /** 递归提供全部 StatData（含 StatType 标题、无分组空标题、能力标题、参数）。 data 已含缩进，渲染端直接显示。 */
+  public void each(Cons<StatData> cons) {
     types.each(
         (K, V) -> {
           cons.get(cache.get(K));
