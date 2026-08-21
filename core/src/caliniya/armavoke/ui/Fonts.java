@@ -27,9 +27,9 @@ public class Fonts {
 
   // 不需要缩放的字体名称集合
   private static final ObjectSet<String> unscaled = new ObjectSet<>();
-  
+
   public static void setup() {
-  	def.getData().markupEnabled = true;
+    def.getData().markupEnabled = true;
     outline.getData().markupEnabled = true;
   }
 
@@ -87,8 +87,12 @@ public class Fonts {
         new FreeTypeFontParameter() {
           {
             size = 24; // 基础字号
+
+            this.hinting = FreeTypeFontGenerator.Hinting.none;
+            
             shadowColor = Color.white;
-            shadowOffsetY = 2;
+            shadowOffsetY = 1;
+
             incremental = true; // 增量加载：这对中文等字符集很大的语言至关重要
           }
         };
@@ -96,7 +100,9 @@ public class Fonts {
     // 加载默认字体
     Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(fontFile, param))
             .loaded =
-        f -> Fonts.def = f;
+        f -> {
+          Fonts.def = f;
+        };
 
     // 加载描边字体 (复用 param，但在 loadSync 中会被修改添加边框)
     FreeTypeFontParameter outlineParam =
