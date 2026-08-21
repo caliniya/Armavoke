@@ -48,9 +48,9 @@ public class ContentType {
 
     stat = new StatStack();
 
-    stat.addRaw(localizedName);
+    stat.add(localizedName, StatType.none);
     if (description != null) {
-      stat.addRaw(description);
+      stat.add(description, StatType.none);
     }
 
     if (register) {

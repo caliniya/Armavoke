@@ -67,6 +67,34 @@ public class StatData {
     this.data = indent() + data;
   }
 
+  public static StatData with(Stat stat, float value) {
+    return new StatData(stat, value);
+  }
+
+  public static StatData with(Stat stat, float value, float valueMax) {
+    return new StatData(stat, value, valueMax);
+  }
+
+  public static StatData with(Stat stat, float value, StatUnit unit) {
+    return new StatData(stat, value, unit);
+  }
+
+  public static StatData with(Stat stat, float value, StatUnit unit, int level, float valueMax) {
+    return new StatData(stat, value, unit, level, valueMax);
+  }
+
+  public static StatData with(String data) {
+    return new StatData(data);
+  }
+
+  public static StatData with(String data, int level) {
+    return new StatData(data, level);
+  }
+
+  public static StatData with(String data, int level, StatType type) {
+    return new StatData(data, level, type);
+  }
+
   /** 插入子元素：自动 level+1 并重新生成含缩进的 data。 */
   public StatData add(StatData child) {
     child.level = this.level + 1;
