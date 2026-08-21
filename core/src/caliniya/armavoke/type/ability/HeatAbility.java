@@ -8,6 +8,7 @@ import caliniya.armavoke.core.meta.stat.StatData;
 import caliniya.armavoke.core.meta.stat.StatStack;
 import caliniya.armavoke.core.meta.stat.StatType;
 import caliniya.armavoke.core.meta.stat.StatUnit;
+import caliniya.armavoke.core.meta.ui.Pal;
 
 /**
  * 过热能力：负责<b>散热</b>与<b>锁定</b>。热量由外部热源（武器/能力/模组）通过 {@code Entity.addHeat} 添加； 达到储热上限 →
@@ -15,6 +16,7 @@ import caliniya.armavoke.core.meta.stat.StatUnit;
  *
  * <p>没附加此能力的单位完全无过热机制（能力系统：附加即生效）。
  */
+@SuppressWarnings("unused")
 public class HeatAbility extends Ability {
 
   /** 最大储热上限（达到即过热锁定；0 = 无过热机制）。 */
@@ -73,15 +75,15 @@ public class HeatAbility extends Ability {
   @Override
   public void stats(StatStack stack) {
     stack.add(
-        new StatData(localizedName)
-            .add(
-                StatData.with(description)
-                    .add(StatData.with(Stat.heatMax, heatMax))
-                    .add(StatData.with(Stat.heatSpeed, heatSpeed))));
+        StatData.with(Pal.format(Pal.light, localizedName))
+            .add(StatData.with(Pal.format(Pal.light, description)))
+            .add(StatData.with(Stat.heatMax, heatMax))
+            .add(StatData.with(Stat.heatSpeed, heatSpeed)));
   }
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.add(new StatData(Stat.heat, heat, heatMax));
+    stat.add(
+        StatData.with(Pal.format(Pal.light, localizedName)).add(StatData.with(Stat.heat, heat)));
   }
 }
