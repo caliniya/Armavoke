@@ -44,14 +44,12 @@ public class ContentType {
     this.internalName = type.name() + "." + name;
 
     this.localizedName = Core.bundle.get(internalName + ".name", name);
-    this.description = Core.bundle.getOrNull(internalName + ".description");
+    this.description = Core.bundle.get(internalName + ".description", "");
 
     stat = new StatStack();
 
     stat.add(localizedName, StatType.none);
-    if (description != null) {
-      stat.add(description, StatType.none);
-    }
+    stat.add(description, StatType.none);
 
     if (register) {
       // 注册时会自动分配 ID

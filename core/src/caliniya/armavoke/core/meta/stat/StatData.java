@@ -110,6 +110,6 @@ public class StatData {
   // 包含自身以及子元素的递归
   public void each(Cons<StatData> con) {
     con.get(this);
-    datas.each(d -> con.get(d));
+    datas.each(d -> d.each(con));
   }
 }

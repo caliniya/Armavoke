@@ -72,9 +72,12 @@ public class HeatAbility extends Ability {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(new StatData(localizedName).add())
-    stack.add(Stat.heatMax, heatMax, StatUnit.none);
-    stack.add(Stat.heatSpeed, heatSpeed, StatUnit.perSecond);
+    stack.add(
+        new StatData(localizedName)
+            .add(
+                StatData.with(description)
+                    .add(StatData.with(Stat.heatMax, heatMax))
+                    .add(StatData.with(Stat.heatSpeed, heatSpeed))));
   }
 
   @Override
