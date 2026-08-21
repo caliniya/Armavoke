@@ -59,6 +59,10 @@ public class StatData {
     this(data, level, StatType.none);
   }
 
+  public StatData(String data, StatType type) {
+    this(data, 1, type);
+  }
+
   /** 纯文本 + 组/层级信息（标题等）。 */
   public StatData(String data, int level, StatType type) {
     this.level = level;
@@ -67,20 +71,20 @@ public class StatData {
     this.data = indent() + data;
   }
 
-  public static StatData with(Stat stat, float value) {
-    return new StatData(stat, value);
-  }
-
-  public static StatData with(Stat stat, float value, float valueMax) {
-    return new StatData(stat, value, valueMax);
-  }
-
   public static StatData with(Stat stat, float value, StatUnit unit) {
     return new StatData(stat, value, unit);
   }
 
   public static StatData with(Stat stat, float value, StatUnit unit, int level, float valueMax) {
     return new StatData(stat, value, unit, level, valueMax);
+  }
+
+  public static StatData with(Stat stat, float value, float valueMax) {
+    return new StatData(stat, value, valueMax);
+  }
+
+  public static StatData with(Stat stat, float value) {
+    return new StatData(stat, value);
   }
 
   public static StatData with(String data) {
@@ -95,6 +99,10 @@ public class StatData {
     return new StatData(data, level, type);
   }
 
+  public static StatData with(String data, StatType type) {
+    return new StatData(data, type);
+  }
+
   /** 插入子元素：自动 level+1 并重新生成含缩进的 data。 */
   public StatData add(StatData child) {
     child.level = this.level + 1;
@@ -104,12 +112,18 @@ public class StatData {
   }
 
   public String indent() {
-    return level <= 0 ? "   " : "\u3000\u3000".repeat(level);
+    return level <= 0 ? "   " : "   " + "\u3000\u3000".repeat(level);
   }
 
   // 包含自身以及子元素的递归
   public void each(Cons<StatData> con) {
     con.get(this);
     datas.each(d -> d.each(con));
+  }
+
+  public StatData setLevel(int level) {
+    this.level = level;
+    this.data = indent() + raw;
+    return this;
   }
 }

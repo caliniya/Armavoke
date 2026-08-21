@@ -53,14 +53,14 @@ public class StatStack {
     types.get(data.type).add(data);
     return this;
   }
-  
+
   // 注意一下 我们默认是加在支持组里面
-  public StatStack add(String raw){
+  public StatStack add(String raw) {
     types.get(StatType.function).add(new StatData(raw));
     return this;
   }
-  
-  public StatStack add(String raw , StatType type){
+
+  public StatStack add(String raw, StatType type) {
     types.get(type).add(new StatData(raw));
     return this;
   }
@@ -69,6 +69,9 @@ public class StatStack {
   public void each(Cons<StatData> cons) {
     types.each(
         (K, V) -> {
+          if (!V.any()) {
+            return;
+          }
           cons.get(cache.get(K));
           V.each(d -> d.each(a -> cons.get(a)));
         });

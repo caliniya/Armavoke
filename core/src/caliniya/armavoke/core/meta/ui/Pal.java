@@ -11,6 +11,6 @@ public class Pal {
   }
 
   public static String format(Color color, String text) {
-    return "[#" + color.getClass().getSimpleName() + "]" + text + "[]";
+    return "[#" + color + "]" + text + "[]";
   }
 }

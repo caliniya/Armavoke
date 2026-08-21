@@ -3,23 +3,20 @@ package caliniya.armavoke.type.ability;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.core.meta.stat.Stat;
-import caliniya.armavoke.core.meta.stat.StatData;
-import caliniya.armavoke.core.meta.stat.StatStack;
-import caliniya.armavoke.core.meta.stat.StatType;
-import caliniya.armavoke.core.meta.stat.StatUnit;
+import caliniya.armavoke.core.meta.stat.*;
 import caliniya.armavoke.core.meta.ui.Pal;
 
 /**
- * 过热能力：负责<b>散热</b>与<b>锁定</b>。热量由外部热源（武器/能力/模组）通过 {@code Entity.addHeat} 添加； 达到储热上限 →
- * 锁定单位，热量归零后恢复。储热上限为 0 = 无过热机制。
+ * 过热能力：负责b>锁定</b>。热量由外部热源（武器/能力/模组）通过 {@code Entity.addHeat} 添加； 达到储热上限 → 锁定单位，热量归零后恢复。
+ *
+ * <p>这代表的是过热，散热由实体自行处理
  *
  * <p>没附加此能力的单位完全无过热机制（能力系统：附加即生效）。
  */
 @SuppressWarnings("unused")
 public class HeatAbility extends Ability {
 
-  /** 最大储热上限（达到即过热锁定；0 = 无过热机制）。 */
+  /** 最大储热上限（达到即过热锁定）。 */
   public float heatMax = 100f;
 
   /** 散热速度（每秒降低的热量）。 */
@@ -45,11 +42,11 @@ public class HeatAbility extends Ability {
     this.heatMax = heatMax;
   }
 
-  // 对于过热锁定 只能在这里进行
+  // 散热操作和解锁操作在{@code Entity.updateBase} 中进行，这里只同步以及进行锁定
   @Override
   public void update(Entity e, float dt) {
     heat = e.heat;
-    if (heat > heatMax) {
+    if (heat >= heatMax) {
       e.locked = true;
     }
   }
@@ -59,6 +56,7 @@ public class HeatAbility extends Ability {
     return heatMax <= 0f ? 0f : heat / heatMax;
   }
 
+  // 类型信息不需要序列化，热量值会在单位中进行序列化
   @Override
   public void write(Entity e, Writes w) {
     super.write(w);
@@ -75,8 +73,8 @@ public class HeatAbility extends Ability {
   @Override
   public void stats(StatStack stack) {
     stack.add(
-        StatData.with(Pal.format(Pal.light, localizedName))
-            .add(StatData.with(Pal.format(Pal.light, description)))
+        StatData.with(Pal.format(Pal.light, localizedName), StatType.function)
+            .add(StatData.with(Pal.format(Pal.light, description)).setLevel(2))
             .add(StatData.with(Stat.heatMax, heatMax))
             .add(StatData.with(Stat.heatSpeed, heatSpeed)));
   }

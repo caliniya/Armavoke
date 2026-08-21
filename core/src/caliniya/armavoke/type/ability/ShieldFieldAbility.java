@@ -1,5 +1,6 @@
 package caliniya.armavoke.type.ability;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -8,10 +9,7 @@ import arc.math.geom.Intersector;
 import arc.math.geom.Rect;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
-import caliniya.armavoke.core.meta.stat.Stat;
-import caliniya.armavoke.core.meta.stat.StatStack;
-import caliniya.armavoke.core.meta.stat.StatType;
-import caliniya.armavoke.core.meta.stat.StatUnit;
+import caliniya.armavoke.core.meta.stat.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.core.meta.ui.Pal;
@@ -200,19 +198,34 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void stats(StatStack stack) {
-    stack.add(Stat.shieldMax, max, StatUnit.none);
-    stack.add(Stat.shieldStrength, maxStrength, StatUnit.percent);
-    stack.add(Stat.shieldRegen, regen, StatUnit.perSecond);
-    stack.add(Stat.shieldCost, energyCost, StatUnit.perSecond);
-    stack.add(Stat.radius, radius, StatUnit.none);
-    stack.addResists(StatType.function, "stat.shieldResist", resist, null);
+    StatData group = StatData.with(Pal.format(Pal.light, localizedName), StatType.function);
+    group.add(StatData.with(Pal.format(Pal.light, description)));
+
+    group
+        .add(StatData.with(Stat.shieldMax, max))
+        .add(StatData.with(Stat.shieldStrength, maxStrength, StatUnit.percent))
+        .add(StatData.with(Stat.shieldRegen, regen, StatUnit.perSecond))
+        .add(StatData.with(Stat.shieldCost, energyCost, StatUnit.perSecond))
+        .add(StatData.with(Stat.radius, radius));
+    for (DamageType t : DamageType.values()) {
+      if (t.ordinal() < resist.length) {
+        group.add(
+            StatData.with(
+                    Core.bundle.format(
+                        "stat.shieldResist",
+                        t.localizedName,
+                        StatUnit.percent.format(resist[t.ordinal()])))
+                .setLevel(4));
+      }
+    }
+    stack.add(group);
   }
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.groupStart(localizedName);
-    stat.add(Stat.shield, current);
-    stat.groupEnd();
+    stat.add(
+        StatData.with(Pal.format(Pal.light, localizedName))
+            .add(StatData.with(Stat.shield, current, max)));
   }
 
   @Override

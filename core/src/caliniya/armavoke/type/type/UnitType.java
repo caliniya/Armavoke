@@ -79,26 +79,25 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       weapon.load(name);
     }
     // 基础
-    stat.add(Stat.healthMax, health, StatUnit.none);
-    stat.add(Stat.speed, speed, StatUnit.tilesSecond);
-    stat.add(Stat.rotateSpeed, rotationSpeend, StatUnit.degrees);
-    stat.add(Stat.energyMax, energyMax, StatUnit.none);
-    stat.add(Stat.energyRegen, energyRegen, StatUnit.perSecond);
+    stat.add(Stat.healthMax, health);
+    stat.add(Stat.speed, speed);
+    stat.add(Stat.rotateSpeed, rotationSpeend);
+    stat.add(Stat.energyMax, energyMax);
+    stat.add(Stat.energyRegen, energyRegen);
     // 防护
-    stat.add(Stat.armorMax, armorMax, StatUnit.none);
-    stat.add(Stat.armorValue, armorValue, StatUnit.none);
-    stat.addResists(StatType.protect, "stat.armorResist", armorResist, null);
-    abilities.each(
-        e -> {
-          stat.groupStart(e.localizedName);
-          // 能力介绍（若配置了 bundle 描述）：与能力名对齐（层 1），紧随能力名
-          if (e.description != null) {
-            // 与能力名同色（[light]）
-            stat.addRaw("[light]" + e.description + "[]");
-          }
-          e.stats(stat);
-          stat.groupEnd();
-        });
+    stat.add(Stat.armorMax, armorMax);
+    stat.add(Stat.armorValue, armorValue);
+    for (DamageType t : DamageType.values()) {
+      if (t.ordinal() < armorResist.length) {
+        stat.add(
+            Core.bundle.format(
+                "stat.armorResist",
+                t.localizedName,
+                StatUnit.percent.format(armorResist[t.ordinal()])),
+            StatType.protect);
+      }
+    }
+    abilities.each(e -> e.stats(stat));
   }
 
   public Unit create(TeamTypes team, float x, float y) {
