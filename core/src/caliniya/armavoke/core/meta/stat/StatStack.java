@@ -28,7 +28,7 @@ public class StatStack {
       types.put(s, new Ar<StatData>());
     }
   }
-  
+
   public StatStack add(Stat stat, float value) {
     return add(stat, value, stat.unit);
   }
@@ -74,6 +74,36 @@ public class StatStack {
   public StatStack add(String raw, int level, StatType type) {
     types.get(type).add(new StatData(raw, level, type));
     return this;
+  }
+
+  // 按照预设分组自动查找匹配
+  public StatData find(Stat stat) {
+    for (StatData data : types.get(stat.type)) {
+      if (data.stat == stat) return data;
+    }
+    return null;
+  }
+
+  // 带有特定匹配
+  public StatData find(Stat stat, Object tag) {
+    for (StatData data : types.get(stat.type)) {
+      if (data.stat == stat || data.tag == tag) return data;
+    }
+    return null;
+  }
+
+  public StatData find(String raw, StatType type) {
+    for (StatData data : types.get(type)) {
+      if (data.raw.contains(raw)) return data;
+    }
+    return null;
+  }
+
+  public StatData find(String raw, StatType type, Object tag) {
+    for (StatData data : types.get(type)) {
+      if (data.raw.contains(raw) || data.tag == tag) return data;
+    }
+    return null;
   }
 
   /** 清空所有分组内容（保留分组结构，可复用）。 */

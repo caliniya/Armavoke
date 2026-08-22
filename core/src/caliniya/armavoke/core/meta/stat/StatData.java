@@ -25,6 +25,9 @@ public class StatData {
   // 原始文本（不含缩进），add 重新生成缩进时使用
   public String raw = "";
 
+  /** 可选身份标签：区分内容相同（如同名能力）的条目；null 表示不参与匹配。 */
+  public Object tag;
+
   // 分组的另一种解决方法
   // 自身作为分组标题，该分组所属的内容 直接加入到自身
   public Ar<StatData> datas = new Ar<>();
@@ -106,7 +109,7 @@ public class StatData {
   }
 
   public StatData set(float value) {
-    return update(value, -1);
+    return set(value, -1);
   }
 
   public StatData set(float value, float valueMax) {
@@ -117,6 +120,27 @@ public class StatData {
       this.data = indent() + raw;
     }
     return this;
+  }
+  
+  //所有的find 返回的都是第1个匹配选项
+  public StatData find(Stat stat, Object tag) {
+    for (StatData d : datas) {
+      if (d.stat == stat && (tag == null || java.util.Objects.equals(d.tag, tag))) return d;
+      StatData found = d.find(stat, tag);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  public StatData find(String raw, Object tag) {
+    for (StatData d : datas) {
+      if (d.stat == null
+          && d.raw.equals(raw)
+          && (tag == null || java.util.Objects.equals(d.tag, tag))) return d;
+      StatData found = d.find(raw, tag);
+      if (found != null) return found;
+    }
+    return null;
   }
 
   /** 插入子元素：自动 level+1 并重新生成含缩进的 data。 */
