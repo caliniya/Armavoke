@@ -31,11 +31,20 @@ public class UnitDetailWindow extends Window {
     super(unit.type.localizedName);
     this.unit = unit;
     this.stst = new StatStack();
+    main =
+        new Table() {
+          @Override
+          public void draw() {
+            main(this);
+            super.draw();
+          };
+        };
   }
 
   @Override
   public void main(Table t) {
     if (unit == null) return;
+    t.clear();
     t.clearChildren();
 
     // 名字 + "类型信息"按钮（复用 DataWindow 展示 StatStack）

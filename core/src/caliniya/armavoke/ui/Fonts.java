@@ -92,7 +92,7 @@ public class Fonts {
             this.hinting = FreeTypeFontGenerator.Hinting.none;
             this.gamma = 2f;
 
-            shadowColor = Color.white;
+            shadowColor = Color.darkGray;
             shadowOffsetY = 1;
 
             incremental = true; // 增量加载：这对中文等字符集很大的语言至关重要
