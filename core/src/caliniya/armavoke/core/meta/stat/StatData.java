@@ -131,11 +131,12 @@ public class StatData {
     }
     return null;
   }
-
+  
+  // 因为字符大多数情况下会被颜色格式化，所以不能用完全匹配 而应该用包含
   public StatData find(String raw, Object tag) {
     for (StatData d : datas) {
       if (d.stat == null
-          && d.raw.equals(raw)
+          && d.raw.contains(raw)
           && (tag == null || java.util.Objects.equals(d.tag, tag))) return d;
       StatData found = d.find(raw, tag);
       if (found != null) return found;

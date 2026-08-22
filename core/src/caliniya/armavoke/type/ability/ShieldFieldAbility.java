@@ -249,9 +249,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.add(
-        StatData.with(Pal.format(Pal.light, localizedName))
-            .add(StatData.with(Stat.shield, current, max)));
+    stat.get(localizedName).find()
   }
 
   @Override

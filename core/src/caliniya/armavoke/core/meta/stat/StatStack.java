@@ -76,6 +76,61 @@ public class StatStack {
     return this;
   }
 
+  /** 按 stat 精确查找，命中则就地更新并返回，未命中则新建插入并返回。 */
+  public StatData get(Stat stat, float value, StatUnit unit, int level, float valueMax) {
+    Ar<StatData> list = types.get(stat.type);
+    for (int i = 0; i < list.size; i++) {
+      StatData d = list.get(i);
+      if (d.stat == stat) {
+        d.set(value, valueMax);
+        return d;
+      }
+    }
+    StatData d = new StatData(stat, value, unit, level, valueMax);
+    list.add(d);
+    return d;
+  }
+
+  /**按原始文本精确查找纯文本条目，命中则返回，未命中则新建插入并返回。 */
+  public StatData get(String raw, int level, StatType type) {
+    Ar<StatData> list = types.get(type);
+    for (int i = 0; i < list.size; i++) {
+      StatData d = list.get(i);
+      if (d.stat == null && d.raw.contains(raw)) return d;
+    }
+    StatData d = new StatData(raw, level, type);
+    list.add(d);
+    return d;
+  }
+
+  public StatData get(Stat stat, float value) {
+    return get(stat, value, stat.unit, 1, -1f);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit) {
+    return get(stat, value, unit, 1, -1f);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, float valueMax) {
+    return get(stat, value, unit, 1, valueMax);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, int level) {
+    return get(stat, value, unit, level, -1f);
+  }
+
+  public StatData get(String raw) {
+    return get(raw, 1, StatType.function);
+  }
+
+  public StatData get(String raw, int level) {
+    return get(raw, level, StatType.function);
+  }
+
+  public StatData get(String raw, StatType type) {
+    return get(raw, 1, type);
+  }
+
   // 按照预设分组自动查找匹配
   public StatData find(Stat stat) {
     for (StatData data : types.get(stat.type)) {
