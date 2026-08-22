@@ -28,7 +28,7 @@ public class StatStack {
       types.put(s, new Ar<StatData>());
     }
   }
-
+  
   public StatStack add(Stat stat, float value) {
     return add(stat, value, stat.unit);
   }
@@ -73,6 +73,12 @@ public class StatStack {
 
   public StatStack add(String raw, int level, StatType type) {
     types.get(type).add(new StatData(raw, level, type));
+    return this;
+  }
+
+  /** 清空所有分组内容（保留分组结构，可复用）。 */
+  public StatStack clear() {
+    types.each((K, V) -> V.clear());
     return this;
   }
 

@@ -35,16 +35,19 @@ public class UnitDetailWindow extends Window {
         new Table() {
           @Override
           public void draw() {
-            main(this);
+            stst.clear();
+            unit.stat(stst);
+            //main(this);
             super.draw();
-          };
+          }
+          ;
         };
   }
 
   @Override
   public void main(Table t) {
     if (unit == null) return;
-    t.clear();
+    stst.clear();
     t.clearChildren();
 
     // 名字 + "类型信息"按钮（复用 DataWindow 展示 StatStack）
@@ -69,7 +72,7 @@ public class UnitDetailWindow extends Window {
     stst.each(
         d -> {
           if (d.data == null || d.data.trim().isEmpty()) return;
-          t.add(d.data).left().padBottom(2).align(Align.left);
+          t.add(new Label(() -> d.data)).left().padBottom(2).align(Align.left);
           t.row();
         });
 

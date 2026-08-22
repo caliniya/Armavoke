@@ -105,6 +105,20 @@ public class StatData {
     return new StatData(data, type);
   }
 
+  public StatData set(float value) {
+    return update(value, -1);
+  }
+
+  public StatData set(float value, float valueMax) {
+    this.value = value;
+    this.valueMax = valueMax;
+    if (stat != null && unit != null) {
+      this.raw = stat.localizedName + ": " + unit.format(value);
+      this.data = indent() + raw;
+    }
+    return this;
+  }
+
   /** 插入子元素：自动 level+1 并重新生成含缩进的 data。 */
   public StatData add(StatData child) {
     if (!child.levelSet) {
