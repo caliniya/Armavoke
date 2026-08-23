@@ -38,9 +38,8 @@ public final class EcsGameRuntime {
           unit.kill();
           continue;
         }
-        unit.updateEcsGeneral(delta);
+        EcsUnitRuntime.updateGeneral(entity, unit, delta);
         unit.canShoot = true;
-        GameEcsBridge.syncFromLegacy(unit);
         continue;
       }
       if (runtime instanceof Building building) {
@@ -50,7 +49,11 @@ public final class EcsGameRuntime {
           continue;
         }
         building.update(delta);
-        GameEcsBridge.syncFromLegacy(building);
+        if (building instanceof caliniya.armavoke.world.blocks.produce.unit.FactoryBuild factory) {
+          EcsFactoryRuntime.update(entity, factory, delta);
+        } else {
+          GameEcsBridge.syncFromLegacy(building);
+        }
         continue;
       }
       updateGeneratedGeneral(world, entity);
@@ -84,8 +87,7 @@ public final class EcsGameRuntime {
     for (EcsEntity entity : world.snapshot()) {
       Object runtime = GameEcsBridge.runtime(entity);
       if (runtime instanceof Unit unit) {
-        unit.updateEcsMovement(delta);
-        GameEcsBridge.syncFromLegacy(unit);
+        EcsUnitRuntime.updateMovement(entity, unit, delta);
         continue;
       }
       if (!(entity instanceof PositionAccess position)
@@ -274,8 +276,7 @@ public final class EcsGameRuntime {
     for (EcsEntity entity : world.snapshot()) {
       Object runtime = GameEcsBridge.runtime(entity);
       if (runtime instanceof Unit unit) {
-        unit.updateEcsAi(delta);
-        GameEcsBridge.syncFromLegacy(unit);
+        EcsUnitRuntime.updateAi(entity, unit, delta);
       } else if (entity instanceof caliniya.armavoke.ecs.generated.access.AiControlAccess ai
           && entity instanceof TargetingAccess targeting
           && entity instanceof MovementAccess movement) {

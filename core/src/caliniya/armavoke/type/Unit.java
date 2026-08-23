@@ -24,6 +24,7 @@ import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.type.module.*;
 import caliniya.armavoke.type.ai.UnitAI;
+import caliniya.armavoke.ecs.runtime.EcsUnitRuntime;
 
 public class Unit extends Entity {
 
@@ -74,6 +75,11 @@ public class Unit extends Entity {
   protected Unit() {}
 
   public static Unit create(TeamTypes team, UnitType type, float x, float y) {
+    return EcsUnitRuntime.create(team, type, x, y);
+  }
+
+  /** Internal presentation-object factory used only by the ECS unit runtime. */
+  public static Unit createEcsView(TeamTypes team, UnitType type, float x, float y) {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
     u.team = team;
@@ -87,11 +93,15 @@ public class Unit extends Entity {
     u.id = Entities.assignID();
     u.updateTeamData();
     u.updateHitbox();
-    Entities.add(u);
     return u;
   }
 
   public static Unit create(UnitType type) {
+    return EcsUnitRuntime.createUnbound(type);
+  }
+
+  /** Internal unbound view used while legacy save data is being decoded. */
+  public static Unit createEcsView(UnitType type) {
     Unit u = Pools.obtain(Unit.class, Unit::new);
     u.type = type;
     u.item = new ItemModule(type.itemCap);
@@ -354,6 +364,10 @@ public class Unit extends Entity {
       hitboxData[1] = y;
       hitboxData[2] = size;
     }
+  }
+
+  public void refreshEcsHitbox() {
+    updateHitbox();
   }
 
   public boolean contains(float px, float py) {

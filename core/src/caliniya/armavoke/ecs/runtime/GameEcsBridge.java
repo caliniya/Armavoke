@@ -25,7 +25,6 @@ import caliniya.armavoke.type.Bullet;
 import caliniya.armavoke.type.Unit;
 import caliniya.armavoke.type.Weapon;
 import caliniya.armavoke.type.ai.UnitAI;
-import caliniya.armavoke.world.blocks.produce.recipe.Recipe;
 import caliniya.armavoke.world.blocks.produce.unit.FactoryBuild;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -337,16 +336,7 @@ public final class GameEcsBridge {
     collision.collisionHeight(building.hitboxSize());
     collision.collisionSolid(building.block != null && building.block.solid);
     if (building instanceof FactoryBuild factoryBuild) {
-      ProductionAccess production = (ProductionAccess) entity;
-      production.productionComponent().progress = factoryBuild.progress;
-      production.productionComponent().recipeId = factoryBuild.recipeIndex;
-      production.productionComponent().crafting = factoryBuild.crafting;
-      Recipe recipe = recipe(factoryBuild);
-      production.productionComponent().craftTime =
-          recipe == null ? 300f : recipe.craftTimeSeconds * 60f;
-      SpawnerAccess spawner = (SpawnerAccess) entity;
-      spawner.spawnerOutputTypeId(
-          recipe == null || recipe.output == null ? -1 : contentId(recipe.output.internalName));
+      EcsFactoryRuntime.writeViewToComponents(entity, factoryBuild);
     }
   }
 
@@ -425,10 +415,7 @@ public final class GameEcsBridge {
       building.energyRegen = energy.energyComponent().regen;
       applyTeam(building, ((TeamAccess) entity).teamTeamId());
       if (building instanceof FactoryBuild factoryBuild) {
-        ProductionAccess production = (ProductionAccess) entity;
-        factoryBuild.progress = production.productionComponent().progress;
-        factoryBuild.recipeIndex = production.productionComponent().recipeId;
-        factoryBuild.crafting = production.productionComponent().crafting;
+        EcsFactoryRuntime.readComponentsToView(entity, factoryBuild);
       }
     } else if (runtime instanceof Bullet bullet) {
       PositionAccess position = (PositionAccess) entity;
@@ -479,12 +466,6 @@ public final class GameEcsBridge {
 
   private static boolean isNavigating(Unit unit) {
     return WorldData.moveunits != null && WorldData.moveunits.array.contains(unit);
-  }
-
-  private static Recipe recipe(FactoryBuild build) {
-    if (build.factory() == null || build.factory().recipes == null
-        || build.recipeIndex < 0 || build.recipeIndex >= build.factory().recipes.length) return null;
-    return build.factory().recipes[build.recipeIndex];
   }
 
   private static int contentId(String name) {

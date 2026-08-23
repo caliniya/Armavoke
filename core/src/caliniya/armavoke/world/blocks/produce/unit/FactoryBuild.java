@@ -3,6 +3,7 @@ package caliniya.armavoke.world.blocks.produce.unit;
 import arc.util.pooling.Pools;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.Entities;
+import caliniya.armavoke.ecs.runtime.EcsFactoryRuntime;
 import caliniya.armavoke.type.Building;
 
 /** 单位工厂的运行时建筑状态。 */
@@ -19,17 +20,11 @@ public class FactoryBuild extends Building {
   }
 
   public boolean selectRecipe(int index) {
-    if (crafting || index < 0 || index >= factory().recipes.length) return false;
-    recipeIndex = index;
-    progress = 0f;
-    return true;
+    return EcsFactoryRuntime.selectRecipe(this, index);
   }
 
   public boolean stopRecipe() {
-    if (crafting) return false;
-    recipeIndex = -1;
-    progress = 0f;
-    return true;
+    return EcsFactoryRuntime.stopRecipe(this);
   }
 
   @Override

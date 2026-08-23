@@ -45,41 +45,7 @@ public class Factory extends Block {
 
   @Override
   public void update(Building building, float dt) {
-    if (!(building instanceof FactoryBuild factory)) return;
-    if (factory.recipeIndex < 0 || factory.recipeIndex >= recipes.length) return;
-
-    Recipe recipe = recipes[factory.recipeIndex];
-    if (!factory.crafting) {
-      if (!recipe.consume(factory.item)) return;
-      factory.crafting = true;
-      factory.progress = 0f;
-    }
-
-    factory.progress += dt / (recipe.craftTimeSeconds * 60f);
-    if (factory.progress >= 1f) {
-      spawn(factory, recipe);
-      factory.progress = 0f;
-      factory.crafting = false;
-    }
-  }
-
-  private void spawn(FactoryBuild factory, Recipe recipe) {
-    float distance = psize / 2f + recipe.output.size / 2f + 8f;
-    float spawnX = factory.x;
-    float spawnY = factory.y;
-    switch (factory.angle & 3) {
-      case 0 -> spawnY += distance;
-      case 1 -> spawnX += distance;
-      case 2 -> spawnY -= distance;
-      case 3 -> spawnX -= distance;
-    }
-
-    float maxX = WorldData.world.W * WorldData.TILE_SIZE;
-    float maxY = WorldData.world.H * WorldData.TILE_SIZE;
-    spawnX = Mathf.clamp(spawnX, 0f, maxX);
-    spawnY = Mathf.clamp(spawnY, 0f, maxY);
-    recipe.output.create(factory.team, spawnX, spawnY);
-    Fx.spawn.at(spawnX, spawnY, recipe.output);
+    // Production is updated by the generated ECS general system.
   }
 
   @Override
