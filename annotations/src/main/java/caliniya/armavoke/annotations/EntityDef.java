@@ -23,4 +23,7 @@ public @interface EntityDef {
   String generatedClass() default "";
 
   String constructor() default "";
+
+  /** Additional gameplay interfaces implemented directly by the generated ECS entity. */
+  String[] interfaces() default {};
 }

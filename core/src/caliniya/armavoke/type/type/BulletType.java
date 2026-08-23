@@ -1,88 +1,56 @@
 package caliniya.armavoke.type.type;
 
-import caliniya.armavoke.base.effect.Fx;
-import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.graphics.g2d.Draw;
-import arc.math.Angles;
 import arc.Core;
-import arc.util.ArcRuntimeException;
-import arc.util.Log;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
+import caliniya.armavoke.base.effect.Fx;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.DamageType;
-import caliniya.armavoke.system.Systems;
-import caliniya.armavoke.type.ability.ShieldAbility;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.ui.Fonts;
+import caliniya.armavoke.ecs.runtime.EcsBulletRuntime;
+import caliniya.armavoke.type.Bullet;
 
+/** Immutable bullet content definition. Bullet instances are generated ECS entities. */
 public class BulletType {
-
   public float speed = 6f;
   public float damage = 50f;
-
-  /** 伤害类型（默认动能）。 */
   public DamageType damageType = DamageType.Kinetic;
-
-  /** 破甲：无视护甲的固定伤害减免（护甲容量照扣）。 */
   public boolean breakArmor;
-
-  /** 穿甲：直接穿过护甲层攻击核心（必定不能穿盾，数值受限）。 */
   public boolean bypassArmor;
-
-  /** 破盾：无视护盾的强度减伤（护盾容量照扣）。 */
   public boolean breakShield;
-
-  /** 穿盾：直接穿过护盾层。 */
   public boolean bypassShield;
-
-  /** 击退力度（命中时沿子弹方向给目标的冲量；0 = 不击退）。 */
-  public float knock = 0f;
-
+  public float knock;
   public float lifetime = 600f;
   public float size = 60f;
-
-  // 渲染相关
-  public float drawSize = 1f; // 整体缩放比例
-  public Color frontColor = Color.white; // 子弹前景色
-  public Color backColor = Color.gray; // 子弹背景色
-
+  public float drawSize = 1f;
+  public Color frontColor = Color.white;
+  public Color backColor = Color.gray;
   public TextureRegion region;
 
   public BulletType() {}
 
-  public void load() {
-    this.region = Core.atlas.find("bullet");
+  public void load() { region = Core.atlas.find("bullet"); }
+
+  public Bullet create(Entity owner, float x, float y, float rotation) {
+    return EcsBulletRuntime.create(this, owner, x, y, rotation);
   }
 
-  /** 子弹更新逻辑 (每帧调用) */
-  // 基础的子弹运动目前在子弹处理中进行，未来整合进这里
-  public void update(Bullet b) {}
+  public void update(Bullet bullet) {}
 
-  /** 子弹绘制逻辑 */
-  public void draw(Bullet b) {
-    if(b.id <= 0) return;
-    if (region == null) return;
-
-    // 1. 绘制背层 (光晕)
+  public void draw(Bullet bullet) {
+    if (region == null || bullet == null) return;
     Draw.color(backColor);
-    Draw.rect(region, b.x, b.y, size * 1.5f, size * 1.5f, b.rotation - 90);
-
-    // 2. 绘制前层 (核心)
+    Draw.rect(region, bullet.x(), bullet.y(), size * 1.5f * drawSize, size * 1.5f * drawSize,
+        bullet.rotation() - 90f);
     Draw.color(frontColor);
-    Draw.rect(region, b.x, b.y, size, size, b.rotation - 90);
-
-    Draw.color(); // 重置
+    Draw.rect(region, bullet.x(), bullet.y(), size * drawSize, size * drawSize,
+        bullet.rotation() - 90f);
+    Draw.color();
   }
 
-  /** 命中单位时的回调 */
-  public void hit(Bullet b, Entity target) {
-    Fx.hit.at(b.x, b.y, b.rotation, frontColor, target);
-    target.hit(b);
+  public void hit(Bullet bullet, Entity target) {
+    if (bullet != null) Fx.hit.at(bullet.x(), bullet.y(), bullet.rotation(), frontColor, target);
   }
 
-  /** 命中墙壁/消失时的回调 */
-  public void despawn(Bullet b) {
-    // TODO: 播放消失特效
-  }
+  public void despawn(Bullet bullet) { if (bullet != null) bullet.remove(); }
 }

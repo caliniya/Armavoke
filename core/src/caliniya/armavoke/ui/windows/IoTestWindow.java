@@ -58,7 +58,7 @@ public class IoTestWindow extends Window {
   }
 
   private void saveMap() {
-    if (WorldData.world == null || Systems.EP == null || !Systems.EP.inited) {
+    if (WorldData.world == null || Systems.ECS == null || !Systems.ECS.inited) {
       Log.warn("[IO Test] no active world to save");
       return;
     }

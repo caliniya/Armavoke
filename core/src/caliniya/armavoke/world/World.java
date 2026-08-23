@@ -1,245 +1,123 @@
 package caliniya.armavoke.world;
 
-import arc.math.*;
-import arc.func.*;
-import arc.util.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.content.*;
-import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.base.game.WorldChunk;
+import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.ecs.runtime.EcsRuntime;
+import caliniya.armavoke.game.Contents;
+import caliniya.armavoke.game.data.RouteData;
+import caliniya.armavoke.type.Building;
 
+/** Chunked terrain plus references to authoritative ECS building entities. */
 public class World {
-  public boolean space;
-  public int W, H;
+  public final int W;
+  public final int H;
+  public final boolean space;
+  public final int chunksW;
+  public final int chunksH;
+  public final WorldChunk[] chunks;
 
-  public boolean test = true;
-
-  public WorldChunk[] chunks;
-
-  public int chunksW, chunksH;
-
-  public World(int W, int H, boolean space) {
-    this.W = W;
-    this.H = H;
+  public World(int width, int height, boolean space) {
+    this.W = Math.max(1, width);
+    this.H = Math.max(1, height);
     this.space = space;
-
     this.chunksW = (W + WorldChunk.MASK) >> WorldChunk.SHIFT;
     this.chunksH = (H + WorldChunk.MASK) >> WorldChunk.SHIFT;
     this.chunks = new WorldChunk[chunksW * chunksH];
   }
 
-  public void init() {
-    for (int i = 0; i < chunks.length; i++) {
-      chunks[i] = null;
-    }
+  public void init() {}
+
+  public boolean isValidCoord(int x, int y) { return x >= 0 && y >= 0 && x < W && y < H; }
+
+  private WorldChunk chunk(int x, int y, boolean create) {
+    if (!isValidCoord(x, y)) return null;
+    int index = (y >> WorldChunk.SHIFT) * chunksW + (x >> WorldChunk.SHIFT);
+    WorldChunk value = chunks[index];
+    if (value == null && create) chunks[index] = value = new WorldChunk();
+    return value;
   }
-
-  // --- 区块管理辅助方法 ---
-
-  private int getChunkIndex(int cx, int cy) {
-    return cy * chunksW + cx;
-  }
-
-  private WorldChunk getChunk(int x, int y) {
-    int cx = x >> WorldChunk.SHIFT;
-    int cy = y >> WorldChunk.SHIFT;
-    int idx = cy * chunksW + cx;
-    if (idx < 0 || idx >= chunks.length) return null;
-    return chunks[idx];
-  }
-
-  private WorldChunk getOrCreateChunk(int x, int y) {
-    int cx = x >> WorldChunk.SHIFT;
-    int cy = y >> WorldChunk.SHIFT;
-    int idx = cy * chunksW + cx;
-    if (idx < 0 || idx >= chunks.length) return null;
-    if (chunks[idx] == null) chunks[idx] = new WorldChunk();
-    return chunks[idx];
-  }
-
-  // --- 建筑逻辑 ---
 
   public Building getBuilding(int x, int y) {
-    if (!isValidCoord(x, y)) return null;
-    WorldChunk chunk = getChunk(x, y);
-    if (chunk == null) return null;
-    return chunk.getBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK);
+    WorldChunk value = chunk(x, y, false);
+    return value == null ? null : value.getBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK);
   }
 
-  public boolean hasBuilding(int x, int y) {
-    return getBuilding(x, y) != null;
-  }
+  public boolean hasBuilding(int x, int y) { return getBuilding(x, y) != null; }
 
   public Building setBuilding(int x, int y, Block block, TeamTypes team) {
-    if (!isValidCoord(x, y) || block == null) return null;
-
-    Building newBuild = block.create(x, y, team);
-
-    newBuild.getOccupiedCoords(
-        (tx, ty) -> {
-          if (isValidCoord(tx, ty)) {
-            Building existing = getBuilding(tx, ty);
-            if (existing != null && existing != newBuild) {
-              removeBuilding(existing.tx, existing.ty);
-            }
-            WorldChunk chunk = getOrCreateChunk(tx, ty);
-            chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, newBuild);
-            RouteData.updateBlock(tx, ty, newBuild.block.solid);
-          }
-        });
-    Entities.add(newBuild);
-    return newBuild;
+    if (block == null || !isValidCoord(x, y)) return null;
+    Building building = block.create(x, y, team);
+    if (!setBuilding(building)) {
+      EcsRuntime.remove(building);
+      return null;
+    }
+    return building;
   }
 
-  public void setBuilding(Building b) {
-    if (!isValidCoord(b.tx, b.ty) || b.block == null) return;
-    b.getOccupiedCoords(
-        (tx, ty) -> {
-          if (isValidCoord(tx, ty)) {
-            Building existing = getBuilding(tx, ty);
-            if (existing != null && existing != b) {
-              removeBuilding(existing.tx, existing.ty);
-            }
-            WorldChunk chunk = getOrCreateChunk(tx, ty);
-            chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, b);
-            RouteData.updateBlock(tx, ty, b.block.solid);
-          }
-        });
-    Entities.add(b);
+  public boolean setBuilding(Building building) {
+    if (building == null || building.block() == null || !isValidCoord(building.tx(), building.ty())) return false;
+    final boolean[] valid = {true};
+    building.getOccupiedCoords((x, y) -> {
+      if (!isValidCoord(x, y) || getBuilding(x, y) != null) valid[0] = false;
+    });
+    if (!valid[0]) return false;
+    building.getOccupiedCoords((x, y) -> {
+      chunk(x, y, true).setBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK, building);
+      RouteData.updateBlock(x, y, building.block().solid);
+    });
+    return true;
   }
 
   public void removeBuilding(int x, int y) {
-    Building build = getBuilding(x, y);
-    if (build == null) return;
+    Building building = getBuilding(x, y);
+    if (building == null) return;
+    removeBuilding(building);
+    EcsRuntime.remove(building);
+  }
 
-    // 通知导航数据：先取消实心标记（必须在清除区块前调用）
-    if (build.block.solid) {
-      RouteData.updateBlock(x, y);
-    }
+  public void removeBuilding(Building building) {
+    if (building == null) return;
+    building.getOccupiedCoords((x, y) -> {
+      WorldChunk value = chunk(x, y, false);
+      if (value != null && value.getBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK) == building) {
+        value.setBuilding(x & WorldChunk.MASK, y & WorldChunk.MASK, null);
+        RouteData.updateBlock(x, y, false);
+      }
+    });
+  }
 
-    build.getOccupiedCoords(
-        (tx, ty) -> {
-          if (isValidCoord(tx, ty)) {
-            WorldChunk chunk = getChunk(tx, ty);
-            if (chunk != null
-                && chunk.getBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK) == build) {
-              chunk.setBuilding(tx & WorldChunk.MASK, ty & WorldChunk.MASK, null);
-            }
-          }
-        });
-
-    Entities.remove(build);
+  public boolean isSolid(int index) {
+    return index < 0 || index >= W * H || isSolid(index % W, index / W);
   }
 
   public boolean isSolid(int x, int y) {
     if (!isValidCoord(x, y)) return true;
-    WorldChunk chunk = getChunk(x, y);
-    if (chunk != null && chunk.getENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK) != 0) {
-      return true;
-    }
-    Building b = getBuilding(x, y);
-    if (b != null && b.block.solid) {
-      return true;
-    }
-    return false;
+    ENVBlock env = getENVBlock(x, y);
+    if (env != null && env.solid) return true;
+    Building building = getBuilding(x, y);
+    return building != null && building.block() != null && building.block().solid;
   }
-
-  // --- 环境方块 & 地板 (保持不变) ---
 
   public void setENVBlock(int x, int y, ENVBlock block) {
     if (!isValidCoord(x, y)) return;
-    int id = (block == null) ? 0 : block.id;
-    if (id == 0) {
-      WorldChunk chunk = getChunk(x, y);
-      if (chunk == null) return;
-      chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, 0);
-      // 通知导航数据：移除环境方块
-      RouteData.updateBlock(x, y, false);
-    } else {
-      WorldChunk chunk = getOrCreateChunk(x, y);
-      chunk.setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, id);
-      // 通知导航数据：放置环境方块
-      RouteData.updateBlock(x, y, block.solid);
-    }
-  }
-
-  public int getENVBlockId(int x, int y) {
-    if (!isValidCoord(x, y)) return 0;
-    WorldChunk chunk = getChunk(x, y);
-    if (chunk == null) return 0;
-    return chunk.getENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK);
+    chunk(x, y, true).setENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK, block == null ? 0 : block.id);
   }
 
   public ENVBlock getENVBlock(int x, int y) {
-    int id = getENVBlockId(x, y);
-    if (id == 0) return null;
-    return Contents.getByID(CType.ENVBlock, id);
+    WorldChunk value = chunk(x, y, false);
+    int id = value == null ? 0 : value.getENVBlock(x & WorldChunk.MASK, y & WorldChunk.MASK);
+    return id <= 0 ? null : Contents.getByID(CType.ENVBlock, id);
   }
 
   public void setFloor(int x, int y, Floor floor) {
     if (!isValidCoord(x, y)) return;
-    int id = (floor == null) ? 0 : floor.id;
-    if (id == 0) {
-      WorldChunk chunk = getChunk(x, y);
-      if (chunk == null) return;
-      chunk.setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, 0);
-    } else {
-      WorldChunk chunk = getOrCreateChunk(x, y);
-      chunk.setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, id);
-    }
-  }
-
-  public int getFloorId(int x, int y) {
-    if (!isValidCoord(x, y)) return 0;
-    WorldChunk chunk = getChunk(x, y);
-    if (chunk == null) return 0;
-    return chunk.getFloor(x & WorldChunk.MASK, y & WorldChunk.MASK);
+    chunk(x, y, true).setFloor(x & WorldChunk.MASK, y & WorldChunk.MASK, floor == null ? 0 : floor.id);
   }
 
   public Floor getFloor(int x, int y) {
-    int id = getFloorId(x, y);
-    if (id == 0) return null;
-    return Contents.getByID(CType.Floor, id);
-  }
-
-  // 如果true表示在范围内
-  public boolean isValidCoord(int x, int y) {
-    return x >= 0 && x < W && y >= 0 && y < H;
-  }
-
-  // --- 索引相关方法 ---
-
-  public void setENVBlock(int index, ENVBlock block) {
-    setENVBlock(index % W, index / W, block);
-  }
-
-  public int getENVBlockId(int index) {
-    return getENVBlockId(index % W, index / W);
-  }
-
-  public ENVBlock getENVBlock(int index) {
-    return getENVBlock(index % W, index / W);
-  }
-
-  public void setFloor(int index, Floor floor) {
-    setFloor(index % W, index / W, floor);
-  }
-
-  public int getFloorId(int index) {
-    return getFloorId(index % W, index / W);
-  }
-
-  public Floor getFloor(int index) {
-    return getFloor(index % W, index / W);
-  }
-
-  public boolean isSolid(int index) {
-    return isSolid(index % W, index / W);
-  }
-
-  public int coordToIndex(int x, int y) {
-    return y * W + x;
+    WorldChunk value = chunk(x, y, false);
+    int id = value == null ? 0 : value.getFloor(x & WorldChunk.MASK, y & WorldChunk.MASK);
+    return id <= 0 ? null : Contents.getByID(CType.Floor, id);
   }
 }

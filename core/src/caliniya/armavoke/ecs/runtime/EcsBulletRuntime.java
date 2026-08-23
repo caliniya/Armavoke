@@ -1,204 +1,106 @@
 package caliniya.armavoke.ecs.runtime;
 
-import arc.math.geom.Rect;
-import arc.util.Log;
+import arc.math.Mathf;
 import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.tool.EntityAr;
-import caliniya.armavoke.game.Entities;
-import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.type.ability.api.ForceField;
+import caliniya.armavoke.type.type.BulletType;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 
-/** ECS-owned bullet storage, collision processing, pooling and render-buffer publication. */
+/** Bullet registry and simulation with no legacy bullet objects. */
 public final class EcsBulletRuntime {
-  private static final Object bulletLock = new Object();
-  private static final Object killLock = new Object();
-  private static final Ar<Integer> freeIds = new Ar<>(false, 256);
-  private static final EntityAr<Bullet> pending = new EntityAr<>(bullet -> bullet.id);
-  private static final EntityAr<Bullet> active = new EntityAr<>(bullet -> bullet.id);
-  private static EntityAr<Bullet> renderBuffer = new EntityAr<>(bullet -> bullet.id);
-  private static final Ar<Bullet> removals = new Ar<>(false, 256);
-  private static final Ar<Entity> freshKills = new Ar<>(false, 64);
-  private static final Rect aabb = new Rect();
-  private static int nextId = 1;
+  private static final IdentityHashMap<BulletType, Integer> ids = new IdentityHashMap<>();
+  private static final ArrayList<BulletType> types = new ArrayList<>();
 
   private EcsBulletRuntime() {}
 
-  public static Object lock() {
-    return bulletLock;
+  public static synchronized int id(BulletType type) {
+    if (type == null) return -1;
+    Integer current = ids.get(type);
+    if (current != null) return current;
+    int id = types.size();
+    types.add(type);
+    ids.put(type, id);
+    return id;
   }
 
-  public static EntityAr<Bullet> activeBullets() {
-    return active;
+  public static synchronized BulletType type(int id) {
+    return id >= 0 && id < types.size() ? types.get(id) : null;
   }
 
-  private static synchronized int allocateId() {
-    return freeIds.isEmpty() ? nextId++ : freeIds.remove(freeIds.size - 1);
+  public static Bullet create(BulletType type, Entity owner, float x, float y, float rotation) {
+    Bullet bullet = (Bullet) EcsRuntime.requireWorld().create("bullet");
+    bullet.bulletBulletTypeId(id(type));
+    bullet.bulletOwnerId(owner == null ? -1 : owner.id());
+    bullet.bulletDamage(type.damage);
+    bullet.bulletSpeed(type.speed);
+    bullet.bulletDirectionX(Mathf.cosDeg(rotation));
+    bullet.bulletDirectionY(Mathf.sinDeg(rotation));
+    bullet.bulletLifetime(type.lifetime);
+    bullet.bulletTime(0f);
+    bullet.positionX(x);
+    bullet.positionXBack(x);
+    bullet.positionY(y);
+    bullet.positionYBack(y);
+    bullet.positionRotation(rotation);
+    bullet.positionRotationBack(rotation);
+    bullet.teamTeamId(owner == null || owner.team() == null ? -1 : owner.team().ordinal());
+    bullet.collisionWidth(type.size);
+    bullet.collisionHeight(type.size);
+    bullet.collisionSolid(false);
+    return bullet;
   }
 
-  private static synchronized void recycleId(int id) {
-    if (id > 0 && !freeIds.contains(id)) freeIds.add(id);
-  }
-
-  public static void add(Bullet bullet) {
-    if (bullet == null) return;
-    if (bullet.id <= 0) bullet.id = allocateId();
-    GameEcsBridge.register(bullet);
-    synchronized (pending) {
-      pending.add(bullet);
-    }
-  }
-
-  public static void add(Bullet... bullets) {
-    if (bullets == null) return;
-    for (Bullet bullet : bullets) add(bullet);
-  }
-
-  public static void resize(float width, float height) {
-    active.resize(0f, 0f, width, height);
+  public static Bullet create(Entity owner, BulletType type, float x, float y, float rotation) {
+    return create(type, owner, x, y, rotation);
   }
 
   public static void update(EcsWorld world, float delta) {
-    synchronized (pending) {
-      pending.each(
-          bullet -> {
-            if (bullet != null) active.add(bullet);
-          });
-      pending.clear();
-    }
-    removals.clear();
-    active.eachWrited(
-        bullet -> {
-          bullet.time += delta;
-          if (bullet.type == null || bullet.time >= bullet.type.lifetime) {
-            markForRemoval(bullet);
-            return;
+    EcsEntity[] snapshot = world.snapshot();
+    for (EcsEntity value : snapshot) {
+      if (!(value instanceof Bullet bullet) || !bullet.active()) continue;
+      BulletType type = bullet.type();
+      if (type == null) { bullet.remove(); continue; }
+      bullet.bulletTime(bullet.bulletTime() + delta);
+      bullet.positionX(bullet.x() + bullet.bulletDirectionX() * bullet.bulletSpeed() * delta);
+      bullet.positionY(bullet.y() + bullet.bulletDirectionY() * bullet.bulletSpeed() * delta);
+      bullet.positionXBack(bullet.positionX());
+      bullet.positionYBack(bullet.positionY());
+      type.update(bullet);
+      if (bullet.bulletTime() >= bullet.bulletLifetime()) { bullet.remove(); continue; }
+      boolean intercepted = false;
+      for (EcsEntity fieldValue : snapshot) {
+        if (!(fieldValue instanceof Entity fieldOwner) || !fieldOwner.active()) continue;
+        for (Ability ability : fieldOwner.abilities()) {
+          if (ability instanceof ForceField field && field.isActive()
+              && field.contains(bullet.x(), bullet.y()) && field.onBullet(bullet)) {
+            bullet.remove();
+            intercepted = true;
+            break;
           }
-          bullet.x += bullet.velX * delta;
-          bullet.y += bullet.velY * delta;
-          active.move(bullet, bullet.x, bullet.y);
-          GameEcsBridge.syncFromLegacy(bullet);
-        });
-
-    interceptForceFields();
-    active.each(
-        bullet -> {
-          if (removals.contains(bullet) || bullet.type == null) return;
-          Entities.closestEnemy(
-              bullet.team,
-              bullet.x,
-              bullet.y,
-              bullet.type.size,
-              target -> {
-                float previousHealth = target.health;
-                bullet.type.hit(bullet, target);
-                GameEcsBridge.syncFromLegacy(target);
-                markForRemoval(bullet);
-                if (previousHealth > 0f && target.health <= 0f) {
-                  synchronized (killLock) {
-                    freshKills.add(target);
-                  }
-                }
-              });
-        });
-
-    removals.each(
-        bullet -> {
-          active.remove(bullet);
-          GameEcsBridge.unregister(bullet);
-          recycleId(bullet.id);
-        });
-
-    renderBuffer.clear();
-    active.each(renderBuffer::add);
-    synchronized (bulletLock) {
-      if (WorldData.bullets != null) {
-        EntityAr<Bullet> previous = WorldData.bullets;
-        WorldData.bullets = renderBuffer;
-        renderBuffer = previous;
-      }
-    }
-    removals.each(Bullet::remove);
-    removals.clear();
-  }
-
-  private static void markForRemoval(Bullet bullet) {
-    if (!removals.contains(bullet)) removals.add(bullet);
-  }
-
-  private static void interceptForceFields() {
-    synchronized (ForceField.force) {
-      Ar<ForceField> cleanup = null;
-      for (int i = 0; i < ForceField.force.size; i++) {
-        ForceField field = ForceField.force.get(i);
-        if (field == null) {
-          if (cleanup == null) cleanup = new Ar<>(false, 4);
-          cleanup.add(field);
-          continue;
         }
-        field.hitbox(aabb);
-        active.intersect(
-            aabb.x,
-            aabb.y,
-            aabb.width,
-            aabb.height,
-            bullet -> {
-              if (!removals.contains(bullet)
-                  && field.contains(bullet.x, bullet.y)
-                  && field.onBullet(bullet)) markForRemoval(bullet);
-            });
+        if (intercepted) break;
       }
-      if (cleanup != null) for (ForceField field : cleanup) ForceField.force.remove(field, true);
-    }
-  }
-
-  public static void drainFreshKills(Ar<Entity> destination) {
-    synchronized (killLock) {
-      destination.add(freshKills);
-      freshKills.clear();
+      if (intercepted) continue;
+      float radius = Math.max(1f, type.size * 0.5f);
+      for (EcsEntity targetValue : snapshot) {
+        if (!(targetValue instanceof Entity target) || !target.active() || target.health() <= 0f
+            || target.team() == null || target.team() == bullet.team()) continue;
+        float hitRadius = radius + Math.max(target.width(), target.height()) * 0.5f;
+        if (Mathf.dst2(bullet.x(), bullet.y(), target.x(), target.y()) > hitRadius * hitRadius) continue;
+        target.hit(bullet);
+        type.hit(bullet, target);
+        bullet.remove();
+        break;
+      }
     }
   }
 
   public static void clearAll() {
-    IdentityHashMap<Bullet, Boolean> all = new IdentityHashMap<>();
-    synchronized (pending) {
-      pending.each(bullet -> all.put(bullet, Boolean.TRUE));
-      pending.clear();
-    }
-    active.each(bullet -> all.put(bullet, Boolean.TRUE));
-    renderBuffer.each(bullet -> all.put(bullet, Boolean.TRUE));
-    if (WorldData.bullets != null) {
-      synchronized (bulletLock) {
-        WorldData.bullets.each(bullet -> all.put(bullet, Boolean.TRUE));
-        WorldData.bullets.clear();
-      }
-    }
-    active.clear();
-    renderBuffer.clear();
-    for (Bullet bullet : all.keySet()) {
-      GameEcsBridge.unregister(bullet);
-      recycleId(bullet.id);
-      bullet.remove();
-    }
-    removals.clear();
-    synchronized (killLock) {
-      freshKills.clear();
-    }
-  }
-
-  public static void debug() {
-    Log.info(
-        "Bullets(ECS): active="
-            + active.size()
-            + ", pending="
-            + pending.size()
-            + ", render="
-            + renderBuffer.size()
-            + ", nextId="
-            + nextId
-            + ", freeIds="
-            + freeIds.size);
+    EcsWorld world = EcsRuntime.world();
+    if (world == null) return;
+    for (EcsEntity value : world.snapshot()) if (value instanceof Bullet) world.remove(value);
   }
 }

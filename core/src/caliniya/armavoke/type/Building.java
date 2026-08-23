@@ -1,252 +1,57 @@
 package caliniya.armavoke.type;
 
-import caliniya.armavoke.base.effect.Fx;
-import arc.func.*;
-import arc.util.*;
-import arc.util.io.*;
-import arc.util.pooling.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.type.module.*;
-import caliniya.armavoke.world.*;
-import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.game.*;
+import caliniya.armavoke.base.game.Entity;
+import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.ecs.generated.access.BuildingAccess;
+import caliniya.armavoke.ecs.generated.access.ConsumptionAccess;
+import caliniya.armavoke.ecs.generated.access.ProductionAccess;
+import caliniya.armavoke.ecs.generated.access.SpawnerAccess;
+import caliniya.armavoke.ecs.generated.access.TargetingAccess;
+import caliniya.armavoke.ecs.generated.access.WeaponAccess;
+import caliniya.armavoke.ecs.runtime.EcsRuntime;
+import caliniya.armavoke.game.Contents;
+import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.world.Block;
+import arc.func.Intc2;
 
-public class Building extends Entity {
+/** Building behavior backed exclusively by ECS components. */
+public interface Building extends Entity, WeaponAccess, BuildingAccess, TargetingAccess,
+    ProductionAccess, ConsumptionAccess, SpawnerAccess {
 
-  // --- 锚点坐标 (左下角起始点) ---
-  // 0:上, 1:右, 2:下, 3:左
-  public int tx, ty, angle;
+  default Block block() { return Contents.getByID(CType.Block, buildingBlockId()); }
+  default float size() { return buildingSize(); }
+  default int tx() { return buildingTileX(); }
+  default int ty() { return buildingTileY(); }
+  default int angle() { return buildingAngle(); }
+  default void angle(int value) { buildingAngle(value); rotation(value * 90f); }
 
-  public TeamData teamData;
-
-  public float rotation; // 实际渲染旋转角度 (精确到度，用于炮塔转动)
-  public float reload; // 武器装填进度
-
-  // --- 形状数据 (独立副本，已旋转) ---
-  public int[] shapeOffsets;
-
-  public Block block;
-
-  protected Building() {}
-
-  /** 初始化建筑实体 */
-  public void init() {
-    // 确保坐标和角度有效
-    if (block == null) return;
-
-    this.angle = angle % 4;
-
-    // 对象池复用防污染：清空能力与战斗基础属性
-    abilities.clear();
-    armor = 0;
-    armorMax = 0;
-    armorValue = 0;
-    energy = 0;
-    energyMax = 0;
-    energyRegen = 0;
-
-    // 初始化坐标
-    this.x = (tx * WorldData.TILE_SIZE) + block.psize / 2;
-    this.y = (ty * WorldData.TILE_SIZE) + block.psize / 2;
-
-    // 初始化血量
-    this.maxHealth = block.health;
-    // 只有当血量为0时才初始化为满血(防止覆盖读取存档后的数据)
-    if (this.health <= 0) this.health = block.health;
-
-    // 初始化物品
-    if (this.item == null) {
-      this.item = new ItemModule(block.capacity);
-      this.item.setFilter(block.allowItem);
+  default void getOccupiedCoords(Intc2 consumer) {
+    Block value = block();
+    if (value == null || consumer == null) return;
+    if (value.shapeOffsets != null && value.shapeOffsets.length >= 2) {
+      int[] offsets = Block.getRotatedOffsets(angle(), value.shapeOffsets);
+      for (int i = 0; i + 1 < offsets.length; i += 2) consumer.get(tx() + offsets[i], ty() + offsets[i + 1]);
+      return;
     }
-    if (this.liquid == null && block.liquidCapacity > 0) {
-      this.liquid = new LiquidModule(block.liquidCapacity);
-    }
-    if (this.power == null && block.powerCapacity > 0) {
-      this.power = new PowerModule(block.powerCapacity);
-    }
+    for (int ox = 0; ox < value.size; ox++) for (int oy = 0; oy < value.size; oy++) consumer.get(tx() + ox, ty() + oy);
+  }
 
-    // 计算旋转后的形状数据
-    if (block.shapeOffsets != null) {
-      this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
-    } else {
-      this.shapeOffsets = null;
-    }
+  default Entity target() {
+    Object value = EcsRuntime.find(targetingTargetId());
+    return value instanceof Entity entity ? entity : null;
+  }
+
+  default void target(Entity value) { targetingTargetId(value == null ? -1 : value.id()); }
+
+  default void draw() {
+    Block value = block();
+    if (value != null) value.draw(this);
+    drawAbilities();
   }
 
   @Override
-  public void update(float dt) {
-    updateBase(dt);
-    block.update(this, dt);
-  }
-
-  /** 计算该建筑占据的所有世界坐标 */
-  public void getOccupiedCoords(Intc2 consumer) {
-    if (shapeOffsets != null) {
-      for (int i = 0; i < shapeOffsets.length; i += 2) {
-        consumer.get(tx + shapeOffsets[i], ty + shapeOffsets[i + 1]);
-      }
-    } else {
-      int s = block.size;
-      for (int dx = 0; dx < s; dx++) {
-        for (int dy = 0; dy < s; dy++) {
-          consumer.get(tx + dx, ty + dy);
-        }
-      }
-    }
-  }
-
-  /** 交互逻辑：判断是否占据指定坐标 */
-  public boolean occupies(int worldX, int worldY) {
-    if (shapeOffsets != null) {
-      for (int i = 0; i < shapeOffsets.length; i += 2) {
-        if (tx + shapeOffsets[i] == worldX && ty + shapeOffsets[i + 1] == worldY) {
-          return true;
-        }
-      }
-      return false;
-    }
-    if (block != null) {
-      int s = block.size;
-      return worldX >= tx && worldX < tx + s && worldY >= ty && worldY < ty + s;
-    }
-    return false;
-  }
-
-  @Override
-  public void draw() {
-    block.draw(this);
-  }
-
-  @Override
-  public void kill() {
-    Fx.destroy.at(x, y, 0f, this);
-    remove();
-  }
-
-  @Override
-  public void remove() {
-    WorldData.world.removeBuilding(tx, ty);
-    id = Entities.freeID(id);
-    Pools.free(this);
-  }
-
-  @Override
-  public float hitboxSize() {
-    return block != null ? block.psize : 8f;
-  }
-
-  @Override
-  public void reset() {
-    // block = null;
-    health = 0;
-    shapeOffsets = null;
-    this.team = null;
-    this.teamData = null;
-    tx = 0;
-    ty = 0;
-    x = 0;
-    y = 0;
-    angle = 0;
-    rotation = 0;
-    reload = 0;
-    target = null;
-  }
-
-  /** 写入存档数据 */
-  @Override
-  public void write(Writes w) {
-    w.b((byte) angle); // 0-3 只需要一个字节
-    w.i(tx);
-    w.i(ty);
-    w.i(angle);
-    w.f(health);
-    w.b((byte) team.ordinal()); // 阵营序号
-    w.i(id);
-
-    block.write(this, w);
-    item.write(w);
-    if (liquid != null) {
-      w.bool(true);
-      liquid.write(w);
-    } else {
-      w.bool(false);
-    }
-    if (power != null) {
-      w.bool(true);
-      power.write(w);
-    } else {
-      w.bool(false);
-    }
-  }
-
-  /** 读取存档数据 */
-  @Override
-  public void read(Reads r) {
-    this.angle = r.b();
-
-    this.tx = r.i();
-    this.ty = r.i();
-    this.angle = r.i();
-
-    this.health = r.f();
-    byte teamID = r.b();
-    this.team = TeamTypes.values()[teamID];
-    this.id = Entities.checkoutID(r.i());
-
-    block.read(this, r);
-
-    if (this.item == null && block != null) {
-      this.item = new ItemModule(block.capacity);
-      this.item.setFilter(block.allowItem);
-    }
-
-    item.read(r);
-    if (r.bool()) {
-      if (this.liquid == null) this.liquid = new LiquidModule(block.liquidCapacity);
-      liquid.read(r);
-    }
-    if (r.bool()) {
-      if (this.power == null) this.power = new PowerModule(block.powerCapacity);
-      power.read(r);
-    }
-
-    this.x = tx * WorldData.TILE_SIZE + block.psize / 2;
-    this.y = ty * WorldData.TILE_SIZE + block.psize / 2;
-    if (block != null) {
-      this.maxHealth = block.health;
-      if (block.shapeOffsets != null) {
-        this.shapeOffsets = Block.getRotatedOffsets(this.angle, block.shapeOffsets);
-      }
-    }
-    teamData = team.data();
-  }
-
-  // --- 静态工厂方法 ---
-  public static Building create(Block block, int tx, int ty, int angle, TeamTypes team) {
-    Building building = Pools.obtain(Building.class, Building::new);
-    building.block = block;
-    building.tx = tx;
-    building.ty = ty;
-    building.angle = angle;
-    building.team = team;
-    // Entities.add(building);
-    building.teamData = team.data();
-    building.init();
-    building.id = Entities.assignID();
-    return building;
-  }
-
-  public static Building create(Block block, int tx, int ty, TeamTypes team) {
-    return create(block, tx, ty, 0, team);
-  }
-
-  public static Building create(Block block) {
-    Building building = Pools.obtain(Building.class, Building::new);
-    building.block = block;
-    building.init();
-    return building;
+  default void remove() {
+    if (WorldData.world != null) WorldData.world.removeBuilding(this);
+    EcsRuntime.remove(this);
   }
 }

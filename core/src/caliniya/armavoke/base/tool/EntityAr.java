@@ -80,7 +80,7 @@ public class EntityAr<T extends QuadTreeObject> implements Iterable<T> {
     this(
         e -> {
           if (e instanceof Entity) {
-            return ((Entity) e).id;
+            return ((Entity) e).id();
           }
           throw new RuntimeException(
               "Entity does not have getId() method, please use EntityAr(Intf<T> idGetter) constructor");

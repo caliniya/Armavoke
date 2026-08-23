@@ -114,7 +114,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   public void update(Entity e, float dt) {
     if (!active) return;
     syncFrames();
-    if (costFrame > 0 && e.energy <= 0) {
+    if (costFrame > 0 && e.energy() <= 0) {
       active = false; // 能量耗尽自动关闭
       return;
     }
@@ -150,14 +150,14 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public boolean onBullet(Bullet b) {
-    if (e.team == null || e == null || b.team == null) {
+    if (e == null || b == null || e.team() == null || b.team() == null) {
       return false;
     }
-    if (b.owner.team == e.team) {
+    if (b.owner() != null && b.owner().team() == e.team()) {
       return false;
     }
     float remaining =
-        applyDamage(e, b.type.damage, b.type.damageType, b.type.breakShield, b.type.bypassShield);
+        applyDamage(e, b.type().damage, b.type().damageType, b.type().breakShield, b.type().bypassShield);
     return remaining <= 0f;
   }
 
@@ -167,7 +167,7 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void hitbox(Rect out) {
-    out.set(e.x - radius, e.y - radius, radius * 2f, radius * 2f);
+    out.set(e.x() - radius, e.y() - radius, radius * 2f, radius * 2f);
   }
 
   public float capacityMax() {
@@ -259,9 +259,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
     if (!active || current <= 0f) return;
     Draw.color(Pal.light, 0.6f);
     if (sides <= 0) {
-      Lines.circle(e.x, e.y, radius);
+      Lines.circle(e.x(), e.y(), radius);
     } else {
-      Lines.poly(e.x, e.y, sides, radius, rotation);
+      Lines.poly(e.x(), e.y(), sides, radius, rotation);
     }
     Draw.color();
   }
@@ -270,9 +270,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   @Override
   public boolean contains(float x, float y) {
     if (sides <= 0) {
-      return Mathf.dst2(e.x, e.y, x, y) <= radius * radius;
+      return Mathf.dst2(e.x(), e.y(), x, y) <= radius * radius;
     }
-    return Intersector.isInRegularPolygon(sides, e.x, e.y, radius, rotation, x, y);
+    return Intersector.isInRegularPolygon(sides, e.x(), e.y(), radius, rotation, x, y);
   }
 
   @Override

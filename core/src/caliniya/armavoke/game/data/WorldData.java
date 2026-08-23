@@ -1,76 +1,34 @@
 package caliniya.armavoke.game.data;
 
-import arc.*;
-import arc.util.Log;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.content.*;
-import caliniya.armavoke.core.*;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.system.Systems;
-import caliniya.armavoke.world.*;
-import arc.math.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
-import caliniya.armavoke.ecs.runtime.EcsBulletRuntime;
-import caliniya.armavoke.ecs.runtime.GameEcsBridge;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.ecs.runtime.EcsRuntime;
+import caliniya.armavoke.game.Game;
+import caliniya.armavoke.game.Teams;
+import caliniya.armavoke.world.World;
 
-public class WorldData {
+/** World-level data only. Gameplay entities live exclusively in the ECS world. */
+public final class WorldData {
   public static World world;
-
-  // ========== 全局实体容器 ==========
-  public static EntityAr<Unit> units;
-  public static EntityAr<Building> buildings;
-  public static EntityAr<Unit> moveunits;
-  public static EntityAr<Bullet> bullets;
-
-  // --- 空间划分相关 ---
   public static final int CHUNK_SIZE = 32;
   public static final int TILE_SIZE = 32;
+  public static final int tilesize = TILE_SIZE;
   public static final int CHUNK_PIXEL_SIZE = CHUNK_SIZE * TILE_SIZE;
 
   private WorldData() {}
 
-  @SuppressWarnings("unchecked")
-  public static void initWorld(int w, int h, boolean space) {
-    EcsBulletRuntime.clearAll();
-    GameEcsBridge.resetForWorld();
+  public static void initWorld(int width, int height, boolean space) {
+    if (EcsRuntime.world() != null) EcsRuntime.clear();
     Game.team = TeamTypes.Evoke;
-
-    units = new EntityAr<>(unit -> unit.id);
-    buildings = new EntityAr<>(building -> building.id);
-    moveunits = new EntityAr<>(unit -> unit.id);
-    bullets = new EntityAr<>(bullet -> bullet.id);
-
-    world = new World(w, h, space);
+    world = new World(width, height, space);
     world.init();
-
     Teams.init();
-
     RouteData.init();
-
-    // 初始化四叉树覆盖范围
-    float worldPixelW = world.W * TILE_SIZE;
-    float worldPixelH = world.H * TILE_SIZE;
-    initAllTrees(worldPixelW, worldPixelH);
   }
 
-  public static void initAllTrees(float worldPixelW, float worldPixelH) {
-    if (units != null) units.resize(0, 0, worldPixelW, worldPixelH);
-    if (buildings != null) buildings.resize(0, 0, worldPixelW, worldPixelH);
-    if (moveunits != null) moveunits.resize(0, 0, worldPixelW, worldPixelH);
-    if (bullets != null) bullets.resize(0, 0, worldPixelW, worldPixelH);
-    // 同步子弹处理系统的内部子弹树（力场拦截等依赖它的 intersect）
-    if (Systems.BP != null) Systems.BP.resizeTree(worldPixelW, worldPixelH);
-  }
+  /** Kept as a no-op compatibility entry point; ECS queries need no spatial mirror tree. */
+  public static void initAllTrees(float worldPixelWidth, float worldPixelHeight) {}
 
   public static void clear() {
-    EcsBulletRuntime.clearAll();
-    if (units != null) units.clear(unit -> unit.reset());
-    if (buildings != null) buildings.clear(building -> building.remove());
-    if (moveunits != null) moveunits.clear(unit -> unit.reset());
-    if (bullets != null) bullets.clear();
-    GameEcsBridge.resetForWorld();
+    EcsRuntime.clear();
   }
 }

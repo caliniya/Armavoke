@@ -143,7 +143,7 @@ public class RouteData {
           });
 
       // 级联更新腐蚀层：以建筑包围盒为范围
-      int s = build.block != null ? build.block.size : 1;
+      int s = build.block() != null ? build.block().size : 1;
       int minX = Math.max(0, bx);
       int maxX = Math.min(W - 1, bx + s - 1);
       int minY = Math.max(0, by);

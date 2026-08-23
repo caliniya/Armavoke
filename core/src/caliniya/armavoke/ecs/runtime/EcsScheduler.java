@@ -28,7 +28,7 @@ public final class EcsScheduler extends System<EcsScheduler> {
     index = 8;
     registry = EcsRegistry.loadGenerated();
     world = new EcsWorld(registry);
-    GameEcsBridge.attach(world);
+    EcsRuntime.attach(world);
     orderedSystems = registry.orderedSystems();
     for (EcsRegistry.SystemConfig config : orderedSystems) config.system.initialize(world);
     for (EcsRegistry.ThreadConfig thread : registry.threads()) {
@@ -46,7 +46,6 @@ public final class EcsScheduler extends System<EcsScheduler> {
   public void update(float delta) {
     if (!inited || paused || world == null) return;
     long currentTick = ++tick;
-    GameEcsBridge.beginFrame(world);
     List<EcsRegistry.SystemConfig> due = new ArrayList<>();
     for (EcsRegistry.SystemConfig config : orderedSystems) {
       if (currentTick % config.interval == 0L) due.add(config);
@@ -55,7 +54,6 @@ public final class EcsScheduler extends System<EcsScheduler> {
       EcsBuffers.prepare(world.snapshot());
       executeBatch(batch, delta);
       EcsBuffers.publish(world.snapshot());
-      GameEcsBridge.endBatch();
     }
   }
 
@@ -144,7 +142,7 @@ public final class EcsScheduler extends System<EcsScheduler> {
           Log.err("ECS system dispose failed: @", config.name, error);
         }
       }
-      GameEcsBridge.detach(world);
+      EcsRuntime.detach(world);
       world.clear();
     }
     super.dispose();

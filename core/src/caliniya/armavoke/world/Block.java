@@ -16,6 +16,7 @@ import caliniya.armavoke.game.*;
 import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.ecs.runtime.EcsEntityFactory;
 import caliniya.armavoke.ui.*;
 
 public class Block extends ContentType implements DrawType<Building>, TechNodeContent {
@@ -52,12 +53,12 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
 
   public Building create() {
     psize = size * WorldData.TILE_SIZE;
-    return Building.create(this);
+    return EcsEntityFactory.createBuilding(this, 0, 0, 0, TeamTypes.Mutex);
   }
 
   public Building create(int tx, int ty, TeamTypes team) {
     psize = size * WorldData.TILE_SIZE;
-    return Building.create(this, tx, ty, team);
+    return EcsEntityFactory.createBuilding(this, tx, ty, 0, team);
   }
 
   public void load() {
@@ -67,35 +68,36 @@ public class Block extends ContentType implements DrawType<Building>, TechNodeCo
   public void update(Building building, float dt) {}
 
   public void draw(Building b) {
-    float rotation = b.angle * 90f;
-    Draw.rect(region, b.x, b.y, rotation);
+    float rotation = b.angle() * 90f;
+    Draw.rect(region, b.x(), b.y(), rotation);
   }
 
   public void drawDebug(Building b) {
     Draw.color(Color.green);
     Lines.stroke(4f);
     // 绘制基于 size 的包围盒
-    Lines.rect(b.x - b.block.psize / 2, b.y - b.block.psize / 2, b.block.psize, b.block.psize);
+    Lines.rect(b.x() - psize / 2, b.y() - psize / 2, psize, psize);
 
     // 3. 绘制占据的实际格子 (黄色细线)
     // 对于异形建筑，这比包围盒更准确
-    if (b.shapeOffsets != null) {
+    if (shapeOffsets != null) {
       Draw.color(Color.cyan);
       Lines.stroke(1f);
-      for (int i = 0; i < b.shapeOffsets.length; i += 2) {
-        float tx = (b.tx + b.shapeOffsets[i]) * WorldData.TILE_SIZE;
-        float ty = (b.ty + b.shapeOffsets[i + 1]) * WorldData.TILE_SIZE;
+      int[] offsets = getRotatedOffsets(b.angle(), shapeOffsets);
+      for (int i = 0; i < offsets.length; i += 2) {
+        float tx = (b.tx() + offsets[i]) * WorldData.TILE_SIZE;
+        float ty = (b.ty() + offsets[i + 1]) * WorldData.TILE_SIZE;
         Lines.rect(tx, ty, WorldData.TILE_SIZE, WorldData.TILE_SIZE);
       }
     }
 
     // 4. 绘制旋转角度 (青色文字)
     Fonts.def.draw(
-        b.x + "   " + b.y, b.x + b.block.psize / 2f, b.y + b.block.psize + 10f, Align.center);
+        b.x() + "   " + b.y(), b.x() + psize / 2f, b.y() + psize + 10f, Align.center);
     Fonts.def.draw(
-        Strings.format("" + b.health),
-        b.x - b.block.size,
-        b.y - b.block.size + b.block.size + 8f,
+        Strings.format("" + b.health()),
+        b.x() - size,
+        b.y() + 8f,
         Align.center);
     Draw.color(); // 重置颜色
   }

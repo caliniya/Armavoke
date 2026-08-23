@@ -28,7 +28,6 @@ import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
 import caliniya.armavoke.ui.windows.DataWindow;
-import caliniya.armavoke.world.blocks.produce.unit.FactoryBuild;
 
 public class MenuFragment {
 
@@ -73,7 +72,7 @@ public class MenuFragment {
                       () -> {
                         WorldData.initWorld(100, 100, true);
                         Data.loadSystems();
-                        Systems.EP.init();
+                        Systems.ECS.init();
 
                         // 两个测试单位，各自运行时安装强化模组（出厂无模组，由外部"安装"）
                         Unit A = UnitTypes.test.create(TeamTypes.Evoke, 100, 100);
@@ -115,8 +114,8 @@ public class MenuFragment {
                         Building playerFactory =
                             WorldData.world.setBuilding(
                                 centerX - 12, centerY, Blocks.unitFactory, TeamTypes.Evoke);
-                        if (playerFactory instanceof FactoryBuild factory) {
-                          factory.item.addItem(Items.Ge, 100);
+                        if (playerFactory != null && playerFactory.block() instanceof caliniya.armavoke.world.blocks.produce.unit.Factory) {
+                          playerFactory.item().addItem(Items.Ge, 100);
                         }
 
                         RouteData.init();

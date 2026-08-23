@@ -1,81 +1,35 @@
 package caliniya.armavoke.system.render;
 
-import arc.*;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
-import arc.util.ArcRuntimeException;
-import arc.util.Log;
+import arc.Core;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.type.ability.Ability;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.system.Systems;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.type.Bullet;
-import caliniya.armavoke.type.type.BulletType;
-import caliniya.armavoke.game.data.WorldData;
+import caliniya.armavoke.ecs.runtime.EcsQueries;
 import caliniya.armavoke.system.System;
-import caliniya.armavoke.system.world.BulletProcess;
-import caliniya.armavoke.ui.fragment.UniverseFragment;
+import caliniya.armavoke.type.Bullet;
+import caliniya.armavoke.type.Unit;
 
+/** Renders authoritative ECS units and bullets. */
 public class UnitRender extends System<UnitRender> {
-
-  // 调试开关
   public static boolean debug = true;
+  public static Ar<Bullet> temp = new Ar<>(false, 1000);
 
-  public static Ar<Bullet> temp = new Ar<Bullet>(false, 1000);
-
-  @Override
-  public UnitRender init() {
-    this.index = 13;
-    Events.run(EventType.events.EnterUV, () -> paused = true);
-    Events.run(EventType.events.ExitUV, () -> paused = false);
-    return super.init(false, false);
-  }
+  @Override public UnitRender init() { return this; }
 
   @Override
   public void update() {
-    if (!inited || paused) return;
-    // 绘制单位
-    WorldData.units.each(
-        u -> {
-          if (shouldDraw(u.x, u.y, u.size * 2)) {
-            u.draw();
-            // 绘制能力视觉效果（力场等）
-            for (Ability a : u.abilities) a.draw(u);
-            // 血条由单位类型绘制（可覆写）
-            u.type.drawHealthBar(u);
-            // 调用单位内部的调试绘制方法
-            if (debug) {
-              u.type.drawDebug(u);
-            }
-          }
-        });
-
-    // 绘制子弹
-    // 用与 BulletProcess 相同的固定锁对象，确保与逻辑线程的缓冲交换互斥，
-    // 避免拷到正在被清空/重填的缓冲导致子弹闪烁。
-    temp.clear();
-    synchronized (Systems.BP.BULLET_LOCK) {
-      temp.addAll(WorldData.bullets);
+    for (Unit unit : EcsQueries.units()) {
+      if (unit.health() <= 0f || !shouldDraw(unit.x(), unit.y(), unit.size() * 2f)) continue;
+      unit.draw();
+      if (unit.type() != null) {
+        unit.type().drawHealthBar(unit);
+        if (debug) unit.type().drawDebug(unit);
+      }
     }
-    temp.each(
-        b -> {
-          if (b.recycled) return;
-          if (shouldDraw(b.x, b.y, b.type.size)) {
-            b.type.draw(b);
-          }
-        });
+    for (Bullet bullet : EcsQueries.bullets()) if (shouldDraw(bullet.x(), bullet.y(), bullet.collisionWidth() * 2f)) bullet.draw();
   }
 
-  // 通用的剔除方法
-  private boolean shouldDraw(float x, float y, float size) {
-    float viewX = Core.camera.position.x;
-    float viewY = Core.camera.position.y;
-    float buffer = debug ? 500f : size;
-    float w = Core.camera.width / 2f + buffer;
-    float h = Core.camera.height / 2f + buffer;
-    return x > viewX - w && x < viewX + w && y > viewY - h && y < viewY + h;
+  private boolean shouldDraw(float x, float y, float padding) {
+    float width = Core.camera.width * 0.5f + padding;
+    float height = Core.camera.height * 0.5f + padding;
+    return Math.abs(x - Core.camera.position.x) <= width && Math.abs(y - Core.camera.position.y) <= height;
   }
 }

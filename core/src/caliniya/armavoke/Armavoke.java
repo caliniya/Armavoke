@@ -22,7 +22,6 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.system.*;
 import caliniya.armavoke.system.input.*;
 import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.ui.*;
 import caliniya.armavoke.ui.fragment.*;

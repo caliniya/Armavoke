@@ -141,31 +141,16 @@ public class DataIO {
     int unitCount = r.i();
     for (int i = 0; i < unitCount; i++) {
       String typeName = r.str();
-      UnitType type = Contents.get(typeName, UnitType.class);
-      if (type != null) {
-        Unit u = type.create();
-        u.read(r);
-        skipToEndMarker(r); // 校验结束标记
-      } else {
-        Log.warn("Unknown unit type in save: @, skipping...", typeName);
-        skipToEndMarker(r);
-      }
+      Log.info("Skipping legacy unit record: @", typeName);
+      skipToEndMarker(r);
     }
 
     // --- Buildings ---
     int buildingCount = r.i();
     for (int i = 0; i < buildingCount; i++) {
       String typeName = r.str();
-      Block type = Contents.get(typeName, Block.class);
-      if (type != null) {
-        Building b = type.create();
-        b.read(r);
-        skipToEndMarker(r); // 校验结束标记
-        WorldData.world.setBuilding(b);
-      } else {
-        Log.warn("Unknown block type in save: @, skipping...", typeName);
-        skipToEndMarker(r);
-      }
+      Log.info("Skipping legacy building record: @", typeName);
+      skipToEndMarker(r);
     }
 
     try {
@@ -177,7 +162,7 @@ public class DataIO {
         }
       }
     } catch (IOException error) {
-      Log.warn("ECS save section could not be read; using legacy entity data", error);
+      Log.warn("ECS save section could not be read", error);
     }
   }
 

@@ -1,100 +1,74 @@
 package caliniya.armavoke.world.defence.turret;
 
-import arc.graphics.g2d.Lines;
-import arc.math.Angles;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
 import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
+import arc.math.Angles;
 import arc.math.Mathf;
-import arc.util.Log;
-import arc.util.io.Writes;
 import arc.util.io.Reads;
+import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.core.meta.ui.Pal;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
+import caliniya.armavoke.ecs.runtime.EcsBulletRuntime;
+import caliniya.armavoke.game.Entities;
+import caliniya.armavoke.type.Building;
 import caliniya.armavoke.type.type.BulletType;
 import caliniya.armavoke.world.Block;
 
+/** Turret behavior whose mutable state lives in building ECS components. */
 public class Turret extends Block {
-
   public float range = 400f;
   public float rotateSpeed = 500f;
   public float reloadTime = 10f;
   public BulletType bulletType;
-
   public TextureRegion baseRegion;
 
-  public Turret(String name) {
-    super(name);
-    this.capacity = 0;
-  }
+  public Turret(String name) { super(name); }
 
   @Override
   public void load() {
     super.load();
     baseRegion = Core.atlas.find(name + "-base");
-    if (bulletType != null) bulletType.load();
   }
 
   @Override
-  public void update(Building b, float dt) {
-    // 目标由 EntityProces 后台线程维护，这里只做射程 + 血量校验
-    if (b.target != null) {
-      float dst2 = Mathf.dst2(b.x, b.y, b.target.x, b.target.y);
-      if (b.target.health <= 0 || dst2 > range * range) {
-        b.target = null;
-      }
+  public void update(Building building, float delta) {
+    Entity target = building.target();
+    if (target == null || !target.active() || target.health() <= 0f
+        || Mathf.dst2(building.x(), building.y(), target.x(), target.y()) > range * range) {
+      target = findTarget(building);
+      building.target(target);
     }
-
-    // 瞄准与射击
-    if (b.target != null) {
-      float targetAngle = Angles.angle(b.x, b.y, b.target.x, b.target.y);
-      b.rotation = Angles.moveToward(b.rotation, targetAngle, rotateSpeed * dt);
-
-      b.reload += dt;
-
-      if (b.reload >= reloadTime && Angles.angleDist(b.rotation, targetAngle) < 5f) {
-        shoot(b, b.rotation);
-        b.reload = 0;
-      }
+    building.weaponReload(building.weaponReload() + delta);
+    if (target == null) return;
+    float angle = Angles.angle(building.x(), building.y(), target.x(), target.y());
+    building.rotation(Angles.moveToward(building.rotation(), angle, rotateSpeed * delta));
+    if (bulletType != null && building.weaponReload() >= reloadTime) {
+      EcsBulletRuntime.create(bulletType, building, building.x(), building.y(), building.rotation());
+      building.weaponReload(0f);
     }
   }
 
   @Override
-  public void draw(Building b) {
-    Draw.rect(baseRegion, b.x, b.y, b.angle * 90f);
-    Draw.rect(region, b.x, b.y, b.rotation - 90f);
-  }
-
-  private void shoot(Building b, float angle) {
-    float x = b.x;
-    float y = b.y;
-    Bullet.create(bulletType, b, x, y, angle, 0, 0);
-  }
-
-  /** 覆写 */
-  @Override
-  public Entity findTarget(Building b) {
-    return Entities.closestEnemy(b.team, b.x, b.y, range);
+  public void draw(Building building) {
+    if (baseRegion != null) Draw.rect(baseRegion, building.x(), building.y(), building.angle() * 90f);
+    Draw.rect(region, building.x(), building.y(), building.rotation() - 90f);
   }
 
   @Override
-  public void write(Building b, Writes w) {
-    w.f(b.rotation);
-    w.f(b.reload);
+  public Entity findTarget(Building building) {
+    return Entities.closestEnemy(building.team(), building.x(), building.y(), range);
   }
 
-  @Override
-  public void read(Building b, Reads r) {
-    b.rotation = r.f();
-    b.reload = r.f();
-  }
+  @Override public void write(Building building, Writes writes) {}
+  @Override public void read(Building building, Reads reads) {}
 
   @Override
-  public void drawDebug(Building b) {
-    super.drawDebug(b);
-    Draw.color(Pal.light);
-    Lines.circle(b.x,b.y,range);
+  public void drawDebug(Building building) {
+    super.drawDebug(building);
+    Draw.color(Color.scarlet);
+    Lines.circle(building.x(), building.y(), range);
+    Draw.color();
   }
 }

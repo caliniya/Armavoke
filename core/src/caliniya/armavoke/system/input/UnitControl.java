@@ -1,248 +1,102 @@
 package caliniya.armavoke.system.input;
 
-import arc.*;
+import arc.Core;
 import arc.input.GestureDetector.GestureListener;
-import arc.input.KeyCode;
 import arc.input.InputProcessor;
-import arc.math.Mathf;
+import arc.input.KeyCode;
 import arc.math.geom.Vec2;
-import arc.util.Log;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.type.EventType;
-import caliniya.armavoke.core.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
+import caliniya.armavoke.core.Render;
+import caliniya.armavoke.ecs.runtime.EcsQueries;
+import caliniya.armavoke.ecs.runtime.EcsUnitRuntime;
 import caliniya.armavoke.game.data.CommandData;
 import caliniya.armavoke.game.data.WorldData;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.type.ai.UnitAI;
 import caliniya.armavoke.type.Building;
+import caliniya.armavoke.type.Unit;
 import caliniya.armavoke.ui.windows.FactoryMenuWindow;
-import caliniya.armavoke.world.blocks.produce.unit.FactoryBuild;
+import caliniya.armavoke.world.blocks.produce.unit.Factory;
 
+/** Input commands applied directly to ECS units and buildings. */
 public class UnitControl implements InputProcessor, GestureListener {
-
   private static final float selectRadius = 100f;
   private static final float dragThreshold = 8f;
   private float downX, downY;
   private boolean dragged;
 
-  public UnitControl init() {
-    return this;
+  public UnitControl init() { return this; }
+
+  private Vec2 world(float screenX, float screenY) {
+    return Core.camera.unproject(new Vec2(screenX, screenY));
   }
 
   @Override
   public boolean tap(float x, float y, int count, KeyCode button) {
-    if (!CommandData.commanding) return openFactory(x, y);
-    if (dragged) {
-      dragged = false;
-      return true;
+    Vec2 point = world(x, y);
+    if (!CommandData.commanding) return openFactory(point.x, point.y);
+    if (button == KeyCode.mouseRight || CommandData.commandType == CommandData.CommandType.Move) {
+      for (Unit unit : CommandData.checkedUnits) EcsUnitRuntime.commandMove(unit, point.x, point.y);
+      return !CommandData.checkedUnits.isEmpty();
     }
-
-    Vec2 worldPos = Core.camera.unproject(x, y);
-    float wx = worldPos.x;
-    float wy = worldPos.y;
-
-    Unit clicked = CommandData.findUnitAt(wx, wy, selectRadius);
-    if (clicked != null && clicked.team == Game.team) {
-      CommandData.select(clicked);
-      UI.hud.refreshCommand();
-      return true;
-    }
-
-    if (clicked != null && clicked.team != Game.team && !CommandData.checkedUnits.isEmpty()) {
-      issueAttackCommand(clicked);
-      return true;
-    }
-
-    // 按当前指挥状态执行（直接指挥）
-    if (CommandData.commandType == CommandData.CommandType.Move) {
-      if (!CommandData.checkedUnits.isEmpty()) {
-        issueMoveCommand(wx, wy);
-      }
-      return true;
-    } else if (CommandData.commandType == CommandData.CommandType.Stop) {
-      stopUnits();
-      return true;
-    }
-
-    return false;
+    Unit unit = CommandData.findUnitAt(point.x, point.y, selectRadius);
+    CommandData.clearSelection();
+    return CommandData.select(unit);
   }
 
-  /** 让选中单位立即停下（清目标/速度/寻路）。 */
-  private void stopUnits() {
-    for (Unit u : CommandData.checkedUnits) {
-      if (u != null && u.ai != null) u.ai.stop();
-    }
-  }
-
-  private boolean openFactory(float screenX, float screenY) {
+  private boolean openFactory(float x, float y) {
     if (WorldData.world == null) return false;
-    Vec2 worldPos = Core.camera.unproject(screenX, screenY);
-    int tileX = (int) (worldPos.x / WorldData.TILE_SIZE);
-    int tileY = (int) (worldPos.y / WorldData.TILE_SIZE);
-    Building building = WorldData.world.getBuilding(tileX, tileY);
-    if (building instanceof FactoryBuild factory && building.team == Game.team) {
-      new FactoryMenuWindow(factory).build();
-      return true;
-    }
-    return false;
-  }
-
-  /** 下达移动指令 */
-  private void issueMoveCommand(float tx, float ty) {
-    float mapWidth = WorldData.world.W * WorldData.TILE_SIZE;
-    float mapHeight = WorldData.world.H * WorldData.TILE_SIZE;
-
-    if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) return;
-    if (isSolidAtWorldPos(tx, ty)) return;
-
-    synchronized (WorldData.moveunits) {
-      for (int i = 0; i < CommandData.checkedUnits.size; i++) {
-        Unit u = CommandData.checkedUnits.get(i);
-        if (u == null || u.health <= 0) continue;
-
-        if (u.ai != null) u.ai.moveTo(tx, ty);
-
-        if (!WorldData.moveunits.array.contains(u)) {
-          WorldData.moveunits.add(u);
-        }
-      }
-    }
-  }
-
-  private void issueAttackCommand(Unit enemy) {
-    for (Unit unit : CommandData.checkedUnits) {
-      if (unit != null && unit.health > 0f && unit.ai != null) {
-        unit.ai.attack(enemy);
-      }
-    }
-  }
-
-  private void finishBoxSelection() {
-    Vec2 first =
-        Core.camera.unproject(new Vec2(CommandData.boxStartX, CommandData.boxStartY));
-    Vec2 second = Core.camera.unproject(new Vec2(CommandData.boxEndX, CommandData.boxEndY));
-    float minX = Math.min(first.x, second.x);
-    float minY = Math.min(first.y, second.y);
-    float maxX = Math.max(first.x, second.x);
-    float maxY = Math.max(first.y, second.y);
-
-    Ar<Unit> selected = new Ar<>();
-    WorldData.units.intersect(
-        minX,
-        minY,
-        maxX - minX,
-        maxY - minY,
-        unit -> {
-          if (unit != null && unit.health > 0f && unit.team == Game.team) selected.add(unit);
-        });
-    CommandData.replaceSelection(selected);
-    UI.hud.refreshCommand();
-  }
-
-  private boolean isSolidAtWorldPos(float wx, float wy) {
-    int gx = (int) (wx / WorldData.TILE_SIZE);
-    int gy = (int) (wy / WorldData.TILE_SIZE);
-    return WorldData.world.isSolid(gx, gy);
-  }
-
-  // InputProcessor 接口的空实现...
-  @Override
-  public boolean touchDown(int x, int y, int p, KeyCode b) {
-    return false;
-  }
-
-  @Override
-  public boolean pinch(Vec2 i1, Vec2 i2, Vec2 p1, Vec2 p2) {
-    return false;
-  }
-
-  @Override
-  public boolean longPress(float x, float y) {
-    return false;
-  }
-
-  @Override
-  public boolean fling(float vx, float vy, KeyCode button) {
-    return false;
-  }
-
-  @Override
-  public boolean pan(float x, float y, float dx, float dy) {
-    if (!CommandData.commanding || !CommandData.boxSelect) return false;
-    if (!CommandData.boxDragging) {
-      CommandData.boxDragging = true;
-      CommandData.boxStartX = downX;
-      CommandData.boxStartY = downY;
-    }
-    CommandData.boxEndX = x;
-    CommandData.boxEndY = y;
-    dragged =
-        Mathf.dst(CommandData.boxStartX, CommandData.boxStartY, x, y) >= dragThreshold;
+    Building building = WorldData.world.getBuilding((int) (x / WorldData.TILE_SIZE), (int) (y / WorldData.TILE_SIZE));
+    if (building == null || !(building.block() instanceof Factory)) return false;
+    new FactoryMenuWindow(building).build();
     return true;
   }
 
-  @Override
-  public boolean panStop(float x, float y, int pointer, KeyCode button) {
+  @Override public boolean touchDown(float x, float y, int pointer, KeyCode button) {
+    downX = x; downY = y; dragged = false; return false;
+  }
+  @Override public boolean pan(float x, float y, float dx, float dy) {
+    if (Math.abs(x - downX) + Math.abs(y - downY) > dragThreshold) dragged = true;
+    if (CommandData.boxSelect) {
+      Vec2 start = world(downX, downY), end = world(x, y);
+      CommandData.boxDragging = true;
+      CommandData.boxStartX = start.x; CommandData.boxStartY = start.y;
+      CommandData.boxEndX = end.x; CommandData.boxEndY = end.y;
+    } else {
+      Core.camera.position.x -= dx * Render.currentZoom;
+      Core.camera.position.y += dy * Render.currentZoom;
+    }
+    return true;
+  }
+  @Override public boolean panStop(float x, float y, int pointer, KeyCode button) {
     if (!CommandData.boxDragging) return false;
-    CommandData.boxEndX = x;
-    CommandData.boxEndY = y;
-    if (dragged) finishBoxSelection();
+    float minX = Math.min(CommandData.boxStartX, CommandData.boxEndX);
+    float minY = Math.min(CommandData.boxStartY, CommandData.boxEndY);
+    float maxX = Math.max(CommandData.boxStartX, CommandData.boxEndX);
+    float maxY = Math.max(CommandData.boxStartY, CommandData.boxEndY);
+    Ar<Unit> selected = new Ar<>();
+    EcsQueries.intersectUnits(minX, minY, maxX - minX, maxY - minY, selected::add);
+    CommandData.replaceSelection(selected);
     CommandData.boxDragging = false;
     return true;
   }
-
-  @Override
-  public boolean zoom(float initialDistance, float distance) {
-    return false;
-  }
-
-  @Override
-  public boolean touchDown(float x, float y, int pointer, KeyCode button) {
-    if (!CommandData.commanding || !CommandData.boxSelect) return false;
-    downX = x;
-    downY = y;
-    dragged = false;
-    CommandData.boxStartX = x;
-    CommandData.boxStartY = y;
-    CommandData.boxEndX = x;
-    CommandData.boxEndY = y;
+  @Override public boolean zoom(float initialDistance, float distance) {
+    if (distance != 0f) {
+      float target = Math.max(0.1f, Math.min(8f, Render.currentZoom * initialDistance / distance));
+      Render.zoom(target - Render.currentZoom);
+    }
     return true;
   }
-
-  @Override
-  public boolean keyDown(KeyCode key) {
+  @Override public boolean keyDown(KeyCode key) {
+    if (key == KeyCode.escape) CommandData.clearSelection();
     return false;
   }
-
-  @Override
-  public boolean keyUp(KeyCode key) {
-    return false;
-  }
-
-  @Override
-  public boolean keyTyped(char character) {
-    return false;
-  }
-
-  @Override
-  public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button) {
-    return false;
-  }
-
-  @Override
-  public boolean touchDragged(int screenX, int screenY, int pointer) {
-    return false;
-  }
-
-  @Override
-  public boolean mouseMoved(int screenX, int screenY) {
-    return false;
-  }
-
-  @Override
-  public boolean scrolled(float amountX, float amountY) {
-    return false;
-  }
+  @Override public boolean touchDown(int x, int y, int pointer, KeyCode button) { return touchDown((float) x, y, pointer, button); }
+  @Override public boolean pinch(Vec2 i1, Vec2 i2, Vec2 p1, Vec2 p2) { return false; }
+  @Override public boolean longPress(float x, float y) { return false; }
+  @Override public boolean fling(float vx, float vy, KeyCode button) { return false; }
+  @Override public boolean keyUp(KeyCode key) { return false; }
+  @Override public boolean keyTyped(char character) { return false; }
+  @Override public boolean touchUp(int x, int y, int pointer, KeyCode button) { return false; }
+  @Override public boolean touchDragged(int x, int y, int pointer) { return false; }
+  @Override public boolean mouseMoved(int x, int y) { return false; }
+  @Override public boolean scrolled(float x, float y) { return false; }
 }

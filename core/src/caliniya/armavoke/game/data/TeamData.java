@@ -1,42 +1,22 @@
 package caliniya.armavoke.game.data;
 
-import arc.func.*;
-import arc.math.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.base.type.*;
+import arc.func.Cons;
+import arc.math.Mathf;
+import caliniya.armavoke.base.game.Entity;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.ecs.runtime.EcsQueries;
+import caliniya.armavoke.ecs.runtime.EcsEntity;
 
-/** 阵营数据 —— 提供针对特定阵营的实体查询和操作。 所有数据都存储在全局 WorldData 中，本类只负责按阵营过滤。 */
 public class TeamData {
   public final TeamTypes team;
 
-  public TeamData(TeamTypes team) {
-    this.team = team;
-  }
+  public TeamData(TeamTypes team) { this.team = team; }
 
-  // 查找此阵营中指定半径的实体
-  public void find(float x, float y, float r, Cons<Entity> con) {
-    WorldData.units.intersect(
-        x - r,
-        y - r,
-        r * 2,
-        r * 2,
-        u -> {
-          if (Mathf.dst2(u.x, u.y, x, y) <= r * r) {
-            con.get(u);
-          }
-        });
-    WorldData.buildings.intersect(
-        x - r,
-        y - r,
-        r * 2,
-        r * 2,
-        b -> {
-          if (Mathf.dst2(b.x, b.y, x, y) <= r * r) {
-            con.get(b);
-          }
-        });
+  public void find(float x, float y, float radius, Cons<Entity> consumer) {
+    float range2 = radius * radius;
+    for (EcsEntity value : EcsQueries.snapshot()) {
+      if (value instanceof Entity entity && entity.active() && entity.team() == team
+          && Mathf.dst2(x, y, entity.x(), entity.y()) <= range2) consumer.get(entity);
+    }
   }
 }

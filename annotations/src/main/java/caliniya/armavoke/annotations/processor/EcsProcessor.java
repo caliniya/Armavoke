@@ -219,10 +219,11 @@ public final class EcsProcessor extends AbstractProcessor {
               generatedClass,
               definition.pooled(),
               definition.serializable(),
-              definition.constructor(),
-              classValues(type, EntityDef.class.getCanonicalName(), "components"),
-              classValues(type, EntityDef.class.getCanonicalName(), "abilities"),
-              classValues(type, EntityDef.class.getCanonicalName(), "modules"));
+               definition.constructor(),
+               classValues(type, EntityDef.class.getCanonicalName(), "components"),
+               classValues(type, EntityDef.class.getCanonicalName(), "abilities"),
+               classValues(type, EntityDef.class.getCanonicalName(), "modules"),
+               java.util.Arrays.asList(definition.interfaces()));
       putUnique(entities, model.name, model, type, "entity");
     }
   }
@@ -533,11 +534,18 @@ public final class EcsProcessor extends AbstractProcessor {
         .append("public final class ")
         .append(className)
         .append(" extends caliniya.armavoke.ecs.runtime.EcsEntity");
-    if (!included.isEmpty()) {
+    if (!included.isEmpty() || !entity.interfaces.isEmpty()) {
       source.append(" implements ");
+      boolean wroteInterface = false;
+      for (String interfaceName : entity.interfaces) {
+        if (wroteInterface) source.append(", ");
+        source.append(interfaceName);
+        wroteInterface = true;
+      }
       for (int i = 0; i < included.size(); i++) {
-        if (i > 0) source.append(", ");
+        if (wroteInterface) source.append(", ");
         source.append(accessPackage).append('.').append(accessName(included.get(i)));
+        wroteInterface = true;
       }
     }
     source.append(" {\n");
@@ -1270,6 +1278,7 @@ public final class EcsProcessor extends AbstractProcessor {
     final List<String> components;
     final List<String> abilities;
     final List<String> modules;
+    final List<String> interfaces;
 
     EntityModel(
         TypeElement element,
@@ -1281,7 +1290,8 @@ public final class EcsProcessor extends AbstractProcessor {
         String constructor,
         List<String> components,
         List<String> abilities,
-        List<String> modules) {
+        List<String> modules,
+        List<String> interfaces) {
       this.element = element;
       this.name = name;
       this.typeName = typeName;
@@ -1292,6 +1302,7 @@ public final class EcsProcessor extends AbstractProcessor {
       this.components = components;
       this.abilities = abilities;
       this.modules = modules;
+      this.interfaces = interfaces;
     }
   }
 }

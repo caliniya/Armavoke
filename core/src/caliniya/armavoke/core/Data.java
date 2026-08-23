@@ -18,9 +18,7 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.io.DataIO;
 import caliniya.armavoke.io.GameIO;
 import caliniya.armavoke.map.Maps;
-import caliniya.armavoke.system.game.GameProcess;
 import caliniya.armavoke.system.render.*;
-import caliniya.armavoke.system.world.*;
 import caliniya.armavoke.type.Weapon;
 import caliniya.armavoke.system.*;
 import java.util.*;
@@ -52,7 +50,6 @@ public class Data {
     Systems.MR = new MapRender();
     Systems.UR = new UnitRender();
     Systems.BR = new BlockRender();
-    Systems.GP = new GameProcess();
     Systems.UV = new UniverseRender();
     // Systems.DE = new DebugRender();
     Systems.FX = new caliniya.armavoke.base.effect.Effects();
@@ -65,9 +62,6 @@ public class Data {
         Systems.UV,
         Systems.FX,
         Systems.ECS);
-    Systems.BP = new BulletProcess();
-    Systems.UM = new UnitMath();
-    Systems.EP = new EntityProces();
   }
 
   // 初始化所有系统，允许其工作
@@ -79,10 +73,6 @@ public class Data {
 
     Systems.systems.sort();
 
-    Systems.GP.init();
-    Systems.BP.init();
-    Systems.UM.init();
-    Systems.EP.init();
 
     Game.starMap = new StarMap(2000, 2000);
 

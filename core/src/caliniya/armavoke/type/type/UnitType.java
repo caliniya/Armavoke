@@ -1,306 +1,108 @@
 package caliniya.armavoke.type.type;
 
-import arc.*;
-
-import arc.util.*;
-import arc.graphics.*;
-import arc.math.geom.*;
-import arc.graphics.g2d.*;
-import caliniya.armavoke.core.meta.ui.Pal;
+import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
+import arc.math.Mathf;
+import caliniya.armavoke.base.game.ContentType;
+import caliniya.armavoke.base.api.DrawType;
+import caliniya.armavoke.base.api.TechNodeContent;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.base.type.CType;
+import caliniya.armavoke.base.type.DamageType;
+import caliniya.armavoke.base.type.TeamTypes;
+import caliniya.armavoke.ecs.runtime.EcsEntityFactory;
+import caliniya.armavoke.type.Unit;
+import caliniya.armavoke.type.Weapon;
 import caliniya.armavoke.type.ability.Ability;
-import caliniya.armavoke.ui.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.type.type.*;
-import caliniya.armavoke.base.api.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.base.game.*;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.base.type.*;
-import caliniya.armavoke.core.meta.stat.Stat;
-import caliniya.armavoke.core.meta.stat.StatStack;
-import caliniya.armavoke.core.meta.stat.StatType;
-import caliniya.armavoke.core.meta.stat.StatUnit;
-import caliniya.armavoke.type.ability.*;
 
+/** Immutable unit content definition. Unit instances are generated ECS entities. */
 public class UnitType extends ContentType implements DrawType<Unit>, TechNodeContent {
-
-  public float speed = 60f, // 格每秒
-      health = 100f,
-      speedt, // 像素每帧
-      rotationSpeend = 1f // 旋转速度(单位帧每度？)
-  ;
-
-  // 物理数据，若碰撞盒为空 则使用size进行填充
-  public float[] hitbox = null;
+  public float speed = 60f, health = 100f, speedt, rotationSpeend = 1f;
+  public float[] hitbox;
   public float size = 100f;
-
-  // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
-
-  /** 移动攻击接近目标后停止的距离。 */
   public float engageRange = 150f;
-
-  // 单位的容量，使用通用的模块规则
   public int itemCap = 50;
   public float liquidCap;
   public float powerCap;
-
-  // 防护（类型默认，实例可覆盖）
-  public float armorMax; // 护甲容量上限
-  public float armorValue; // 护甲强度（固定减伤）
-
-  /** 护甲对各类伤害的百分比抗性（0~1），索引 = DamageType.ordinal()。 */
+  public float armorMax;
+  public float armorValue;
   public float[] armorResist = new float[DamageType.values().length];
-
-  // 能量回充速率（每秒，类型默认）
   public float energyRegen;
   public float energyMax;
-
-  public Ar<Ability> abilities = new Ar<Ability>();
-
-  public Ar<WeaponType> weapons = new Ar<WeaponType>();
-
-  // 渲染资源
+  public Ar<Ability> abilities = new Ar<>();
+  public Ar<WeaponType> weapons = new Ar<>();
   public TextureRegion region, cell;
 
-  public UnitType(String name) {
-    super(name, CType.Unit);
-  }
+  public UnitType(String name) { super(name, CType.Unit); }
 
   @Override
-  public TechNodeContent[] requirements() {
-    return requirements; // ContentType 里的前置字段（默认 null）
-  }
+  public TechNodeContent[] requirements() { return requirements; }
 
-  // 加载资源 (在 Assets 加载完成后调用)
   public void load() {
-    this.speedt = (speed * WorldData.TILE_SIZE) / 60f;
-    region = Core.atlas.find(name, "white");
-    cell = Core.atlas.find(name + "-cell", "air");
-    for (WeaponType weapon : weapons) {
-      weapon.load(name);
-    }
-    // 基础
-    stat.add(Stat.healthMax, health);
-    stat.add(Stat.speed, speed);
-    stat.add(Stat.rotateSpeed, rotationSpeend);
-    stat.add(Stat.energyMax, energyMax);
-    stat.add(Stat.energyRegen, energyRegen);
-    // 防护
-    stat.add(Stat.armorMax, armorMax);
-    stat.add(Stat.armorValue, armorValue);
-    for (DamageType t : DamageType.values()) {
-      if (t.ordinal() < armorResist.length) {
-        stat.add(
-            Core.bundle.format(
-                "stat.armorResist",
-                t.localizedName,
-                StatUnit.percent.format(armorResist[t.ordinal()])),
-            StatType.protect);
-      }
-    }
-    abilities.each(e -> e.stats(stat));
+    region = Core.atlas.find(name);
+    cell = Core.atlas.find(name + "-cell");
+    speedt = speed / 60f;
   }
 
   public Unit create(TeamTypes team, float x, float y) {
-    return Unit.create(team, this, x, y);
+    return EcsEntityFactory.createUnit(this, team, x, y);
   }
 
-  // 用于存档读取的创建
-  public Unit create() {
-    return Unit.create(this);
-  }
+  public Unit create() { return create(TeamTypes.Mutex, 0f, 0f); }
 
-  public void draw(Unit u) {
-    // 默认的绘制逻辑
-    if (u.isSelected) {
-      Draw.color(Color.green);
-      Lines.stroke(2f);
-      Lines.circle(u.x, u.y, u.size + 4);
+  @Override
+  public void draw(Unit unit) {
+    if (unit == null || region == null) return;
+    for (Weapon weapon : unit.weapons()) weapon.draw();
+    Draw.color();
+    Draw.rect(region, unit.x(), unit.y(), size, size, unit.rotation() - 90f);
+    if (cell != null && unit.team() != null) {
+      Draw.color(Color.white);
+      Draw.rect(cell, unit.x(), unit.y(), size, size, unit.rotation() - 90f);
       Draw.color();
     }
-
-    Draw.rect(u.region, u.x, u.y, u.rotation);
-    Draw.rect(u.cell, u.x, u.y, u.rotation);
-
-    // 绘制武器
-    for (Weapon weapon : u.weapons) {
-      weapon.type.draw(weapon);
-    }
-    Draw.color();
   }
 
-  /**
-   * 绘制单位血条（默认样式）：单位右边缘垂直条， **固定分段 + 段内独立填充**。
-   *
-   * <p>1. 固定分段：总容量 = 核心Max + 护甲Max + 护盾原始Max， 各段宽 = 条长 × 该层Max/总容量（段位置固定，互不影响）；
-   *
-   * <p>2. 段内独立渲染：每段从左到右按「当前 / 该层最大」填充， 左侧固定、右侧随当前值缩；
-   *
-   * <p>3. 护盾段比例用等效容量：比例 = 当前/最大（接近线性）。 子类可覆写此方法定制血条。
-   */
-  public void drawHealthBar(Unit u) {
-
-    float coreMax = Math.max(0f, u.maxHealth);
-    float core = Math.max(0f, u.health);
-    float armorMax = Math.max(0f, u.armorMax);
-    float armor = Math.max(0f, u.armor);
-    // 护盾段 = 所有护盾能力容量之和（单体护盾 + 力场等）
-    float shieldMax = Math.max(0f, u.totalShieldMax());
-    float shieldCur = Math.max(0f, u.totalShield());
-
-    float totalMax = coreMax + armorMax + shieldMax;
-    if (totalMax <= 0f) return;
-
-    float barLen = u.size * 1.5f;
-    float barW = 8f;
-    // 以单位中心为原点：血条贴右边缘（半径 0.5×size），垂直居中于单位中心
-    float startX = u.x + u.size * 0.5f;
-    float startY = u.y - u.size * 0.75f; // 下端 -0.75×size，上端 +0.75×size（对称）
-
-    // 底色
+  public void drawHealthBar(Unit unit) {
+    if (unit == null || unit.maxHealth() <= 0f) return;
+    float width = Math.max(28f, size * 0.8f);
+    float y = unit.y() + size * 0.58f;
     Draw.color(Color.darkGray);
-    Fill.rect(startX + barW / 2f, startY + barLen / 2f, barW, barLen);
-
-    // 固定分段
-    float coreSeg = barLen * coreMax / totalMax;
-    float armorSeg = barLen * armorMax / totalMax;
-    float shieldSeg = barLen * shieldMax / totalMax;
-
-    // 核心段（最下，红）
-    if (coreSeg > 0f && core > 0f) {
-      float h = coreSeg * (core / coreMax);
-      Draw.color(Color.scarlet);
-      Fill.rect(startX + barW / 2f, startY + h / 2f, barW, h);
-    }
-
-    // 护甲段（中，白）
-    if (armorSeg > 0f && armor > 0f) {
-      float h = armorSeg * (armor / armorMax);
-      Draw.color(Color.lightGray);
-      Fill.rect(startX + barW / 2f, startY + coreSeg + h / 2f, barW, h);
-    }
-
-    // 护盾段（最上，蓝）：等效容量比例（= 当前/最大，线性）
-    if (shieldSeg > 0f && shieldCur > 0f) {
-      float h = shieldSeg * (shieldCur / shieldMax);
-      Draw.color(Color.sky);
-      Fill.rect(startX + barW / 2f, startY + coreSeg + armorSeg + h / 2f, barW, h);
-    }
-
-    // --- 能量条 + 热量条（血条右侧副条，从下往上填充）---
-    float gap = -1f; // 条间距
-    float energyW = 5f; // 能量条宽度
-    float heatW = 3f; // 热量条宽度
-    float energyX = startX + barW + gap; // 能量条左缘
-
-    if (u.energyMax > 0f) {
-      float energy = Math.max(0f, u.energy);
-      float energyH = barLen * Math.min(1f, energy / u.energyMax);
-
-      // 底色（空条，让玩家知道有这个槽位）
-      Draw.color(Color.darkGray);
-      Fill.rect(energyX + energyW / 2f, startY + barLen / 2f, energyW, barLen);
-      // 金色填充，从下往上
-      if (energyH > 0f) {
-        Draw.color(Pal.light);
-        Fill.rect(energyX + energyW / 2f, startY + energyH / 2f, energyW, energyH);
-      }
-    }
-
-    // 热量条：仅有过热机制（heatable 且上限 > 0）的单位显示，位于能量条右侧
-    if (u.heatable && u.heatMax > 0f) {
-      float heatX = u.energyMax > 0f ? energyX + energyW + gap : energyX;
-      float heatH = barLen * Math.min(1f, Math.max(0f, u.heat) / u.heatMax);
-
-      Draw.color(Color.darkGray);
-      Fill.rect(heatX + heatW / 2f, startY + barLen / 2f, heatW, barLen);
-      if (heatH > 0f) {
-        Draw.color(Color.orange);
-        Fill.rect(heatX + heatW / 2f, startY + heatH / 2f, heatW, heatH);
-      }
-    }
-
+    Fill.rect(unit.x(), y, width, 5f);
+    Draw.color(Color.valueOf("84f491"));
+    Fill.rect(unit.x() - width * 0.5f + width * Mathf.clamp(unit.health() / unit.maxHealth()) * 0.5f,
+        y, width * Mathf.clamp(unit.health() / unit.maxHealth()), 3f);
     Draw.color();
   }
 
-  public void drawDebug(Unit u) {
-
-    Draw.color(Color.yellow);
-    Lines.stroke(2f);
-
-    if (u.hitboxData != null) {
-      for (int i = 0; i < u.hitboxData.length; i += 3) {
-        float cx = u.hitboxData[i];
-        float cy = u.hitboxData[i + 1];
-        float s = u.hitboxData[i + 2];
-        Lines.rect(cx - s / 2f, cy - s / 2f, s, s);
-      }
-    }
-
-    // 绘制计算出的外接圆 (新增，用于验证 size 计算是否正确)
-    Draw.color(Color.sky);
-    float radius = u.size / 2f;
-    Lines.circle(u.x, u.y, radius);
-    Draw.color(Color.yellow); // 还原颜色
-
-    if (Math.abs(u.speedX) > 0.001f || Math.abs(u.speedY) > 0.001f) {
-      Draw.color(Color.magenta);
-      float scale = 20f;
-      Lines.line(u.x, u.y, u.x + u.speedX * scale, u.y + u.speedY * scale);
-      Fonts.def.draw(Strings.format(u.speedX + " " + u.speedY), u.x, u.y + size + 8f, Align.center);
-    }
-
-    if (u.targetX != 0 || u.targetY != 0) {
-      Draw.color(Color.orange);
-      Lines.line(u.x, u.y, u.targetX, u.targetY);
-      float s = 8f;
-      Lines.line(u.targetX - s, u.targetY - s, u.targetX + s, u.targetY + s);
-      Lines.line(u.targetX - s, u.targetY + s, u.targetX + s, u.targetY - s);
-    }
-    if (u.path != null && !u.path.isEmpty()) {
-      Draw.color(Color.cyan);
-
-      float lastX = u.x;
-      float lastY = u.y;
-
-      for (int i = u.pathIndex; i < u.path.size; i++) {
-        Point2 p = u.path.get(i);
-        float wx = p.x * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-        float wy = p.y * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
-
-        Lines.line(lastX, lastY, wx, wy);
-        Fill.square(wx, wy, 3f);
-        lastX = wx;
-        lastY = wy;
-      }
-    }
-
-    for (Weapon weapon : u.weapons) {
-      weapon.type.drawDebug(weapon);
-    }
+  public void drawDebug(Unit unit) {
+    Draw.color(Color.scarlet);
+    Lines.rect(unit.x() - unit.width() * 0.5f, unit.y() - unit.height() * 0.5f,
+        unit.width(), unit.height());
+    if (unit.movementMoving()) Lines.line(unit.x(), unit.y(), unit.movementTargetX(), unit.movementTargetY());
     Draw.color();
   }
 
-  public void update(Unit u, float dt) {
-    // TODO: 以后再说
-  }
+  public void update(Unit unit, float delta) {}
 
   public void addWeapons(WeaponType... newWeapons) {
+    if (newWeapons == null) return;
     for (WeaponType weapon : newWeapons) {
-      // 添加主武器
-      weapon.isMirror = false;
+      if (weapon == null) continue;
       weapons.add(weapon);
-
-      // 处理镜像
       if (weapon.mirror) {
-        WeaponType copy = weapon.copy();
-        copy.flip();
+        WeaponType mirrored = weapon.copy();
+        mirrored.x = -weapon.x;
+        mirrored.shootX = -weapon.shootX;
+        mirrored.isMirror = true;
         weapon.otherSide = weapons.size;
-        copy.otherSide = weapons.size - 1;
-
-        weapons.add(copy);
+        mirrored.otherSide = weapons.size - 1;
+        weapons.add(mirrored);
       }
     }
   }

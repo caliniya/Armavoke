@@ -26,9 +26,9 @@ public class HeatAbility extends Ability {
 
   @Override
   public Ability onCreate(Entity e) {
-    e.heatSpeed = heatSpeed;
-    e.heatable = true;
-    e.heatMax = heatMax;
+    e.combat().heatSpeed = heatSpeed;
+    e.combat().heatable = true;
+    e.combat().heatMax = heatMax;
     return super.onCreate(e);
   }
 
@@ -44,9 +44,9 @@ public class HeatAbility extends Ability {
   // 散热操作和解锁操作在{@code Entity.updateBase} 中进行，这里只同步以及进行锁定
   @Override
   public void update(Entity e, float dt) {
-    heat = e.heat;
+    heat = e.heat();
     if (heat >= heatMax) {
-      e.locked = true;
+      e.locked(true);
     }
   }
 
@@ -59,14 +59,15 @@ public class HeatAbility extends Ability {
   @Override
   public void write(Entity e, Writes w) {
     super.write(w);
-    w.f(e.heat);
+    w.f(e.heat());
   }
 
   @Override
   public void read(Entity e, Reads r) {
     super.read(r);
     heat = r.f();
-    e.locked = heat >= heatMax;
+    e.heat(heat);
+    e.locked(heat >= heatMax);
   }
 
   @Override
