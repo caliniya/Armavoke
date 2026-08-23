@@ -56,8 +56,16 @@ public class Data {
     Systems.UV = new UniverseRender();
     // Systems.DE = new DebugRender();
     Systems.FX = new caliniya.armavoke.base.effect.Effects();
+    Systems.ECS = new caliniya.armavoke.ecs.runtime.EcsScheduler();
     Systems.addSystem(
-        new Render(), Systems.MR, Systems.UR, Systems.GP, Systems.BR, Systems.UV, Systems.FX);
+        new Render(),
+        Systems.MR,
+        Systems.UR,
+        Systems.GP,
+        Systems.BR,
+        Systems.UV,
+        Systems.FX,
+        Systems.ECS);
     Systems.BP = new BulletProcess();
     Systems.UM = new UnitMath();
     Systems.EP = new EntityProces();

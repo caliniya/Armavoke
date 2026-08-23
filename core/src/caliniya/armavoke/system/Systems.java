@@ -23,6 +23,7 @@ public class Systems {
   public static DebugRender DE;
   public static UniverseRender UV;
   public static caliniya.armavoke.base.effect.Effects FX;
+  public static caliniya.armavoke.ecs.runtime.EcsScheduler ECS;
 
   public static void addSystem(caliniya.armavoke.system.System<?>... newSystems) {
     for (caliniya.armavoke.system.System<?> s : newSystems) {
