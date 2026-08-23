@@ -11,7 +11,7 @@ import caliniya.armavoke.system.render.UniverseRender;
 import caliniya.armavoke.ui.fragment.UniverseFragment;
 import caliniya.armavoke.world.stars.Universe;
 
-/** 宇宙视图网格选择器。<br> */
+/** 宇宙视图网格选择器。这是过去的网格实现系统，已经被现在的新图取代了，需要重构<br> */
 public class UniverseInput implements InputProcessor {
 
   private final Vec2 world = new Vec2();
