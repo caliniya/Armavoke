@@ -278,12 +278,12 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   }
 
   public void stat(StatStack stat) {
-    stat.add(Stat.health, health);
-    stat.add(Stat.armor, armor);
-    stat.add(Stat.shield, totalShield());
-    stat.add(Stat.energy, energy);
-    if (heatable && heatMax > 0f) stat.add(Stat.heat, heat);
-    if (power != null) stat.add(Stat.power, power.power);
+    stat.get(Stat.health, health,maxHealth);
+    stat.get(Stat.armor, armor , armorMax);
+    stat.get(Stat.shield, totalShield() ,totalShieldMax());
+    stat.get(Stat.energy, energy , energyMax);
+    if (heatable) stat.get(Stat.heat, heat , heatMax);
+    if (power != null) stat.get(Stat.power, power.power , power.powerMax);
     for (Ability a : abilities) {
       a.statAbility(stat);
     }

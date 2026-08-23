@@ -35,9 +35,8 @@ public class UnitDetailWindow extends Window {
         new Table() {
           @Override
           public void draw() {
-            stst.clear();
             unit.stat(stst);
-            //main(this);
+            main(this);
             super.draw();
           }
           ;

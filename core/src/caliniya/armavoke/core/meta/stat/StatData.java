@@ -41,7 +41,7 @@ public class StatData {
   }
 
   public StatData(Stat stat, float value, StatUnit unit) {
-    this(stat, value, unit, 1, 0);
+    this(stat, value, unit, 1, -1f);
   }
 
   public StatData(Stat stat, float value, StatUnit unit, int level, float valueMax) {
@@ -121,8 +121,8 @@ public class StatData {
     }
     return this;
   }
-  
-  //所有的find 返回的都是第1个匹配选项
+
+  // 所有的find 返回的都是第1个匹配选项
   public StatData find(Stat stat, Object tag) {
     for (StatData d : datas) {
       if (d.stat == stat && (tag == null || java.util.Objects.equals(d.tag, tag))) return d;
@@ -131,12 +131,12 @@ public class StatData {
     }
     return null;
   }
-  
+
   // 因为字符大多数情况下会被颜色格式化，所以不能用完全匹配 而应该用包含
   public StatData find(String raw, Object tag) {
     for (StatData d : datas) {
       if (d.stat == null
-          && d.raw.contains(raw)
+          && d.raw.equals(raw)
           && (tag == null || java.util.Objects.equals(d.tag, tag))) return d;
       StatData found = d.find(raw, tag);
       if (found != null) return found;
@@ -156,6 +156,60 @@ public class StatData {
 
   public String indent() {
     return level <= 0 ? "   " : "   " + "\u3000\u3000".repeat(level);
+  }
+
+  /** 对于查找命中的 会自动设置，未命中的则会新建并插入 */
+  public StatData get(Stat stat, float value, StatUnit unit, int level, float valueMax) {
+    for (StatData d : datas) {
+      if (d.stat == stat) {
+        d.set(value, valueMax);
+        return d;
+      }
+    }
+    StatData d = new StatData(stat, value, unit, level, valueMax);
+    add(d);
+    return d;
+  }
+  
+  public StatData get(String raw, int level, StatType type) {
+    for (StatData d : datas) {
+      if (d.stat == null && d.raw.equals(raw)) return d;
+    }
+    StatData d = new StatData(raw, level, type);
+    add(d);
+    return d;
+  }
+
+  public StatData get(Stat stat, float value) {
+    return get(stat, value, stat.unit, 1, -1f);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit) {
+    return get(stat, value, unit, 1, -1f);
+  }
+
+  public StatData get(Stat stat, float value, float valueMax) {
+    return get(stat, value, stat.unit, 1, valueMax);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, float valueMax) {
+    return get(stat, value, unit, 1, valueMax);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, int level) {
+    return get(stat, value, unit, level, -1f);
+  }
+
+  public StatData get(String raw) {
+    return get(raw, 1, StatType.function);
+  }
+
+  public StatData get(String raw, int level) {
+    return get(raw, level, StatType.function);
+  }
+
+  public StatData get(String raw, StatType type) {
+    return get(raw, 1, type);
   }
 
   // 包含自身以及子元素的递归

@@ -4,6 +4,7 @@ import arc.Core;
 import arc.func.Cons;
 import arc.struct.ObjectMap;
 import arc.struct.OrderedMap;
+import java.util.Objects;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.ui.Pal;
@@ -91,16 +92,78 @@ public class StatStack {
     return d;
   }
 
-  /**按原始文本精确查找纯文本条目，命中则返回，未命中则新建插入并返回。 */
+  /** 按原始文本精确查找纯文本条目，命中则返回，未命中则新建插入并返回。 */
   public StatData get(String raw, int level, StatType type) {
     Ar<StatData> list = types.get(type);
     for (int i = 0; i < list.size; i++) {
       StatData d = list.get(i);
-      if (d.stat == null && d.raw.contains(raw)) return d;
+      if (d.stat == null && d.raw.equals(raw)) return d;
     }
     StatData d = new StatData(raw, level, type);
     list.add(d);
     return d;
+  }
+
+  /** 按 stat 精确查找（带 tag 匹配），命中则就地更新并返回，未命中则新建插入并返回。 */
+  public StatData get(
+      Stat stat, float value, StatUnit unit, int level, float valueMax, Object tag) {
+    Ar<StatData> list = types.get(stat.type);
+    for (int i = 0; i < list.size; i++) {
+      StatData d = list.get(i);
+      if (d.stat == stat && Objects.equals(d.tag, tag)) {
+        d.set(value, valueMax);
+        return d;
+      }
+    }
+    StatData d = new StatData(stat, value, unit, level, valueMax);
+    d.tag = tag;
+    list.add(d);
+    return d;
+  }
+
+  /** 按原始文本精确查找纯文本条目（带 tag 匹配），命中则返回，未命中则新建插入并返回。 */
+  public StatData get(String raw, int level, StatType type, Object tag) {
+    Ar<StatData> list = types.get(type);
+    for (int i = 0; i < list.size; i++) {
+      StatData d = list.get(i);
+      if (d.stat == null && d.raw.equals(raw) && Objects.equals(d.tag, tag)) return d;
+    }
+    StatData d = new StatData(raw, level, type);
+    d.tag = tag;
+    list.add(d);
+    return d;
+  }
+
+  public StatData get(Stat stat, float value, float valueMax) {
+    return get(stat, value, stat.unit, 1, valueMax, null);
+  }
+
+  public StatData get(Stat stat, float value, Object tag) {
+    return get(stat, value, stat.unit, 1, -1f, tag);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, Object tag) {
+    return get(stat, value, unit, 1, -1f, tag);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, float valueMax, Object tag) {
+    return get(stat, value, unit, 1, valueMax, tag);
+  }
+
+  public StatData get(Stat stat, float value, StatUnit unit, int level, Object tag) {
+    return get(stat, value, unit, level, -1f, tag);
+  }
+
+  public StatData get(String raw, Object tag) {
+    return get(raw, 1, StatType.function, tag);
+  }
+
+  public StatData get(String raw, int level, Object tag) {
+    return get(raw, level, StatType.function, tag);
+  }
+
+  public StatData get(String raw, StatType type, Object tag) {
+    return get(raw, 1, type, tag);
   }
 
   public StatData get(Stat stat, float value) {
@@ -156,7 +219,7 @@ public class StatStack {
 
   public StatData find(String raw, StatType type, Object tag) {
     for (StatData data : types.get(type)) {
-      if (data.raw.contains(raw) || data.tag == tag) return data;
+      if (data.raw.contains(raw) && Objects.equals(data.tag, tag)) return data;
     }
     return null;
   }
