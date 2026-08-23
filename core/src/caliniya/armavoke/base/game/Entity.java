@@ -278,12 +278,13 @@ public abstract class Entity implements Poolable, QuadTreeObject {
   }
 
   public void stat(StatStack stat) {
-    stat.get(Stat.health, health,maxHealth);
-    stat.get(Stat.armor, armor , armorMax);
-    stat.get(Stat.shield, totalShield() ,totalShieldMax());
-    stat.get(Stat.energy, energy , energyMax);
-    if (heatable) stat.get(Stat.heat, heat , heatMax);
-    if (power != null) stat.get(Stat.power, power.power , power.powerMax);
+    // 构建统计结构并注册动态数值源（live）：渲染端每帧经 getData 自动取最新值，无需反复调用本方法
+    stat.get(Stat.health, health, maxHealth).live = () -> health;
+    stat.get(Stat.armor, armor, armorMax).live = () -> armor;
+    stat.get(Stat.shield, totalShield(), totalShieldMax()).live = () -> totalShield();
+    stat.get(Stat.energy, energy, energyMax).live = () -> energy;
+    if (heatable) stat.get(Stat.heat, heat, heatMax).live = () -> heat;
+    if (power != null) stat.get(Stat.power, power.power, power.powerMax).live = () -> power.power;
     for (Ability a : abilities) {
       a.statAbility(stat);
     }

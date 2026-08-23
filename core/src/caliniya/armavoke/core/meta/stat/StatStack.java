@@ -7,7 +7,6 @@ import arc.struct.OrderedMap;
 import java.util.Objects;
 import caliniya.armavoke.base.tool.Ar;
 import caliniya.armavoke.base.type.DamageType;
-import caliniya.armavoke.core.meta.ui.Pal;
 
 /** 一个完整的信息组 */
 public class StatStack {
@@ -20,7 +19,7 @@ public class StatStack {
   static {
     cache = new ObjectMap<>();
     for (StatType s : StatType.values()) {
-      cache.put(s, new StatData(Pal.format(Pal.light, s.localizedName), 0));
+      cache.put(s, new StatData(s.localizedName, 0));
     }
   }
 
@@ -129,6 +128,36 @@ public class StatStack {
       if (d.stat == null && d.raw.equals(raw) && Objects.equals(d.tag, tag)) return d;
     }
     StatData d = new StatData(raw, level, type);
+    d.tag = tag;
+    list.add(d);
+    return d;
+  }
+
+  /** 按 tag 查找纯文本标题条目（默认 function 分组）：命中则就地替换文本，未命中则新建插入。 */
+  public StatData get(Object tag, String text) {
+    return get(tag, text, 1, StatType.function);
+  }
+
+  /** 带缩进数量版（用于新建时的层级）。 */
+  public StatData get(Object tag, String text, int level) {
+    return get(tag, text, level, StatType.function);
+  }
+
+  /**
+   * 完整版：在指定分组内按 tag（身份标识，如能力实例自身）查找纯文本条目；
+   * 命中则把文本替换为 text（保持原有缩进），未命中则新建插入（层级用 level）。
+   */
+  public StatData get(Object tag, String text, int level, StatType type) {
+    Ar<StatData> list = types.get(type);
+    for (int i = 0; i < list.size; i++) {
+      StatData d = list.get(i);
+      if (d.stat == null && Objects.equals(d.tag, tag)) {
+        d.raw = text;
+        d.data = d.indent() + text;
+        return d;
+      }
+    }
+    StatData d = new StatData(text, level, type);
     d.tag = tag;
     list.add(d);
     return d;

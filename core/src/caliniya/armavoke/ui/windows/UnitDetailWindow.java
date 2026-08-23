@@ -11,7 +11,9 @@ import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import caliniya.armavoke.type.Unit;
 import caliniya.armavoke.base.game.ContentType;
+import caliniya.armavoke.core.meta.stat.StatData;
 import caliniya.armavoke.core.meta.stat.StatStack;
+import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.ability.Ability;
 import caliniya.armavoke.type.Enhancement;
 import caliniya.armavoke.ui.Button;
@@ -35,8 +37,6 @@ public class UnitDetailWindow extends Window {
         new Table() {
           @Override
           public void draw() {
-            // 每帧只刷新数据：StatStack.get 命中已有条目就地更新，无对象分配
-            unit.stat(stst);
             super.draw();
           }
           ;
@@ -84,7 +84,16 @@ public class UnitDetailWindow extends Window {
     stst.each(
         d -> {
           if (d.data == null || d.data.trim().isEmpty()) return;
-          t.add(new Label(() -> d.data)).left().padBottom(2).align(Align.left);
+          if (d.stat != null && d.valueMax > 0f) {
+            // 带最大值的运行时数值行：文本（值 / 最大 (百分比)）+ 进度条
+            Table row = new Table();
+            row.left();
+            row.add(new Label(() -> d.getData())).left();
+            row.add(bar(d)).padLeft(8f);
+            t.add(row).left().padBottom(2f);
+          } else {
+            t.add(new Label(() -> d.getData())).left().padBottom(2).align(Align.left);
+          }
           t.row();
         });
 
@@ -102,15 +111,15 @@ public class UnitDetailWindow extends Window {
                       enh.enabled
                           ? Core.bundle.get("unitDetail.disable")
                           : Core.bundle.get("unitDetail.enable"),
-                      () -> {
-                        enh.setEnabled(!enh.enabled);
-                      })
+                      () -> enh.setEnabled(!enh.enabled))
                   .set(
                       b ->
                           b.text.setText(
-                              enh.enabled
-                                  ? Core.bundle.get("unitDetail.disable")
-                                  : Core.bundle.get("unitDetail.enable"))))
+                              () ->
+                                  Core.bundle.get(
+                                      enh.enabled
+                                          ? "unitDetail.disable"
+                                          : "unitDetail.enable"))))
           .size(64f, 36f)
           .padLeft(6f);
       t.add(row).growX().left().row();
@@ -119,17 +128,21 @@ public class UnitDetailWindow extends Window {
       if (!a.toggleable) continue;
       Table row = new Table();
       row.left();
-      row.add("[gray]" + a.localizedName + "[]").left().pad(2f);
+      row.add(a.localizedName).left().pad(2f);
       row.add(
               new Button(
                   a.enabled
                       ? Core.bundle.get("unitDetail.disable")
                       : Core.bundle.get("unitDetail.enable"),
-                  () -> {
-                    a.setEnabled(!a.enabled);
-
-                    main(this.main); // 刷新窗口内容
-                  }))
+                  () -> a.setEnabled(!a.enabled))
+                  .set(
+                      b ->
+                          b.text.setText(
+                              () ->
+                                  Core.bundle.get(
+                                      a.enabled
+                                          ? "unitDetail.disable"
+                                          : "unitDetail.enable"))))
           .size(64f, 36f)
           .padLeft(6f);
       t.add(row).growX().left().row();
@@ -140,18 +153,11 @@ public class UnitDetailWindow extends Window {
     enhancementCount = unit.enhancements.size;
   }
 
-  /** 条形图元素：每帧读取最新值绘制。 */
-  private Element bar(Floatf<Unit> cur, Floatf<Unit> max, Color color) {
-    float[] curVal = {0f};
-    float[] maxVal = {1f};
+  /** 数值进度条：每帧读取 StatData 的最新 value/valueMax 绘制（仅 valueMax > 0 的行使用）。 */
+  private Element bar(StatData d) {
     return new Element() {
       {
-        setSize(120f, 8f);
-        update(
-            () -> {
-              curVal[0] = cur.get(unit);
-              maxVal[0] = max.get(unit);
-            });
+        setSize(100f, 6f);
       }
 
       @Override
@@ -163,9 +169,9 @@ public class UnitDetailWindow extends Window {
 
         Draw.color(Color.darkGray);
         Fill.rect(x + w / 2f, y + h / 2f, w, h);
-        if (maxVal[0] > 0f) {
-          float fw = w * Math.min(1f, curVal[0] / maxVal[0]);
-          Draw.color(color);
+        if (d.valueMax > 0f) {
+          float fw = w * Math.min(1f, Math.max(0f, d.value / d.valueMax));
+          Draw.color(Pal.light);
           Fill.rect(x + fw / 2f, y + h / 2f, fw, h);
         }
         Draw.color();

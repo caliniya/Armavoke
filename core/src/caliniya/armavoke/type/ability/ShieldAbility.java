@@ -6,7 +6,6 @@ import caliniya.armavoke.base.type.DamageType;
 import caliniya.armavoke.core.meta.stat.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.ability.api.Shield;
 
 /**
@@ -61,15 +60,6 @@ public class ShieldAbility extends Ability implements Shield {
 
   /** 当前破盾冷却剩余时间（秒）；0 = 不在冷却。 */
   public float cooldown;
-
-  /** 上报用格式化标题（onCreate 时生成一次，避免每帧格式化分配）。 */
-  private String titleText;
-
-  @Override
-  public Ability onCreate(Entity e) {
-    titleText = Pal.format(Pal.light, localizedName);
-    return super.onCreate(e);
-  }
 
   @Override
   public void setEnabled(boolean enabled) {
@@ -197,8 +187,8 @@ public class ShieldAbility extends Ability implements Shield {
   @Override
   public void stats(StatStack stack) {
 
-    StatData group = StatData.with(Pal.format(Pal.light, localizedName), 1, StatType.function);
-    group.add(StatData.with(Pal.format(Pal.light, description)).setLevel(1));
+    StatData group = StatData.with(localizedName, 1, StatType.function);
+    group.add(StatData.with(description).setLevel(1));
 
     group
         .add(StatData.with(Stat.shieldMax, max))
@@ -221,8 +211,8 @@ public class ShieldAbility extends Ability implements Shield {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.get(titleText, StatType.function, this)
-        .get(Stat.shield, current, max).setLevel(2);
+    stat.get(this, localizedName)
+        .get(Stat.shield, current, max).setLevel(2).live = () -> current;
   }
 
   @Override

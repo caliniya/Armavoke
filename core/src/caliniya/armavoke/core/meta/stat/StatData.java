@@ -1,6 +1,9 @@
 package caliniya.armavoke.core.meta.stat;
 
+import arc.func.Floatp;
 import arc.func.Cons;
+import arc.util.Nullable;
+import arc.util.Strings;
 import caliniya.armavoke.base.tool.Ar;
 
 /** 统计值单元 */
@@ -27,6 +30,12 @@ public class StatData {
 
   /** 可选身份标签：区分内容相同（如同名能力）的条目；null 表示不参与匹配。 */
   public Object tag;
+
+  /** 动态数值源：非 null 时渲染端每帧经 {@link #getData()} 取最新值（静态条目保持 null）。 */
+  public @Nullable Floatp live;
+
+  /** 显示拼接缓冲（单线程：仅渲染路径使用；返回给 Label 后立即被复制消费）。 */
+  private final StringBuilder builder = new StringBuilder(64);
 
   // 分组的另一种解决方法
   // 自身作为分组标题，该分组所属的内容 直接加入到自身
@@ -218,6 +227,32 @@ public class StatData {
   public void each(Cons<StatData> con) {
     con.get(this);
     datas.each(d -> d.each(con));
+  }
+
+  /**
+   * 统一取显示文本：静态条目直接返回 data；动态条目（live 非 null）先按最新值就地刷新
+   * （{@link #set} 自带值未变短路，零分配），再把最新文本交给渲染端。
+   */
+  public CharSequence getData() {
+    if (live != null) {
+      set(live.get(), valueMax);
+    }
+    // 有最大值的数值条目：用 StringBuilder 组装「值 / 最大 (百分比)」，缓冲复用、零中间对象
+    if (stat != null && unit != null && valueMax > 0f) {
+      builder.setLength(0);
+      builder
+          .append(indent())
+          .append(stat.localizedName)
+          .append(": ")
+          .append(unit.format(value))
+          .append(" / ")
+          .append(unit.format(valueMax))
+          .append(" (")
+          .append(Strings.autoFixed(value / valueMax * 100f, 1))
+          .append("%)");
+      return builder;
+    }
+    return data;
   }
 
   public StatData setLevel(int level) {

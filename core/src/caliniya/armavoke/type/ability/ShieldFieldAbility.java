@@ -67,13 +67,8 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
   /** 当前破盾冷却剩余时间（秒）；0 = 不在冷却。 */
   public float cooldown;
 
-  /** 上报用格式化标题/描述（onCreate 时生成一次，避免每帧格式化分配）。 */
-  private String titleText, descText;
-
   @Override
   public ShieldFieldAbility onCreate(Entity e) {
-    titleText = Pal.format(Pal.light, localizedName);
-    descText = Pal.format(Pal.light, description);
     register();
     this.e = e;
     return (ShieldFieldAbility) super.onCreate(e);
@@ -229,8 +224,8 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void stats(StatStack stack) {
-    StatData group = StatData.with(Pal.format(Pal.light, localizedName), StatType.function);
-    group.add(StatData.with(Pal.format(Pal.light, description)).setLevel(1));
+    StatData group = StatData.with(localizedName, StatType.function);
+    group.add(StatData.with(description).setLevel(1));
 
     group
         .add(StatData.with(Stat.shieldMax, max))
@@ -254,9 +249,9 @@ public class ShieldFieldAbility extends Ability implements Shield, ForceField {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.get(titleText, StatType.function, this)
-        .get(descText).setLevel(1)
-        .get(Stat.shield, current, max).setLevel(2);
+    stat.get(this, localizedName)
+        .get(description).setLevel(1)
+        .get(Stat.shield, current, max).setLevel(2).live = () -> current;
   }
 
   @Override

@@ -4,7 +4,6 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.core.meta.stat.*;
-import caliniya.armavoke.core.meta.ui.Pal;
 
 /**
  * 过热能力：负责b>锁定</b>。热量由外部热源（武器/能力/模组）通过 {@code Entity.addHeat} 添加； 达到储热上限 → 锁定单位，热量归零后恢复。
@@ -25,12 +24,8 @@ public class HeatAbility extends Ability {
   /** 当前热量。 */
   public float heat;
 
-  /** 上报用格式化标题（onCreate 时生成一次，避免每帧格式化分配）。 */
-  private String titleText;
-
   @Override
   public Ability onCreate(Entity e) {
-    titleText = Pal.format(Pal.light, localizedName);
     e.heatSpeed = heatSpeed;
     e.heatable = true;
     e.heatMax = heatMax;
@@ -77,15 +72,15 @@ public class HeatAbility extends Ability {
   @Override
   public void stats(StatStack stack) {
     stack.add(
-        StatData.with(Pal.format(Pal.light, localizedName), StatType.function)
-            .add(StatData.with(Pal.format(Pal.light, description)).setLevel(1))
+        StatData.with(localizedName, StatType.function)
+            .add(StatData.with(description).setLevel(1))
             .add(StatData.with(Stat.heatMax, heatMax))
             .add(StatData.with(Stat.heatSpeed, heatSpeed)));
   }
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.get(titleText, StatType.function, this)
-        .get(Stat.heat, heat).setLevel(2);
+    stat.get(this, localizedName)
+        .get(Stat.heat, heat).setLevel(2).live = () -> heat;
   }
 }
