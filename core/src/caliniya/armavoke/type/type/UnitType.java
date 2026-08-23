@@ -38,6 +38,9 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
   // 单位的探测距离，位于此范围内的敌方会被标记出来(todo)，没有被标记的敌人仍然可以被攻击
   public float scanDistance = 200f;
 
+  /** 移动攻击接近目标后停止的距离。 */
+  public float engageRange = 150f;
+
   // 单位的容量，使用通用的模块规则
   public int itemCap = 50;
   public float liquidCap;

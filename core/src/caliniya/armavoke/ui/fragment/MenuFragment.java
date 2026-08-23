@@ -28,6 +28,7 @@ import caliniya.armavoke.ui.*;
 
 import static caliniya.armavoke.base.type.EventType.*;
 import caliniya.armavoke.ui.windows.DataWindow;
+import caliniya.armavoke.world.blocks.produce.unit.FactoryBuild;
 
 public class MenuFragment {
 
@@ -110,6 +111,13 @@ public class MenuFragment {
                         Building enemyTurret =
                             WorldData.world.setBuilding(
                                 centerX, centerY, Blocks.testTurret, TeamTypes.Mutex);
+
+                        Building playerFactory =
+                            WorldData.world.setBuilding(
+                                centerX - 12, centerY, Blocks.unitFactory, TeamTypes.Evoke);
+                        if (playerFactory instanceof FactoryBuild factory) {
+                          factory.item.addItem(Items.Ge, 100);
+                        }
 
                         RouteData.init();
                         ObjectMap<String, String> tag = new ObjectMap<String, String>();

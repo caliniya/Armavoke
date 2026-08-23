@@ -15,10 +15,17 @@ import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.data.CommandData;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.*;
+import caliniya.armavoke.type.ai.UnitAI;
+import caliniya.armavoke.type.Building;
+import caliniya.armavoke.ui.windows.FactoryMenuWindow;
+import caliniya.armavoke.world.blocks.produce.unit.FactoryBuild;
 
 public class UnitControl implements InputProcessor, GestureListener {
 
-  public boolean b = false;
+  private static final float selectRadius = 100f;
+  private static final float dragThreshold = 8f;
+  private float downX, downY;
+  private boolean dragged;
 
   public UnitControl init() {
     return this;
@@ -26,27 +33,25 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   @Override
   public boolean tap(float x, float y, int count, KeyCode button) {
-    if (!Core.app.isMobile()) return false;
-    // 使用全局指挥状态判断
-    if (!CommandData.commanding) return false;
+    if (!CommandData.commanding) return openFactory(x, y);
+    if (dragged) {
+      dragged = false;
+      return true;
+    }
 
     Vec2 worldPos = Core.camera.unproject(x, y);
     float wx = worldPos.x;
     float wy = worldPos.y;
 
-    b = false;
-
-    CommandData.findUnit(
-        wx,
-        wy,
-        t -> {
-          if (t == null) return;
-          toggleUnitSelection(t);
-        });
-
-    if (b) {
-      // 选中变化，刷新指挥面板
+    Unit clicked = CommandData.findUnitAt(wx, wy, selectRadius);
+    if (clicked != null && clicked.team == Game.team) {
+      CommandData.select(clicked);
       UI.hud.refreshCommand();
+      return true;
+    }
+
+    if (clicked != null && clicked.team != Game.team && !CommandData.checkedUnits.isEmpty()) {
+      issueAttackCommand(clicked);
       return true;
     }
 
@@ -66,30 +71,22 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   /** 让选中单位立即停下（清目标/速度/寻路）。 */
   private void stopUnits() {
-    synchronized (WorldData.moveunits) {
-      for (Unit u : CommandData.checkedUnits) {
-        if (u == null) continue;
-        u.speedX = 0;
-        u.speedY = 0;
-        u.targetX = u.x;
-        u.targetY = u.y;
-        u.path = null;
-        u.pathed = false;
-        WorldData.moveunits.remove(u);
-      }
+    for (Unit u : CommandData.checkedUnits) {
+      if (u != null && u.ai != null) u.ai.stop();
     }
   }
 
-  private void toggleUnitSelection(Unit u) {
-    // 直接操作全局列表
-    if (CommandData.checkedUnits.contains(u)) {
-      u.isSelected = false;
-      CommandData.checkedUnits.remove(u);
-    } else {
-      u.isSelected = true;
-      CommandData.checkedUnits.add(u);
+  private boolean openFactory(float screenX, float screenY) {
+    if (WorldData.world == null) return false;
+    Vec2 worldPos = Core.camera.unproject(screenX, screenY);
+    int tileX = (int) (worldPos.x / WorldData.TILE_SIZE);
+    int tileY = (int) (worldPos.y / WorldData.TILE_SIZE);
+    Building building = WorldData.world.getBuilding(tileX, tileY);
+    if (building instanceof FactoryBuild factory && building.team == Game.team) {
+      new FactoryMenuWindow(factory).build();
+      return true;
     }
-    b = true;
+    return false;
   }
 
   /** 下达移动指令 */
@@ -105,15 +102,43 @@ public class UnitControl implements InputProcessor, GestureListener {
         Unit u = CommandData.checkedUnits.get(i);
         if (u == null || u.health <= 0) continue;
 
-        u.targetX = tx;
-        u.targetY = ty;
+        if (u.ai != null) u.ai.moveTo(tx, ty);
 
         if (!WorldData.moveunits.array.contains(u)) {
           WorldData.moveunits.add(u);
         }
-        u.pathed = false;
       }
     }
+  }
+
+  private void issueAttackCommand(Unit enemy) {
+    for (Unit unit : CommandData.checkedUnits) {
+      if (unit != null && unit.health > 0f && unit.ai != null) {
+        unit.ai.attack(enemy);
+      }
+    }
+  }
+
+  private void finishBoxSelection() {
+    Vec2 first =
+        Core.camera.unproject(new Vec2(CommandData.boxStartX, CommandData.boxStartY));
+    Vec2 second = Core.camera.unproject(new Vec2(CommandData.boxEndX, CommandData.boxEndY));
+    float minX = Math.min(first.x, second.x);
+    float minY = Math.min(first.y, second.y);
+    float maxX = Math.max(first.x, second.x);
+    float maxY = Math.max(first.y, second.y);
+
+    Ar<Unit> selected = new Ar<>();
+    WorldData.units.intersect(
+        minX,
+        minY,
+        maxX - minX,
+        maxY - minY,
+        unit -> {
+          if (unit != null && unit.health > 0f && unit.team == Game.team) selected.add(unit);
+        });
+    CommandData.replaceSelection(selected);
+    UI.hud.refreshCommand();
   }
 
   private boolean isSolidAtWorldPos(float wx, float wy) {
@@ -145,12 +170,27 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   @Override
   public boolean pan(float x, float y, float dx, float dy) {
-    return false;
+    if (!CommandData.commanding || !CommandData.boxSelect) return false;
+    if (!CommandData.boxDragging) {
+      CommandData.boxDragging = true;
+      CommandData.boxStartX = downX;
+      CommandData.boxStartY = downY;
+    }
+    CommandData.boxEndX = x;
+    CommandData.boxEndY = y;
+    dragged =
+        Mathf.dst(CommandData.boxStartX, CommandData.boxStartY, x, y) >= dragThreshold;
+    return true;
   }
 
   @Override
   public boolean panStop(float x, float y, int pointer, KeyCode button) {
-    return false;
+    if (!CommandData.boxDragging) return false;
+    CommandData.boxEndX = x;
+    CommandData.boxEndY = y;
+    if (dragged) finishBoxSelection();
+    CommandData.boxDragging = false;
+    return true;
   }
 
   @Override
@@ -160,7 +200,15 @@ public class UnitControl implements InputProcessor, GestureListener {
 
   @Override
   public boolean touchDown(float x, float y, int pointer, KeyCode button) {
-    return false;
+    if (!CommandData.commanding || !CommandData.boxSelect) return false;
+    downX = x;
+    downY = y;
+    dragged = false;
+    CommandData.boxStartX = x;
+    CommandData.boxStartY = y;
+    CommandData.boxEndX = x;
+    CommandData.boxEndY = y;
+    return true;
   }
 
   @Override

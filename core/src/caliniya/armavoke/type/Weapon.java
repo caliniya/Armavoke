@@ -1,6 +1,7 @@
 package caliniya.armavoke.type;
 
 import arc.math.Angles;
+import arc.math.Mathf;
 import arc.util.Time;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.game.*;
@@ -72,7 +73,10 @@ public class Weapon {
     }
 
     // 射击判定 - 提前检查目标有效性
-    if (target == null || target.health < 0f || reloadTimer > 0) {
+    if (target == null
+        || target.health <= 0f
+        || reloadTimer > 0
+        || Mathf.dst2(wx, wy, target.x, target.y) > type.range * type.range) {
       return;
     }
 
@@ -88,7 +92,8 @@ public class Weapon {
       // 判定标准：单位的绝对朝向是否对准了目标的绝对角度
       // owner.rotation + 90 代表单位正前方的绝对角度
       float unitFacing = owner.rotation + 90;
-      canShoot = Angles.within(unitFacing, owner.angleToTarget, type.shootCone);
+      float fixedTargetAngle = Angles.angle(wx, wy, target.x, target.y);
+      canShoot = Angles.within(unitFacing, fixedTargetAngle, type.shootCone);
       // 射击角度 = 单位正前方
       shootAngle = unitFacing;
     }

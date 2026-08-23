@@ -1,5 +1,6 @@
 package caliniya.armavoke.type;
 
+import caliniya.armavoke.base.effect.Fx;
 import arc.util.*;
 import arc.math.*;
 import arc.util.io.*;
@@ -22,6 +23,7 @@ import caliniya.armavoke.game.data.*;
 import caliniya.armavoke.type.type.*;
 import caliniya.armavoke.base.game.*;
 import caliniya.armavoke.type.module.*;
+import caliniya.armavoke.type.ai.UnitAI;
 
 public class Unit extends Entity {
 
@@ -30,6 +32,13 @@ public class Unit extends Entity {
 
   public Ar<Weapon> weapons = new Ar<>();
   public Weapon mainFixedWeapon = null;
+
+  /** 自动索敌目标与指挥移动攻击目标互相独立。 */
+  public volatile Entity attackTarget;
+  public UnitAI ai;
+
+  /** 后台索敌节流计时，15 tick 约等于 0.25 秒。 */
+  public volatile float scanCooldown;
 
   // --- 物理属性 ---
   public volatile float speedX, speedY, angle;
@@ -49,6 +58,7 @@ public class Unit extends Entity {
   public int pathIndex = 0;
   public boolean pathed;
   public boolean velocityDirty = true;
+  public int routeVersion = -1;
 
   // --- 状态属性 ---
   public boolean isSelected = false;
@@ -146,6 +156,15 @@ public class Unit extends Entity {
       }
     }
 
+    if (ai == null) {
+      ai = new UnitAI(this);
+    } else {
+      ai.reset();
+    }
+    attackTarget = null;
+    scanCooldown = 0f;
+    routeVersion = -1;
+
     this.rotation = 0f;
     this.speedX = 0f;
     this.speedY = 0f;
@@ -201,11 +220,16 @@ public class Unit extends Entity {
     this.hitboxData = null;
 
     this.pathFindCooldown = 0;
+    this.scanCooldown = 0f;
+    this.routeVersion = -1;
+    this.attackTarget = null;
+    if (ai != null) ai.reset();
     if (path != null) path.clear();
   }
 
   @Override
   public void kill() {
+    Fx.destroy.at(x, y, rotation, this);
     remove();
   }
 
@@ -246,6 +270,8 @@ public class Unit extends Entity {
 
     if (locked) return;
 
+    if (ai != null) ai.update(dt);
+
     float oldX = this.x;
     float oldY = this.y;
     float oldRot = this.rotation;
@@ -269,20 +295,17 @@ public class Unit extends Entity {
       angleToTarget = Angles.angle(x, y, targetX, targetY);
     }
 
-    if (canShoot) {
-      if (mainFixedWeapon != null && distToTarget > 1f) {
-        rotation = Angles.moveToward(rotation, angleToTarget - 90, rotationSpeed * dt);
-      } else {
-        if (Mathf.len(speedX, speedY) > 0.01f && distToTarget > 1f) {
-          rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
-        }
-      }
-    } else {
-      if (Mathf.len(speedX, speedY) > 0.01f) {
-        rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
-      }
-      type.update(this, dt);
+    Entity fixedTarget = mainFixedWeapon == null ? null : mainFixedWeapon.target;
+    if (canShoot
+        && (ai == null || ai.canTarget())
+        && fixedTarget != null
+        && fixedTarget.health > 0f) {
+      float targetRotation = Angles.angle(x, y, fixedTarget.x, fixedTarget.y) - 90f;
+      rotation = Angles.moveToward(rotation, targetRotation, rotationSpeed * dt);
+    } else if (Mathf.len(speedX, speedY) > 0.01f) {
+      rotation = Angles.moveToward(rotation, angle - 90, rotationSpeed * dt);
     }
+    type.update(this, dt);
 
     moving = (x != oldX || y != oldY);
     boolean rotated = !Mathf.equal(rotation, oldRot);
@@ -356,7 +379,7 @@ public class Unit extends Entity {
 
     for (Weapon weapon : weapons) {
       // 过热锁定期间无法射击
-      weapon.update(dt, canShoot && !overheated());
+      weapon.update(dt, canShoot && !overheated() && (ai == null || ai.canTarget()));
     }
   }
 
@@ -466,6 +489,9 @@ public class Unit extends Entity {
     this.path = null;
     this.pathIndex = 0;
     this.pathed = false;
+    this.routeVersion = -1;
+    this.scanCooldown = 0f;
+    this.attackTarget = null;
     this.velocityDirty = true;
     Entities.add(this);
     WorldData.moveunits.add(this);

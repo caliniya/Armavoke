@@ -7,12 +7,14 @@ import arc.scene.actions.Actions;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.scene.Element;
 import arc.scene.event.Touchable;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import caliniya.armavoke.core.meta.ui.Pal;
 import caliniya.armavoke.type.Unit;
+import caliniya.armavoke.type.ai.UnitAI;
 import arc.util.Align;
 import arc.util.Log;
 import caliniya.armavoke.base.type.EventType;
@@ -35,6 +37,7 @@ public class HUDFragment {
   private Table commandPanel;
   private Table unitInfoTable;
   private Button moveBtn, stopBtn;
+  private Button boxSelectBtn, guardBtn, combatBtn, holdFireBtn;
   private Element healthBarElement; // 复用的血条元素
   private Element energyBarElement; // 复用的能量条元素
   private Element heatBarElement; // 复用的热量条元素
@@ -48,6 +51,7 @@ public class HUDFragment {
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     Core.scene.root.addChild(root);
+    addSelectionOverlay();
 
     a = new Table().top().left();
     b = new Table().bottom().left();
@@ -129,6 +133,14 @@ public class HUDFragment {
     topRow.left().top();
     topRow.add(new Button("指挥信息", () -> new CommandInfoWindow().build()));
     topRow.add(new Button("清空", () -> clearSelection()));
+    boxSelectBtn =
+        new Button(
+            () -> {
+              CommandData.boxSelect = !CommandData.boxSelect;
+              boxSelectBtn.setChecked(CommandData.boxSelect);
+            },
+            "框选");
+    topRow.add(boxSelectBtn);
     commandPanel.add(topRow).growX().left();
     commandPanel.row();
     commandPanel.add().height(6f).row();
@@ -156,8 +168,12 @@ public class HUDFragment {
     Table stateRow = new Table();
     stateRow.defaults().size(70f, 40f).pad(3f);
     stateRow.left().bottom();
-    stateRow.button("待命", () -> Log.info("指令：原地待命（未实现）"));
-    stateRow.button("停火", () -> Log.info("指令：停火（未实现）"));
+    guardBtn = new Button("驻守", () -> setUnitState(UnitAI.State.Guard));
+    combatBtn = new Button("战斗", () -> setUnitState(UnitAI.State.Combat));
+    holdFireBtn = new Button("停火", () -> setUnitState(UnitAI.State.HoldFire));
+    stateRow.add(guardBtn);
+    stateRow.add(combatBtn);
+    stateRow.add(holdFireBtn);
     stateRow.button("全部开启", () -> toggleAllAbilities(true));
     stateRow.button("全部关闭", () -> toggleAllAbilities(false));
     commandPanel.add(stateRow).growX().left();
@@ -167,13 +183,17 @@ public class HUDFragment {
 
   /** 清空当前选中的单位列表。 */
   private void clearSelection() {
-    for (caliniya.armavoke.type.Unit u : CommandData.checkedUnits) {
-      if (u != null) u.isSelected = false;
-    }
-    CommandData.checkedUnits.clear();
+    CommandData.clearSelection();
     CommandData.commandType = CommandData.CommandType.Move; // 恢复默认移动模式
     moveBtn.setChecked(true);
     stopBtn.setChecked(false);
+    refreshCommand();
+  }
+
+  private void setUnitState(UnitAI.State state) {
+    for (Unit unit : CommandData.checkedUnits) {
+      if (unit != null && unit.ai != null) unit.ai.setState(state);
+    }
     refreshCommand();
   }
 
@@ -247,6 +267,48 @@ public class HUDFragment {
                 ? "[sky]停止指令中：点击执行[]"
                 : "[gray]无指令[]";
     unitInfoTable.add(cmdText).left().padTop(4f);
+    updateStateButtons();
+  }
+
+  private void updateStateButtons() {
+    if (guardBtn == null || combatBtn == null || holdFireBtn == null) return;
+    UnitAI.State state = null;
+    boolean same = !CommandData.checkedUnits.isEmpty();
+    for (Unit unit : CommandData.checkedUnits) {
+      if (unit == null || unit.ai == null) continue;
+      if (state == null) state = unit.ai.state;
+      else if (state != unit.ai.state) same = false;
+    }
+    guardBtn.setChecked(same && state == UnitAI.State.Guard);
+    combatBtn.setChecked(same && state == UnitAI.State.Combat);
+    holdFireBtn.setChecked(same && state == UnitAI.State.HoldFire);
+  }
+
+  private void addSelectionOverlay() {
+    Element overlay =
+        new Element() {
+          @Override
+          public void draw() {
+            if (root == null || !root.visible || !CommandData.boxDragging) return;
+            float x1 = CommandData.boxStartX;
+            float x2 = CommandData.boxEndX;
+            float y1 = Core.graphics.getHeight() - CommandData.boxStartY;
+            float y2 = Core.graphics.getHeight() - CommandData.boxEndY;
+            float minX = Math.min(x1, x2);
+            float minY = Math.min(y1, y2);
+            float width = Math.abs(x2 - x1);
+            float height = Math.abs(y2 - y1);
+
+            Draw.color(Color.sky, 0.18f);
+            Fill.rect(minX + width / 2f, minY + height / 2f, width, height);
+            Draw.color(Color.sky);
+            Lines.stroke(2f);
+            Lines.rect(minX, minY, width, height);
+            Draw.color();
+          }
+        };
+    overlay.touchable = Touchable.disabled;
+    Core.scene.root.addChild(overlay);
   }
 
   /** 整合血条元素（复用一个实例，绘制时读取 selectedUnit）。 */
@@ -387,6 +449,12 @@ public class HUDFragment {
   }
 
   private void updateRightPanel() {
+    if (!CommandData.commanding) {
+      CommandData.boxSelect = false;
+      CommandData.boxDragging = false;
+      if (boxSelectBtn != null) boxSelectBtn.setChecked(false);
+      clearSelection();
+    }
     rightContainer.clearChildren();
     Table currentPanel = CommandData.commanding ? commandPanel : buildingPanel;
     currentPanel.clearActions();

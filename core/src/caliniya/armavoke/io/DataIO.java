@@ -58,7 +58,18 @@ public class DataIO {
   }
 
   // 调用此方法来实现保存
-  public static void setSave(Fi file, @Nullable StringMap tags) {
+  public static synchronized void setSave(Fi file, @Nullable StringMap tags) {
+    if (Systems.EP == null || !Systems.EP.inited) {
+      Log.warn("Save ignored: EntityProces is not initialized");
+      return;
+    }
+    if (Systems.EP.task || Systems.EP.task2 || Systems.EP.task3) {
+      Log.warn("Save ignored: another save is still running");
+      return;
+    }
+    bos.reset();
+    data = null;
+    copyed = false;
     saveTarget = file;
     copy(tags);
   }

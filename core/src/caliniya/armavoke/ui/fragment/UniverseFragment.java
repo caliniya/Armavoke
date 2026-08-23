@@ -12,12 +12,16 @@ import caliniya.armavoke.base.type.EventType;
 import caliniya.armavoke.content.Stars;
 import caliniya.armavoke.campaign.Campaign;
 import caliniya.armavoke.core.UI;
+import caliniya.armavoke.core.Data;
 import caliniya.armavoke.game.Game;
 import caliniya.armavoke.game.data.ProgressData;
 import caliniya.armavoke.io.ProgressIO;
 import caliniya.armavoke.io.WorldIO;
 import caliniya.armavoke.ui.Button;
 import caliniya.armavoke.ui.windows.Window;
+import caliniya.armavoke.ui.windows.IoTestWindow;
+import caliniya.armavoke.ui.Styles;
+import caliniya.armavoke.world.stars.Universe;
 import caliniya.armavoke.world.stars.StarMap;
 import caliniya.armavoke.world.stars.StarNode;
 
@@ -25,12 +29,14 @@ import caliniya.armavoke.world.stars.StarNode;
 public class UniverseFragment {
 
   public Table root;
+  private Table nodePanel;
 
   public void build() {
     root = new Table();
     root.setFillParent(true);
     root.touchable = Touchable.childrenOnly;
     root.align(Align.topLeft);
+    Universe.clearSelection();
 
     Table btnGroup = new Table();
     btnGroup.defaults().width(140f).height(54f).pad(4f);
@@ -42,15 +48,77 @@ public class UniverseFragment {
     btnGroup.row();
     btnGroup.add(new Button("进度测试", () -> showProgressTest()));
     btnGroup.row();
+    btnGroup.add(new Button("IO 测试", () -> new IoTestWindow().build()));
+    btnGroup.row();
     btnGroup.add(new Button("关闭", () -> close()));
 
+    nodePanel = new Table();
+    nodePanel.background(Styles.background);
+    nodePanel.visible = false;
+
     root.add(btnGroup).left().top().align(Align.topLeft).get().align(Align.topLeft);
+    root.add().growX();
+    root.add(nodePanel).width(280f).right().top().pad(12f);
     Core.scene.root.addChild(root);
     Events.fire(EventType.events.EnterUV);
   }
 
+  /** 刷新星系节点详情；传入 null 时隐藏面板。 */
+  public void showNode(StarNode node) {
+    if (nodePanel == null) return;
+    nodePanel.clearChildren();
+    if (node == null) {
+      nodePanel.visible = false;
+      return;
+    }
+
+    nodePanel.visible = true;
+    ProgressData.MapProgress progress = Campaign.progress().get(node.mapName());
+    boolean unlocked = progress != null && progress.unlocked;
+    boolean completed = progress != null && progress.completed;
+
+    nodePanel.add("[light]" + node.localizedName + "[]").growX().left().pad(10f).row();
+    nodePanel.add("[gray]内部名: " + node.mapName() + "[]").left().pad(6f).row();
+    nodePanel
+        .add(unlocked ? "[green]已解锁[]" : "[red]未解锁[]")
+        .left()
+        .pad(6f)
+        .row();
+    nodePanel
+        .add(completed ? "[green]已通关[]" : "[gray]未通关[]")
+        .left()
+        .pad(6f)
+        .row();
+    nodePanel.add(new Button("进入", () -> enterNode(node))).growX().height(52f).pad(10f);
+  }
+
+  private void enterNode(StarNode node) {
+    String starName = Game.starMap != null && Game.starMap.name != null
+        ? Game.starMap.name
+        : Campaign.progress().currentStar;
+    if (starName == null || starName.isEmpty()) starName = "demo";
+    final String selectedStar = starName;
+    Fi file = Campaign.nodeMapFile(selectedStar, node);
+    if (!file.exists()) {
+      Log.warn("No map file for star node: @/@", selectedStar, node.mapName());
+      return;
+    }
+
+    Data.load(
+        file,
+        () -> {
+          Campaign.progress().currentStar = selectedStar;
+          Campaign.progress().getOrCreate(node.mapName()).unlocked = true;
+          Campaign.saveProgress();
+          UI.hud.showHUD();
+          Events.fire(EventType.events.ExitUV);
+          Log.info("Entered star node: @", node.mapName());
+        });
+  }
+
   private void close() {
     root.remove();
+    Universe.clearSelection();
     UI.hud.showHUD();
     UI.pauseWindow.window.visible = true;
     UI.pauseWindow.modalOverlay.visible = true;

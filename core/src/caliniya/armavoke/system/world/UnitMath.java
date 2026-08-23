@@ -37,10 +37,15 @@ public class UnitMath extends caliniya.armavoke.system.System<UnitMath> {
         continue;
       }
 
+      if (u.routeVersion != RouteData.version) {
+        u.pathed = false;
+      }
+
       // 路径请求
       if (!u.pathed) {
         boolean pathFound = calculatePath(u);
         u.pathed = true;
+        u.routeVersion = RouteData.version;
         
         if (!pathFound) continue;
       }
@@ -60,6 +65,16 @@ public class UnitMath extends caliniya.armavoke.system.System<UnitMath> {
     int tx = (int) (u.targetX / WorldData.TILE_SIZE);
     int ty = (int) (u.targetY / WorldData.TILE_SIZE);
 
+    Point2 reachable = RouteData.findNearestPassable(tx, ty, 2, 1, 8);
+    if (reachable == null) {
+      stopAndRemove(u);
+      return false;
+    }
+    tx = reachable.x;
+    ty = reachable.y;
+    u.targetX = tx * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
+    u.targetY = ty * WorldData.TILE_SIZE + WorldData.TILE_SIZE / 2f;
+
     // 如果已经在同一个格子，或者需要寻路
     if (sx != tx || sy != ty) {
       // 这里的 2, 1 暂时硬编码
@@ -76,7 +91,8 @@ public class UnitMath extends caliniya.armavoke.system.System<UnitMath> {
       u.pathIndex = 0;
     } else {
       // 起点终点重合，直接走直线，清空 path 让 vector 计算接管
-      if (u.path != null) u.path.clear();
+      if (u.path == null) u.path = new Ar<>();
+      else u.path.clear();
     }
     return true;
   }

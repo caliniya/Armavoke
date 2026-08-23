@@ -1,5 +1,6 @@
 package caliniya.armavoke.type.type;
 
+import caliniya.armavoke.base.effect.Fx;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.graphics.g2d.Draw;
@@ -76,6 +77,7 @@ public class BulletType {
 
   /** 命中单位时的回调 */
   public void hit(Bullet b, Entity target) {
+    Fx.hit.at(b.x, b.y, b.rotation, frontColor, target);
     target.hit(b);
   }
 

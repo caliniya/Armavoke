@@ -3,7 +3,9 @@ package caliniya.armavoke.system.render;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Camera;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import arc.math.geom.Rect;
 import arc.util.Log;
 import caliniya.armavoke.base.shaders.SpaceShader;
@@ -12,6 +14,8 @@ import caliniya.armavoke.core.Render;
 import caliniya.armavoke.game.Game;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.system.input.UniverseCameraInput;
+import caliniya.armavoke.world.stars.StarNode;
+import caliniya.armavoke.world.stars.Universe;
 
 /** 宇宙渲染 */
 public class UniverseRender extends System<UniverseRender> {
@@ -39,9 +43,21 @@ public class UniverseRender extends System<UniverseRender> {
     cam.update();
     background.render();
     Draw.proj(cam);
-    Game.starMap.draw(cam);
+    if (Game.starMap != null) {
+      Game.starMap.draw(cam);
+      drawHighlight(Universe.hoverNode, Color.sky, 2f, 8f);
+      drawHighlight(Universe.selectedNode, Color.gold, 3f, 14f);
+    }
     //Game.starMap.roadSet.each(r -> r.draw());
     Draw.proj(Core.camera);
+  }
+
+  private void drawHighlight(StarNode node, Color color, float stroke, float padding) {
+    if (node == null) return;
+    Draw.color(color);
+    Lines.stroke(stroke);
+    Lines.circle(node.x, node.y, node.size / 2f + padding);
+    Draw.color();
   }
 
   @Override

@@ -23,6 +23,9 @@ public class RouteData {
   public static int W, H;
   public static NavLayer[] layers;
 
+  /** 障碍数据版本；移动单位用它判断现有路径是否需要重算。 */
+  public static volatile int version;
+
   // 用于增量更新的锁
   public static final Object updateLock = new Object();
 
@@ -67,6 +70,7 @@ public class RouteData {
       calcClearanceFull(layers[cap]);
       updateSizeMapsFull(layers[cap]);
     }
+    version++;
   }
 
   /** 动态更新某个方块的状态 自动处理级联腐蚀和局部距离场重算 */
@@ -110,6 +114,7 @@ public class RouteData {
           updateRegion(curr, minX, minY, maxX, maxY);
         }
       }
+      version++;
     }
   }
 
@@ -121,6 +126,7 @@ public class RouteData {
     synchronized (updateLock) {
       Building build = WorldData.world.getBuilding(bx, by);
       if (build == null) return;
+      final boolean[] changedAny = {false};
 
       // 遍历建筑占据的所有坐标，全部标记为空
       build.getOccupiedCoords(
@@ -130,6 +136,7 @@ public class RouteData {
               int idx = coordToIndex(tx, ty);
               if (l0.baseSolidMap[idx]) {
                 l0.baseSolidMap[idx] = false;
+                changedAny[0] = true;
                 updateRegion(l0, tx, ty, tx, ty);
               }
             }
@@ -166,6 +173,7 @@ public class RouteData {
           updateRegion(curr, uminX, uminY, umaxX, umaxY);
         }
       }
+      if (changedAny[0]) version++;
     }
   }
 
@@ -178,6 +186,7 @@ public class RouteData {
 
       NavLayer l0 = layers[0];
       int[] minX = {W}, maxX = {0}, minY = {H}, maxY = {0};
+      boolean changedAny = false;
 
       // 遍历方块占据的所有坐标，批量标记实心
       if (block.shapeOffsets != null) {
@@ -186,7 +195,10 @@ public class RouteData {
           int ty = y + block.shapeOffsets[i + 1];
           if (isValid(tx, ty)) {
             int idx = coordToIndex(tx, ty);
-            l0.baseSolidMap[idx] = true;
+            if (!l0.baseSolidMap[idx]) {
+              l0.baseSolidMap[idx] = true;
+              changedAny = true;
+            }
             if (tx < minX[0]) minX[0] = tx;
             if (tx > maxX[0]) maxX[0] = tx;
             if (ty < minY[0]) minY[0] = ty;
@@ -200,7 +212,11 @@ public class RouteData {
             int tx = x + dx;
             int ty = y + dy;
             if (isValid(tx, ty)) {
-              l0.baseSolidMap[coordToIndex(tx, ty)] = true;
+              int idx = coordToIndex(tx, ty);
+              if (!l0.baseSolidMap[idx]) {
+                l0.baseSolidMap[idx] = true;
+                changedAny = true;
+              }
             }
           }
         }
@@ -209,6 +225,8 @@ public class RouteData {
         minY[0] = Math.max(0, y);
         maxY[0] = Math.min(H - 1, y + s - 1);
       }
+
+      if (!changedAny) return;
 
       // 一次性更新距离场 (包围盒范围)
       updateRegion(l0, minX[0], minY[0], maxX[0], maxY[0]);
@@ -238,6 +256,34 @@ public class RouteData {
           updateRegion(curr, uminX, uminY, umaxX, umaxY);
         }
       }
+      version++;
+    }
+  }
+
+  /** 在目标格被占用时，寻找附近最近的可通行格。 */
+  public static Point2 findNearestPassable(
+      int tx, int ty, int unitSize, int capability, int maxRadius) {
+    synchronized (updateLock) {
+      capability = Mathf.clamp(capability, 0, MAX_CAPABILITY);
+      NavLayer layer = layers[capability];
+      if (isPassable(layer, tx, ty, unitSize)) return new Point2(tx, ty);
+
+      for (int radius = 1; radius <= maxRadius; radius++) {
+        int minX = tx - radius;
+        int maxX = tx + radius;
+        int minY = ty - radius;
+        int maxY = ty + radius;
+
+        for (int x = minX; x <= maxX; x++) {
+          if (isPassable(layer, x, minY, unitSize)) return new Point2(x, minY);
+          if (isPassable(layer, x, maxY, unitSize)) return new Point2(x, maxY);
+        }
+        for (int y = minY + 1; y < maxY; y++) {
+          if (isPassable(layer, minX, y, unitSize)) return new Point2(minX, y);
+          if (isPassable(layer, maxX, y, unitSize)) return new Point2(maxX, y);
+        }
+      }
+      return null;
     }
   }
 

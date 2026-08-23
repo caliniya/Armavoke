@@ -1,5 +1,6 @@
 package caliniya.armavoke.type;
 
+import caliniya.armavoke.base.effect.Fx;
 import arc.func.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -121,6 +122,7 @@ public class Building extends Entity {
 
   @Override
   public void kill() {
+    Fx.destroy.at(x, y, 0f, this);
     remove();
   }
 

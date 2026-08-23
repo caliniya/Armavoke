@@ -49,8 +49,8 @@ public class Contents {
     Floors.load();
     ENVBlocks.load();
     items = getByType(CType.Item).toArray(ItemType.class);
-    Blocks.load();
     UnitTypes.load();
+    Blocks.load();
     Enhancements.load();
     Stars.load();
     for (Ar<ContentType> types : contentByTypes) {

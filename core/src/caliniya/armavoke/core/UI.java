@@ -17,6 +17,21 @@ import static arc.Core.scene;
 import static arc.Core.graphics;
 
 public class UI {
+  public enum View {
+    Menu,
+    Map,
+    Universe
+  }
+
+  public static View currentView = View.Menu;
+
+  static {
+    arc.Events.run(
+        caliniya.armavoke.base.type.EventType.events.EnterUV,
+        () -> currentView = View.Universe);
+    arc.Events.run(
+        caliniya.armavoke.base.type.EventType.events.ExitUV, () -> currentView = View.Map);
+  }
 
   public static float scl;
 
@@ -52,6 +67,7 @@ public class UI {
   }
 
   public static void Menu() {
+    currentView = View.Menu;
     scene.clear();
     menu.build();
     Debug();
@@ -81,6 +97,7 @@ public class UI {
   }
 
   public static void Game() {
+    currentView = View.Map;
     scene.clear();
     hud.build();
     Debug();

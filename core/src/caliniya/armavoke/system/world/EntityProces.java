@@ -8,6 +8,7 @@ import caliniya.armavoke.io.*;
 import arc.math.Mathf;
 import arc.util.Log;
 import caliniya.armavoke.type.*;
+import caliniya.armavoke.game.Entities;
 import caliniya.armavoke.game.data.WorldData;
 import caliniya.armavoke.system.System;
 import caliniya.armavoke.type.Weapon;
@@ -49,12 +50,39 @@ public class EntityProces extends System<EntityProces> {
         u -> {
           if (u == null) return;
 
+          boolean canTarget = u.ai == null || u.ai.canTarget();
+          if (!canTarget) {
+            u.target = null;
+          } else {
+            if (u.scanCooldown > 0f) u.scanCooldown -= 1f;
+
+            boolean targetInvalid =
+                u.target == null
+                    || u.target.health <= 0f
+                    || u.target.team == u.team
+                    || Mathf.dst2(u.x, u.y, u.target.x, u.target.y)
+                        > u.type.scanDistance * u.type.scanDistance;
+            if (targetInvalid) u.target = null;
+
+            if (u.target == null && u.scanCooldown <= 0f) {
+              u.scanCooldown = 15f;
+              Entities.closestEnemy(
+                  u.team,
+                  u.x,
+                  u.y,
+                  u.type.scanDistance,
+                  enemy -> u.target = enemy);
+            }
+          }
+
           for (Weapon w : u.weapons) {
 
             float wx = u.x + w.type.x;
             float wy = u.y + w.type.y;
 
-            if (w.rotate) {
+            if (!canTarget) {
+              w.target = null;
+            } else if (w.rotate) {
               // 旋转武器（炮塔）：独立锁敌
               // 目标失效 或 超出射程 → 重搜
               if (w.target == null
