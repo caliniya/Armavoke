@@ -95,6 +95,8 @@ public final class GameComponents {
 
   @Component(name = "Bullet", updateBy = "bullet", requires = {Position.class, Team.class})
   public static final class Bullet {
+    public int legacyId;
+
     public float damage;
 
     @FieldOpt(defaultValue = "1f")
@@ -111,6 +113,8 @@ public final class GameComponents {
 
   @Component(name = "Building")
   public static final class Building {
+    public int legacyId;
+
     @FieldOpt(defaultValue = "-1")
     public int blockId;
 
@@ -120,6 +124,8 @@ public final class GameComponents {
 
   @Component(name = "Unit")
   public static final class Unit {
+    public int legacyId;
+
     @FieldOpt(defaultValue = "-1")
     public int unitTypeId;
 

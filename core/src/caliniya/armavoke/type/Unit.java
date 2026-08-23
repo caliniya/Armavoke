@@ -252,6 +252,13 @@ public class Unit extends Entity {
 
   @Override
   public void update(float dt) {
+    updateEcsGeneral(dt);
+    updateEcsAi(dt);
+    updateEcsMovement(dt);
+  }
+
+  /** Main-thread component phase: combat resources, abilities and knockback. */
+  public void updateEcsGeneral(float dt) {
     // 击退冲量：复制副本 → 施加位移 → 平滑衰减（写回共享字段）
     float kx = knockX, ky = knockY;
     if (kx != 0f || ky != 0f) {
@@ -267,11 +274,17 @@ public class Unit extends Entity {
       updateHitbox();
     }
     updateBase(dt);
+  }
 
+  /** AI component phase. */
+  public void updateEcsAi(float dt) {
     if (locked) return;
-
     if (ai != null) ai.update(dt);
+  }
 
+  /** Movement component phase: integrates velocity, rotation and hitboxes. */
+  public void updateEcsMovement(float dt) {
+    if (locked) return;
     float oldX = this.x;
     float oldY = this.y;
     float oldRot = this.rotation;

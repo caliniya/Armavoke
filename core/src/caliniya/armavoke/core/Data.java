@@ -61,7 +61,6 @@ public class Data {
         new Render(),
         Systems.MR,
         Systems.UR,
-        Systems.GP,
         Systems.BR,
         Systems.UV,
         Systems.FX,
@@ -80,6 +79,7 @@ public class Data {
 
     Systems.systems.sort();
 
+    Systems.GP.init();
     Systems.BP.init();
     Systems.UM.init();
     Systems.EP.init();

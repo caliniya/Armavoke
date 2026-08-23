@@ -1,10 +1,18 @@
 package caliniya.armavoke.ecs.runtime;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class EcsWorld {
+  private static final int serializationVersion = 1;
   private static final EcsEntity[] empty = new EcsEntity[0];
 
   private final EcsRegistry registry;
@@ -71,6 +79,56 @@ public final class EcsWorld {
 
   public int size() {
     return snapshot.length;
+  }
+
+  public synchronized void write(DataOutput output) throws IOException {
+    output.writeInt(serializationVersion);
+    int count = 0;
+    for (EcsEntity entity : snapshot) {
+      EcsRegistry.EntityConfig config = registry.entity(entity.entityType());
+      if (config != null && config.serializable && entity.active()) count++;
+    }
+    output.writeInt(count);
+    for (EcsEntity entity : snapshot) {
+      EcsRegistry.EntityConfig config = registry.entity(entity.entityType());
+      if (config == null || !config.serializable || !entity.active()) continue;
+      ByteArrayOutputStream bytes = new ByteArrayOutputStream(512);
+      try (DataOutputStream entityOutput = new DataOutputStream(bytes)) {
+        entity.write(entityOutput);
+      }
+      byte[] payload = bytes.toByteArray();
+      output.writeUTF(entity.entityType());
+      output.writeInt(payload.length);
+      output.write(payload);
+    }
+  }
+
+  public synchronized void read(DataInput input) throws IOException {
+    int version = input.readInt();
+    if (version != serializationVersion) {
+      throw new IOException("Unsupported ECS world version: " + version);
+    }
+    int count = input.readInt();
+    if (count < 0 || count > 1_000_000) throw new IOException("Invalid ECS entity count: " + count);
+    clear();
+    for (int i = 0; i < count; i++) {
+      String type = input.readUTF();
+      int length = input.readInt();
+      if (length < 0 || length > 64 * 1024 * 1024) {
+        throw new IOException("Invalid ECS entity payload: " + length);
+      }
+      byte[] payload = new byte[length];
+      input.readFully(payload);
+      EcsRegistry.EntityConfig config = registry.entity(type);
+      if (config == null || !config.serializable) continue;
+      EcsEntity entity = config.factory.get();
+      try (DataInputStream entityInput =
+          new DataInputStream(new ByteArrayInputStream(payload))) {
+        entity.read(entityInput);
+      }
+      add(entity);
+    }
+    EcsBuffers.prepare(snapshot);
   }
 
   private void rebuildSnapshot() {

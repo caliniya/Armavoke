@@ -7,49 +7,107 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/** Deterministic ECS scheduler with thread-group dispatch and frame barriers. */
 public final class EcsScheduler extends System<EcsScheduler> {
-  private final Map<String, ThreadRunner> background = new LinkedHashMap<>();
+  private final Map<String, GroupRunner> groups = new LinkedHashMap<>();
   private EcsRegistry registry;
   private EcsWorld world;
-  private List<EcsRegistry.SystemConfig> mainSystems = List.of();
+  private List<EcsRegistry.SystemConfig> orderedSystems = List.of();
   private long tick;
 
   @Override
   public EcsScheduler init() {
+    if (inited) return this;
     index = 8;
     registry = EcsRegistry.loadGenerated();
     world = new EcsWorld(registry);
-    for (EcsRegistry.SystemConfig config : registry.systems()) {
-      config.system.initialize(world);
-    }
+    GameEcsBridge.attach(world);
+    orderedSystems = registry.orderedSystems();
+    for (EcsRegistry.SystemConfig config : orderedSystems) config.system.initialize(world);
     for (EcsRegistry.ThreadConfig thread : registry.threads()) {
-      List<EcsRegistry.SystemConfig> group = registry.systemsForThread(thread.name);
-      if (thread.name.equals("main")) {
-        mainSystems = group;
-      } else {
-        background.put(thread.name, new ThreadRunner(thread, group));
-      }
+      if (!thread.name.equals("main")) groups.put(thread.name, new GroupRunner(thread));
     }
     return super.init(false, true);
   }
 
   @Override
   public void update() {
+    update(Math.min(Time.delta, 4f));
+  }
+
+  @Override
+  public void update(float delta) {
     if (!inited || paused || world == null) return;
-    float delta = Math.min(Time.delta, 4f);
     long currentTick = ++tick;
-    for (EcsRegistry.SystemConfig config : mainSystems) {
-      if (currentTick % config.interval == 0L) execute(config, delta);
+    GameEcsBridge.beginFrame(world);
+    List<EcsRegistry.SystemConfig> due = new ArrayList<>();
+    for (EcsRegistry.SystemConfig config : orderedSystems) {
+      if (currentTick % config.interval == 0L) due.add(config);
     }
-    for (ThreadRunner runner : background.values()) runner.schedule(currentTick, delta);
+    for (List<EcsRegistry.SystemConfig> batch : batches(due)) {
+      EcsBuffers.prepare(world.snapshot());
+      executeBatch(batch, delta);
+      EcsBuffers.publish(world.snapshot());
+      GameEcsBridge.endBatch();
+    }
+  }
+
+  private List<List<EcsRegistry.SystemConfig>> batches(List<EcsRegistry.SystemConfig> systems) {
+    List<List<EcsRegistry.SystemConfig>> result = new ArrayList<>();
+    for (EcsRegistry.SystemConfig system : systems) {
+      if (system.thread.equals("main") || !system.parallel || result.isEmpty()) {
+        result.add(new ArrayList<>(List.of(system)));
+        continue;
+      }
+      List<EcsRegistry.SystemConfig> last = result.get(result.size() - 1);
+      boolean compatible = true;
+      for (EcsRegistry.SystemConfig existing : last) {
+        if (existing.thread.equals("main")
+            || !existing.parallel
+            || existing.conflicts(system)
+            || contains(system.after, existing.name)
+            || contains(existing.after, system.name)) {
+          compatible = false;
+          break;
+        }
+      }
+      if (compatible) last.add(system);
+      else result.add(new ArrayList<>(List.of(system)));
+    }
+    return result;
+  }
+
+  private void executeBatch(List<EcsRegistry.SystemConfig> batch, float delta) {
+    List<Future<?>> futures = new ArrayList<>();
+    for (EcsRegistry.SystemConfig config : batch) {
+      if (config.thread.equals("main")) {
+        execute(config, delta);
+      } else {
+        GroupRunner runner = groups.get(config.thread);
+        if (runner == null) {
+          Log.err("Missing ECS thread group: @", config.thread);
+          continue;
+        }
+        futures.add(runner.submit(() -> execute(config, delta)));
+      }
+    }
+    for (Future<?> future : futures) {
+      try {
+        future.get();
+      } catch (InterruptedException interrupted) {
+        Thread.currentThread().interrupt();
+        return;
+      } catch (Throwable error) {
+        Log.err("ECS worker failed", error);
+      }
+    }
   }
 
   private void execute(EcsRegistry.SystemConfig config, float delta) {
@@ -70,141 +128,78 @@ public final class EcsScheduler extends System<EcsScheduler> {
   }
 
   public float groupTps(String group) {
-    ThreadRunner runner = background.get(group);
+    GroupRunner runner = groups.get(group);
     return runner == null ? 0f : runner.smoothedTps;
   }
 
   @Override
   public void dispose() {
-    for (ThreadRunner runner : background.values()) runner.close();
-    background.clear();
+    for (GroupRunner runner : groups.values()) runner.close();
+    groups.clear();
     if (registry != null && world != null) {
-      for (EcsRegistry.SystemConfig config : registry.systems()) {
+      for (EcsRegistry.SystemConfig config : orderedSystems) {
         try {
           config.system.dispose(world);
         } catch (Throwable error) {
           Log.err("ECS system dispose failed: @", config.name, error);
         }
       }
+      GameEcsBridge.detach(world);
       world.clear();
     }
     super.dispose();
   }
 
-  private final class ThreadRunner {
-    private final EcsRegistry.ThreadConfig config;
-    private final List<EcsRegistry.SystemConfig> systems;
-    private final ExecutorService coordinator;
-    private final ExecutorService workers;
-    private final AtomicBoolean busy = new AtomicBoolean();
-    private long tpsWindow = java.lang.System.nanoTime();
-    private int completedTicks;
-    private float smoothedTps;
+  private static boolean contains(String[] values, String target) {
+    for (String value : values) if (value.equals(target)) return true;
+    return false;
+  }
 
-    ThreadRunner(
-        EcsRegistry.ThreadConfig config, List<EcsRegistry.SystemConfig> systems) {
+  private static final class GroupRunner {
+    private final EcsRegistry.ThreadConfig config;
+    private final ExecutorService executor;
+    private long window = java.lang.System.nanoTime();
+    private int completions;
+    private volatile float smoothedTps;
+
+    GroupRunner(EcsRegistry.ThreadConfig config) {
       this.config = config;
-      this.systems = systems;
-      coordinator =
-          Executors.newSingleThreadExecutor(
-              threadFactory("ECS-" + config.name + "-coordinator", config.priority));
-      workers =
+      executor =
           Executors.newFixedThreadPool(
               config.workers, threadFactory("ECS-" + config.name, config.priority));
     }
 
-    void schedule(long currentTick, float delta) {
-      if (systems.isEmpty() || !busy.compareAndSet(false, true)) return;
-      coordinator.execute(
+    Future<?> submit(Runnable runnable) {
+      return executor.submit(
           () -> {
             try {
-              List<EcsRegistry.SystemConfig> due = new ArrayList<>();
-              for (EcsRegistry.SystemConfig system : systems) {
-                if (currentTick % system.interval == 0L) due.add(system);
-              }
-              for (List<EcsRegistry.SystemConfig> batch : batches(due)) executeBatch(batch, delta);
-              updateTps();
+              runnable.run();
             } finally {
-              busy.set(false);
+              updateTps();
             }
           });
     }
 
-    private List<List<EcsRegistry.SystemConfig>> batches(
-        List<EcsRegistry.SystemConfig> due) {
-      List<List<EcsRegistry.SystemConfig>> result = new ArrayList<>();
-      for (EcsRegistry.SystemConfig system : due) {
-        if (!system.parallel || result.isEmpty()) {
-          result.add(new ArrayList<>(List.of(system)));
-          continue;
-        }
-        List<EcsRegistry.SystemConfig> last = result.get(result.size() - 1);
-        boolean compatible = true;
-        for (EcsRegistry.SystemConfig existing : last) {
-          if (!existing.parallel
-              || existing.conflicts(system)
-              || contains(system.after, existing.name)
-              || contains(existing.after, system.name)) {
-            compatible = false;
-            break;
-          }
-        }
-        if (compatible) last.add(system);
-        else result.add(new ArrayList<>(List.of(system)));
-      }
-      return result;
-    }
-
-    private void executeBatch(List<EcsRegistry.SystemConfig> batch, float delta) {
-      CountDownLatch latch = new CountDownLatch(batch.size());
-      for (EcsRegistry.SystemConfig system : batch) {
-        workers.execute(
-            () -> {
-              try {
-                execute(system, delta);
-              } finally {
-                latch.countDown();
-              }
-            });
-      }
-      try {
-        latch.await();
-      } catch (InterruptedException interrupted) {
-        if (config.interruptible) Thread.currentThread().interrupt();
-      }
-    }
-
-    private void updateTps() {
-      completedTicks++;
+    private synchronized void updateTps() {
+      completions++;
       long now = java.lang.System.nanoTime();
-      if (now - tpsWindow >= 1_000_000_000L) {
-        float measured = completedTicks;
+      if (now - window >= 1_000_000_000L) {
+        float measured = completions;
         smoothedTps = smoothedTps == 0f ? measured : smoothedTps * 0.8f + measured * 0.2f;
-        completedTicks = 0;
-        tpsWindow = now;
+        completions = 0;
+        window = now;
       }
     }
 
     void close() {
-      if (config.interruptible) {
-        coordinator.shutdownNow();
-        workers.shutdownNow();
-      } else {
-        coordinator.shutdown();
-        workers.shutdown();
-      }
+      if (config.interruptible) executor.shutdownNow();
+      else executor.shutdown();
       try {
-        coordinator.awaitTermination(100, TimeUnit.MILLISECONDS);
-        workers.awaitTermination(100, TimeUnit.MILLISECONDS);
+        executor.awaitTermination(200, TimeUnit.MILLISECONDS);
       } catch (InterruptedException interrupted) {
         Thread.currentThread().interrupt();
       }
     }
-  }
-
-  private static boolean contains(String[] values, String target) {
-    for (String value : values) if (value.equals(target)) return true;
-    return false;
   }
 
   private static ThreadFactory threadFactory(String prefix, int priority) {

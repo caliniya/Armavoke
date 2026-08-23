@@ -8,6 +8,7 @@ import arc.math.geom.QuadTree.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.type.TeamTypes;
 import caliniya.armavoke.game.data.*;
+import caliniya.armavoke.ecs.runtime.GameEcsBridge;
 import caliniya.armavoke.type.*;
 
 public class Entities {
@@ -63,12 +64,14 @@ public class Entities {
   public static void add(Building... entities) {
     if (entities == null || entities.length == 0) return;
     WorldData.buildings.add(entities);
+    for (Building entity : entities) GameEcsBridge.register(entity);
   }
 
   // 处理 Unit
   public static void add(Unit... entities) {
     if (entities == null || entities.length == 0) return;
     WorldData.units.add(entities);
+    for (Unit entity : entities) GameEcsBridge.register(entity);
   }
 
   /** 注销实体 */
@@ -76,12 +79,14 @@ public class Entities {
     if (units == null || units.length == 0) return;
 
     WorldData.units.remove(units);
+    for (Unit unit : units) GameEcsBridge.unregister(unit);
   }
 
   public static void remove(Building... bs) {
     if (bs == null || bs.length == 0) return;
 
     WorldData.buildings.remove(bs);
+    for (Building building : bs) GameEcsBridge.unregister(building);
   }
 
   /** 在指定范围内查找所有敌人实体 */

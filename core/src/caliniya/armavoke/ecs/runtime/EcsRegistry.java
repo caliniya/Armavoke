@@ -22,6 +22,7 @@ public final class EcsRegistry {
   private final Map<String, SystemConfig> systems = new LinkedHashMap<>();
   private final Map<String, EntityConfig> entities = new LinkedHashMap<>();
   private final Map<String, List<SystemConfig>> systemsByThread = new LinkedHashMap<>();
+  private List<SystemConfig> orderedSystems = List.of();
   private boolean frozen;
 
   public static EcsRegistry loadGenerated() {
@@ -66,7 +67,8 @@ public final class EcsRegistry {
 
   public synchronized void freeze() {
     if (frozen) return;
-    for (SystemConfig system : systems.values()) {
+    orderedSystems = Collections.unmodifiableList(sortSystems(new ArrayList<>(systems.values())));
+    for (SystemConfig system : orderedSystems) {
       if (!threads.containsKey(system.thread)) {
         throw new IllegalStateException(
             "System " + system.name + " references unknown thread " + system.thread);
@@ -74,7 +76,7 @@ public final class EcsRegistry {
       systemsByThread.computeIfAbsent(system.thread, ignored -> new ArrayList<>()).add(system);
     }
     for (Map.Entry<String, List<SystemConfig>> entry : systemsByThread.entrySet()) {
-      entry.setValue(Collections.unmodifiableList(sortSystems(entry.getValue())));
+      entry.setValue(Collections.unmodifiableList(entry.getValue()));
     }
     frozen = true;
   }
@@ -101,15 +103,17 @@ public final class EcsRegistry {
       Set<String> visiting,
       Set<String> visited,
       List<SystemConfig> output) {
-    if (!visited.add(config.name)) return;
-    if (!visiting.add(config.name)) {
+    if (visiting.contains(config.name)) {
       throw new IllegalStateException("Circular ECS system dependency: " + config.name);
     }
+    if (visited.contains(config.name)) return;
+    visiting.add(config.name);
     for (String dependency : config.after) {
       SystemConfig localDependency = local.get(dependency);
       if (localDependency != null) visit(localDependency, local, visiting, visited, output);
     }
     visiting.remove(config.name);
+    visited.add(config.name);
     output.add(config);
   }
 
@@ -131,6 +135,10 @@ public final class EcsRegistry {
 
   public List<SystemConfig> systemsForThread(String thread) {
     return systemsByThread.getOrDefault(thread, List.of());
+  }
+
+  public List<SystemConfig> orderedSystems() {
+    return orderedSystems;
   }
 
   public EntityConfig entity(String name) {

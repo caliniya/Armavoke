@@ -9,6 +9,7 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Time;
 import caliniya.armavoke.base.type.EventType;
+import caliniya.armavoke.ecs.runtime.GameEcsBridge;
 import caliniya.armavoke.system.System;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -27,8 +28,9 @@ public class Effects extends System<Effects> {
 
   static void emit(
       Effect effect, float x, float y, float rotation, Color color, Object data) {
-    pending.add(
-        new EffectContainer().set(ids.incrementAndGet(), effect, x, y, rotation, color, data));
+    int id = ids.incrementAndGet();
+    pending.add(new EffectContainer().set(id, effect, x, y, rotation, color, data));
+    GameEcsBridge.effectEmitted(id, effect, x, y, rotation);
   }
 
   @Override
@@ -95,5 +97,6 @@ public class Effects extends System<Effects> {
   public void clear() {
     pending.clear();
     active.clear();
+    GameEcsBridge.clearEffects();
   }
 }

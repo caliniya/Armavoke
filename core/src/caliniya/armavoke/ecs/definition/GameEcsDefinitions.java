@@ -59,6 +59,7 @@ public final class GameEcsDefinitions {
   @EntityDef(
       name = "bullet",
       generatedClass = "BulletEcsEntity",
+      serializable = false,
       components = {
         GameComponents.Position.class,
         GameComponents.Bullet.class,

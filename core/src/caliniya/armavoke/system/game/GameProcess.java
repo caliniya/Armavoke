@@ -1,22 +1,19 @@
 package caliniya.armavoke.system.game;
 
-import arc.util.*;
+import arc.util.Time;
 import caliniya.armavoke.base.game.Entity;
-import caliniya.armavoke.base.tool.*;
-import caliniya.armavoke.content.*;
-import caliniya.armavoke.core.*;
-import caliniya.armavoke.game.*;
-import caliniya.armavoke.type.*;
-import caliniya.armavoke.game.data.*;
-import caliniya.armavoke.system.*;
-import caliniya.armavoke.system.world.BulletProcess;
+import caliniya.armavoke.base.tool.Ar;
+import caliniya.armavoke.ecs.runtime.EcsGameRuntime;
+import caliniya.armavoke.system.Systems;
+import caliniya.armavoke.type.Building;
+import caliniya.armavoke.type.Unit;
 
-// 在这里进行主线程游戏内容的更新
+/** Compatibility facade. The ECS general system is the sole gameplay update entry point. */
+@Deprecated
 public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
-
   public Ar<Unit> deadUnits;
   public Ar<Building> deadBuildings;
-  public Ar<Entity> freshKilled; // 接收 BulletProcess 的即时击杀通知
+  public Ar<Entity> freshKilled;
 
   @Override
   public GameProcess init() {
@@ -29,51 +26,8 @@ public class GameProcess extends caliniya.armavoke.system.System<GameProcess> {
 
   @Override
   public void update() {
-    // 先处理 BulletProcess 线程刚击杀的实体（延迟最小化，防止血量变负才死）
-    Systems.BP.drainFreshKills(freshKilled);
-    for (Entity e : freshKilled) {
-      e.kill();
+    if (Systems.ECS != null && Systems.ECS.world() != null) {
+      EcsGameRuntime.updateGeneral(Systems.ECS.world(), Math.min(Time.delta, 4f));
     }
-    freshKilled.clear();
-
-    // 读锁遍历执行逻辑（update 只更新位置字段，不写四叉树，避免读锁内写锁死锁）
-    Ar<Unit> moved = new Ar<>();
-    WorldData.units.each(
-        u -> {
-          if (u == null) return;
-          if (u.health <= 0) {
-            deadUnits.add(u);
-            return;
-          } else {
-            u.update(Time.delta);
-            u.canShoot = true;
-            u.updateWeapons(Time.delta);
-            if (u.velocityDirty) moved.add(u);
-          }
-        });
-    // 对位置变化的单位逐个短暂写锁更新四叉树（写锁不长时间持有，读方几乎不阻塞）
-    for (Unit u : moved) {
-      WorldData.units.move(u, u.x, u.y);
-      u.velocityDirty = false;
-    }
-    for (Unit u : deadUnits) {
-      u.kill();
-    }
-    deadUnits.clear();
-
-    WorldData.buildings.each(
-        b -> {
-          if (b == null) return;
-          if (b.health <= 0) {
-            deadBuildings.add(b);
-            return;
-          } else {
-            b.update(Time.delta);
-          }
-        });
-    for (Building b : deadBuildings) {
-      b.kill();
-    }
-    deadBuildings.clear();
   }
 }

@@ -6,6 +6,7 @@ import arc.struct.StringMap;
 import arc.util.io.*;
 import arc.util.*;
 import caliniya.armavoke.system.*;
+import caliniya.armavoke.ecs.runtime.EcsPersistence;
 import java.io.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.type.*;
@@ -41,35 +42,21 @@ public class DataIO {
   // 线程会使用三次循环来写入地图数据和实体数据
   // 写入地图元数据
   public static void copy(@Nullable StringMap tags) {
-    w.b(GameIO.MAGIC.getBytes());
-    w.i(GameIO.SAVE_VERSION);
-    w.i(WorldData.world.W);
-    w.i(WorldData.world.H);
-
-    // --- Tags ---
-    if (tags == null) tags = new StringMap();
-    tags.put("space", String.valueOf(WorldData.world.space));
-    w.s(tags.size);
-    for (var entry : tags) {
-      w.str(entry.key);
-      w.str(entry.value);
+    if (!EcsPersistence.request(saveTarget, tags)) {
+      Log.warn("Save ignored: an ECS save is already running");
     }
-    Systems.EP.task = true;
   }
 
   // 调用此方法来实现保存
   public static synchronized void setSave(Fi file, @Nullable StringMap tags) {
-    if (Systems.EP == null || !Systems.EP.inited) {
-      Log.warn("Save ignored: EntityProces is not initialized");
+    if (Systems.ECS == null || !Systems.ECS.inited || Systems.ECS.world() == null) {
+      Log.warn("Save ignored: ECS is not initialized");
       return;
     }
-    if (Systems.EP.task || Systems.EP.task2 || Systems.EP.task3) {
+    if (EcsPersistence.isSaving()) {
       Log.warn("Save ignored: another save is still running");
       return;
     }
-    bos.reset();
-    data = null;
-    copyed = false;
     saveTarget = file;
     copy(tags);
   }
@@ -102,10 +89,11 @@ public class DataIO {
       }
       boolean isSpace = tags.getBool("space");
 
+      EcsPersistence.queueRestore(null);
       WorldData.initWorld(width, height, isSpace);
       GameIO.submitIo(
           () -> {
-            read(r, width, height);
+            read(r, in, width, height);
             Core.app.post(
                 () -> {
                   Data.loadSystems();
@@ -120,7 +108,7 @@ public class DataIO {
   }
 
   /** 读取存档：调色板 → 地图数据 → 单位 → 建筑 → 寻路初始化。 调用前 WorldData.world 必须已经通过 reBuildAll 初始化。 */
-  private static void read(Reads r, int width, int height) {
+  private static void read(Reads r, DataInputStream input, int width, int height) {
     // --- 调色板 ---
     int floorPaletteSize = r.s();
     Floor[] floorLookup = new Floor[floorPaletteSize];
@@ -178,6 +166,18 @@ public class DataIO {
         Log.warn("Unknown block type in save: @, skipping...", typeName);
         skipToEndMarker(r);
       }
+    }
+
+    try {
+      if (input.available() >= 8) {
+        int marker = r.i();
+        int length = r.i();
+        if (marker == EcsPersistence.sectionMarker && length >= 0 && length <= input.available()) {
+          EcsPersistence.queueRestore(r.b(length));
+        }
+      }
+    } catch (IOException error) {
+      Log.warn("ECS save section could not be read; using legacy entity data", error);
     }
   }
 

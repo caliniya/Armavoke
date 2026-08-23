@@ -13,6 +13,8 @@ import caliniya.armavoke.world.*;
 import arc.math.*;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.type.type.*;
+import caliniya.armavoke.ecs.runtime.EcsBulletRuntime;
+import caliniya.armavoke.ecs.runtime.GameEcsBridge;
 
 public class WorldData {
   public static World world;
@@ -32,6 +34,8 @@ public class WorldData {
 
   @SuppressWarnings("unchecked")
   public static void initWorld(int w, int h, boolean space) {
+    EcsBulletRuntime.clearAll();
+    GameEcsBridge.resetForWorld();
     Game.team = TeamTypes.Evoke;
 
     units = new EntityAr<>(unit -> unit.id);
@@ -62,9 +66,11 @@ public class WorldData {
   }
 
   public static void clear() {
+    EcsBulletRuntime.clearAll();
     if (units != null) units.clear(unit -> unit.reset());
     if (buildings != null) buildings.clear(building -> building.remove());
     if (moveunits != null) moveunits.clear(unit -> unit.reset());
     if (bullets != null) bullets.clear();
+    GameEcsBridge.resetForWorld();
   }
 }
