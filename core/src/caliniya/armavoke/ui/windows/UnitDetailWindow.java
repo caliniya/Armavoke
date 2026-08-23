@@ -35,12 +35,25 @@ public class UnitDetailWindow extends Window {
         new Table() {
           @Override
           public void draw() {
+            // 每帧只刷新数据：StatStack.get 命中已有条目就地更新，无对象分配
             unit.stat(stst);
-            main(this);
             super.draw();
           }
           ;
         };
+    // 结构检查放在 act 阶段（每帧渲染前），重建表格不会发生在绘制过程中
+    main.update(this::checkStructure);
+  }
+
+  /** 结构版本：能力/模组数量变化时才重建表格（平时每帧只刷新数据）。 */
+  private int abilityCount = -1, enhancementCount = -1;
+
+  /** 能力/模组数量变化（罕见）→ 重建表格结构；平时什么都不做。 */
+  private void checkStructure() {
+    if (unit == null) return;
+    if (unit.abilities.size != abilityCount || unit.enhancements.size != enhancementCount) {
+      main(main);
+    }
   }
 
   @Override
@@ -86,13 +99,18 @@ public class UnitDetailWindow extends Window {
       row.add("[gray]" + enh.type.localizedName + "[]").left().pad(2f);
       row.add(
               new Button(
-                  enh.enabled
-                      ? Core.bundle.get("unitDetail.disable")
-                      : Core.bundle.get("unitDetail.enable"),
-                  () -> {
-                    enh.setEnabled(!enh.enabled);
-                    main(this.main); // 刷新窗口内容
-                  }))
+                      enh.enabled
+                          ? Core.bundle.get("unitDetail.disable")
+                          : Core.bundle.get("unitDetail.enable"),
+                      () -> {
+                        enh.setEnabled(!enh.enabled);
+                      })
+                  .set(
+                      b ->
+                          b.text.setText(
+                              enh.enabled
+                                  ? Core.bundle.get("unitDetail.disable")
+                                  : Core.bundle.get("unitDetail.enable"))))
           .size(64f, 36f)
           .padLeft(6f);
       t.add(row).growX().left().row();
@@ -109,12 +127,17 @@ public class UnitDetailWindow extends Window {
                       : Core.bundle.get("unitDetail.enable"),
                   () -> {
                     a.setEnabled(!a.enabled);
+
                     main(this.main); // 刷新窗口内容
                   }))
           .size(64f, 36f)
           .padLeft(6f);
       t.add(row).growX().left().row();
     }
+
+    // 记录结构版本，供 refresh 判断是否需要重建
+    abilityCount = unit.abilities.size;
+    enhancementCount = unit.enhancements.size;
   }
 
   /** 条形图元素：每帧读取最新值绘制。 */

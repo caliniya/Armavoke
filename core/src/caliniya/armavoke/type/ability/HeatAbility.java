@@ -25,8 +25,12 @@ public class HeatAbility extends Ability {
   /** 当前热量。 */
   public float heat;
 
+  /** 上报用格式化标题（onCreate 时生成一次，避免每帧格式化分配）。 */
+  private String titleText;
+
   @Override
   public Ability onCreate(Entity e) {
+    titleText = Pal.format(Pal.light, localizedName);
     e.heatSpeed = heatSpeed;
     e.heatable = true;
     e.heatMax = heatMax;
@@ -81,7 +85,7 @@ public class HeatAbility extends Ability {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.add(
-        StatData.with(Pal.format(Pal.light, localizedName)).add(StatData.with(Stat.heat, heat)));
+    stat.get(titleText, StatType.function, this)
+        .get(Stat.heat, heat).setLevel(2);
   }
 }

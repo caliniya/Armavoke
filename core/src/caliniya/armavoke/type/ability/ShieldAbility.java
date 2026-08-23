@@ -62,6 +62,15 @@ public class ShieldAbility extends Ability implements Shield {
   /** 当前破盾冷却剩余时间（秒）；0 = 不在冷却。 */
   public float cooldown;
 
+  /** 上报用格式化标题（onCreate 时生成一次，避免每帧格式化分配）。 */
+  private String titleText;
+
+  @Override
+  public Ability onCreate(Entity e) {
+    titleText = Pal.format(Pal.light, localizedName);
+    return super.onCreate(e);
+  }
+
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
@@ -212,9 +221,8 @@ public class ShieldAbility extends Ability implements Shield {
 
   @Override
   public void statAbility(StatStack stat) {
-    stat.add(
-        StatData.with(Pal.format(Pal.light, localizedName))
-            .add(StatData.with(Stat.shield, current, max)));
+    stat.get(titleText, StatType.function, this)
+        .get(Stat.shield, current, max).setLevel(2);
   }
 
   @Override

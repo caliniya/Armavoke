@@ -113,6 +113,8 @@ public class StatData {
   }
 
   public StatData set(float value, float valueMax) {
+    // 值未变化时短路：不重算文本，避免每帧做无谓的字符串分配
+    if (this.value == value && this.valueMax == valueMax) return this;
     this.value = value;
     this.valueMax = valueMax;
     if (stat != null && unit != null) {
@@ -219,6 +221,8 @@ public class StatData {
   }
 
   public StatData setLevel(int level) {
+    // 已在相同层级：短路，避免每帧（链式 setLevel）无谓重算
+    if (this.levelSet && this.level == level) return this;
     this.level = level;
     this.levelSet = true;
     this.data = indent() + raw;
