@@ -109,7 +109,6 @@ project(":base") {
     apply plugin: "java-library"
     compileJava.options.fork = true
     dependencies {
-        // 纯基础数据结构模块，只依赖 Arc 核心（无平台绑定）
         api "com.github.Anuken.Arc:arc-core:$arcVersion"
     }
 }
@@ -117,7 +116,7 @@ project(":base") {
 project(":annotation") {
     apply plugin: "java"
     dependencies {
-        // @AnnoProc/AutoProcessor 在 base；AutoProcessor 作为本模块编译期处理器生成 SPI
+        compileOnly gradleApi()
         implementation project(":base")
         annotationProcessor project(":base")
         implementation 'com.squareup:javapoet:1.12.1'

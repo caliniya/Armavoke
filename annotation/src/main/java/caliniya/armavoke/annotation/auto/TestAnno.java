@@ -10,11 +10,11 @@ import java.util.Set;
 
 @AnnoProc
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("caliniya.armavoke.annotation.SystemDef")
+@SupportedAnnotationTypes("caliniya.armavoke.annotation.Annotations.SystemDef")
 public class TestAnno extends Processor {
 
   @Override
   public void process() {
-    messager.printMessage(Diagnostic.Kind.NOTE, "TestAA");
+    messager.printMessage(Diagnostic.Kind.NOTE, "TTTT");
   }
 }

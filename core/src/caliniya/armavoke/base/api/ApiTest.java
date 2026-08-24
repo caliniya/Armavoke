@@ -6,5 +6,5 @@ import caliniya.armavoke.annotation.Annotations.*;
 @Component(name = "qqqq")
 @Entity(name = "test")
 public class ApiTest {
-public int yyyyy;
+public int y;
 }
