@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+    options.compilerArgs += [
+        '-Aorg.gradle.annotation.processing.aggregating=true'  // 显式启用
+    ]
+}
+
+eclipse.project.name = appName + "-annotations"

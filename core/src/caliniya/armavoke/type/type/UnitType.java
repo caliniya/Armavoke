@@ -246,7 +246,7 @@ public class UnitType extends ContentType implements DrawType<Unit>, TechNodeCon
       Draw.color(Color.magenta);
       float scale = 20f;
       Lines.line(u.x, u.y, u.x + u.speedX * scale, u.y + u.speedY * scale);
-      Fonts.def.draw(Strings.format(u.speedX + " " + u.speedY), u.x, u.y + size + 8f, Align.center);
+      Fonts.def.draw(StringApi.format(u.speedX + " " + u.speedY), u.x, u.y + size + 8f, Align.center);
     }
 
     if (u.targetX != 0 || u.targetY != 0) {

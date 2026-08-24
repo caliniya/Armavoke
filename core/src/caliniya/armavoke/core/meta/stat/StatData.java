@@ -3,7 +3,7 @@ package caliniya.armavoke.core.meta.stat;
 import arc.func.Floatp;
 import arc.func.Cons;
 import arc.util.Nullable;
-import arc.util.Strings;
+import caliniya.armavoke.base.api.*;
 import caliniya.armavoke.base.tool.Ar;
 
 /** 统计值单元 */
@@ -166,7 +166,7 @@ public class StatData {
   }
 
   public String indent() {
-    return level <= 0 ? "   " : "   " + "\u3000\u3000".repeat(level);
+    return level <= 0 ? "   " : "   " + StringApi.repeat("\u3000\u3000", level);
   }
 
   /** 对于查找命中的 会自动设置，未命中的则会新建并插入 */
@@ -181,7 +181,7 @@ public class StatData {
     add(d);
     return d;
   }
-  
+
   public StatData get(String raw, int level, StatType type) {
     for (StatData d : datas) {
       if (d.stat == null && d.raw.equals(raw)) return d;
@@ -229,10 +229,7 @@ public class StatData {
     datas.each(d -> d.each(con));
   }
 
-  /**
-   * 统一取显示文本：静态条目直接返回 data；动态条目（live 非 null）先按最新值就地刷新
-   * （{@link #set} 自带值未变短路，零分配），再把最新文本交给渲染端。
-   */
+  /** 统一取显示文本：静态条目直接返回 data；动态条目（live 非 null）先按最新值就地刷新 （{@link #set} 自带值未变短路，零分配），再把最新文本交给渲染端。 */
   public CharSequence getData() {
     if (live != null) {
       set(live.get(), valueMax);
@@ -248,7 +245,7 @@ public class StatData {
           .append(" / ")
           .append(unit.format(valueMax))
           .append(" (")
-          .append(Strings.autoFixed(value / valueMax * 100f, 1))
+          .append(StringApi.autoFixed(value / valueMax * 100f, 1))
           .append("%)");
       return builder;
     }

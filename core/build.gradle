@@ -1,10 +1,5 @@
-sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project.name = appName + "-core"
-java {
-    sourceCompatibility = JavaVersion.VERSION_17 // 或统一为 VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_17 // 或统一为 VERSION_1_8
-}
