@@ -124,6 +124,8 @@ project(":core") {
         compileOnly project(":annotation")
         annotationProcessor project(":annotation")
         
+        implementation project(":tools")
+        
         // 这是啥来着
         api "org.lz4:lz4-java:1.8.0"
         

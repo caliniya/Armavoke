@@ -2,6 +2,7 @@ package caliniya.armavoke.tools.anno.auto;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.SOURCE) // 仅编译时需要
-@Target(ElementType.TYPE) // 标记在类上
+// 标记这个类是一个注解处理器
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface AnnoProc {}
