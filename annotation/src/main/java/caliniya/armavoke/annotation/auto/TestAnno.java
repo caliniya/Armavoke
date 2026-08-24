@@ -2,6 +2,8 @@ package caliniya.armavoke.annotation.auto;
 
 import caliniya.armavoke.base.anno.auto.*;
 import javax.annotation.processing.*;
+import javax.tools.Diagnostic;
+import caliniya.armavoke.annotation.Processor;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import java.util.Set;
@@ -9,11 +11,10 @@ import java.util.Set;
 @AnnoProc
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("*")
-public class TestAnno extends AbstractProcessor {
+public class TestAnno extends Processor {
 
   @Override
-  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    System.out.printf("aa  aa");
-    return false;
+  public void process() {
+    messager.printMessage(Diagnostic.Kind.NOTE, "AnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaan");
   }
 }
