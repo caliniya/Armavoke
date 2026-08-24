@@ -5,6 +5,8 @@ import android.os.Build;
 import android.view.DisplayCutout;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import static arc.Core.*;
 
@@ -34,7 +36,7 @@ public class AndroidLauncher extends AndroidApplication {
 
     Window win = getWindow();
     win.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.BLACK));
-    win.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    requestFullscreen(win);
 
     initialize(
         new Armavoke(),
@@ -111,6 +113,27 @@ public class AndroidLauncher extends AndroidApplication {
     //Log.level = Log.LogLevel.info;
     Log.info("Start-Android");
     Log.info("Log Level : " + Log.level);
+  }
+
+  /**
+   * 全屏处理
+   */
+  private void requestFullscreen(Window win) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      WindowInsetsController controller = win.getDecorView().getWindowInsetsController();
+      if (controller != null) {
+        controller.hide(WindowInsets.Type.statusBars());
+        controller.setSystemBarsBehavior(
+            WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+      }
+    } else {
+      legacyFullscreen(win);
+    }
+  }
+
+  @SuppressWarnings("deprecation")
+  private void legacyFullscreen(Window win) {
+    win.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
   }
 
   @Override

@@ -5,7 +5,6 @@ import caliniya.armavoke.annotation.tool.AMethod;
 import caliniya.armavoke.annotation.tool.AType;
 import caliniya.armavoke.annotation.tool.AVar;
 import caliniya.armavoke.base.tool.Ar;
-
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;

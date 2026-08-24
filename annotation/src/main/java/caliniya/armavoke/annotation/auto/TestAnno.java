@@ -10,9 +10,10 @@ import java.util.Set;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("*")
 public class TestAnno extends AbstractProcessor {
-  
+
   @Override
-public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    System.out.printf("aa  aa");
     return false;
-}
+  }
 }
