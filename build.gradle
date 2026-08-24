@@ -116,7 +116,7 @@ project(":base") {
 project(":annotation") {
     apply plugin: "java"
     dependencies {
-        compileOnly gradleApi()
+        //compileOnly gradleApi()
         implementation project(":base")
         annotationProcessor project(":base")
         implementation 'com.squareup:javapoet:1.12.1'
