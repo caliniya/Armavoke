@@ -16,11 +16,6 @@ public class AutoProcessor extends AbstractProcessor {
     private Messager messager;
 
     @Override
-    public Set<String> getSupportedOptions() {
-        return Collections.singleton("org.gradle.annotation.processing.aggregating");
-    }
-
-    @Override
     public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
         filer = env.getFiler();

@@ -28,7 +28,7 @@ public abstract class Processor extends AbstractProcessor {
     public static Messager messager;
 
     private int round = 0;
-    private int maxRounds = 1;
+    private int maxRounds = 5;
     protected RoundEnvironment roundEnv;
 
     @Override

@@ -15,6 +15,5 @@ public class TestAnno extends Processor {
 
   @Override
   public void process() {
-    messager.printMessage(Diagnostic.Kind.NOTE, "AnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaanAnaaaaaaaan");
   }
 }

@@ -8,9 +8,7 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(JavaCompile) {
     options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
-    options.compilerArgs += [
-        '-Aorg.gradle.annotation.processing.aggregating=true'  // 显式启用
-    ]
+    options.incremental = true
 }
 
 eclipse.project.name = appName + "-annotations"
