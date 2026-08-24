@@ -8,7 +8,7 @@ import caliniya.armavoke.type.ability.*;
 import caliniya.armavoke.type.ability.api.*;
 import caliniya.armavoke.base.game.Entity;
 import caliniya.armavoke.base.tool.Ar;
-import caliniya.armavoke.base.tool.EntityAr;
+import caliniya.armavoke.base.game.EntityAr;
 import caliniya.armavoke.type.*;
 import caliniya.armavoke.game.Entities;
 import caliniya.armavoke.game.data.WorldData;

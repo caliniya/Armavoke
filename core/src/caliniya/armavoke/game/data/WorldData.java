@@ -5,6 +5,7 @@ import arc.util.Log;
 import caliniya.armavoke.base.type.*;
 import caliniya.armavoke.content.*;
 import caliniya.armavoke.core.*;
+import caliniya.armavoke.base.game.EntityAr;
 import caliniya.armavoke.base.tool.*;
 import caliniya.armavoke.game.*;
 import caliniya.armavoke.system.render.*;

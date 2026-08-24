@@ -102,6 +102,8 @@ gradle-app.setting
 /desktop/build/
 /html/build/
 /ios/build/
+/annotation/build/
+/base/build/
 /.androidide
 
 ## OS Specific

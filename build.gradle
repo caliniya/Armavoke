@@ -105,11 +105,21 @@ project(":desktop") {
     }
 }
 
+project(":base") {
+    apply plugin: "java-library"
+    compileJava.options.fork = true
+    dependencies {
+        // 纯基础数据结构模块，只依赖 Arc 核心（无平台绑定）
+        api "com.github.Anuken.Arc:arc-core:$arcVersion"
+    }
+}
+
 project(":annotation") {
     apply plugin: "java"
     dependencies {
-        implementation project(":tools")
-        annotationProcessor project(":tools")
+        // @AnnoProc/AutoProcessor 在 base；AutoProcessor 作为本模块编译期处理器生成 SPI
+        implementation project(":base")
+        annotationProcessor project(":base")
         implementation 'com.squareup:javapoet:1.12.1'
         implementation "com.github.Anuken.Arc:arc-core:$arcVersion"
     }
@@ -124,7 +134,7 @@ project(":core") {
         compileOnly project(":annotation")
         annotationProcessor project(":annotation")
         
-        implementation project(":tools")
+        implementation project(":base")
         
         // 这是啥来着
         api "org.lz4:lz4-java:1.8.0"

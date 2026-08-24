@@ -1,4 +1,4 @@
-package caliniya.armavoke.base.tool;
+package caliniya.armavoke.base.game;
 
 import arc.func.*;
 import arc.math.geom.*;
@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import caliniya.armavoke.base.game.*;
+import caliniya.armavoke.base.tool.Ar;
 
 /**
  * 实体组 —— 管理同一类型实体的集合。
