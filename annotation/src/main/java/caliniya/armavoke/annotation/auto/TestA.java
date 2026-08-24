@@ -8,7 +8,7 @@ import caliniya.armavoke.base.anno.auto.AnnoProc;
 
 @AnnoProc
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("*")
+@SupportedAnnotationTypes("caliniya.armavoke.annotation.Entity")
 public class TestA extends Processor {
 
   @Override

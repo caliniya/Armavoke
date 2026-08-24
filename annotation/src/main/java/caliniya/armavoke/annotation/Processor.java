@@ -28,7 +28,7 @@ public abstract class Processor extends AbstractProcessor {
     public static Messager messager;
 
     private int round = 0;
-    private int maxRounds = 5;
+    private int maxRounds = 2;
     protected RoundEnvironment roundEnv;
 
     @Override
@@ -52,7 +52,7 @@ public abstract class Processor extends AbstractProcessor {
             error("Processing failed: " + e.getMessage());
             throw new RuntimeException(e);
         }
-        return true;
+        return false;
     }
 
     /**

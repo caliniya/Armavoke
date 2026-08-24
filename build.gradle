@@ -133,7 +133,6 @@ project(":core") {
         
         compileOnly project(":annotation")
         annotationProcessor project(":annotation")
-        
         implementation project(":base")
         
         // 这是啥来着
