@@ -38,45 +38,21 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
     tasks.withType(JavaCompile){
-        targetCompatibility = 8
+        targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
-        options.compilerArgs += ["-Xlint:deprecation"]
-
-        options.forkOptions.jvmArgs += [
-            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
-        ]
     }
 }
 
-configure(project(":annotation")){
+
+//其余模块同样统一使用 Java 17
+configure(subprojects){
+    
     tasks.withType(JavaCompile){
-        targetCompatibility = 8
-        sourceCompatibility = 8
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        options.compilerArgs.addAll(['--release', '17'])
         options.fork = true
-    }
-}
-
-configure(project(":tools")){
-    tasks.withType(JavaCompile){
-        targetCompatibility = 8
-        sourceCompatibility = 8
-        options.fork = true
-    }
-}
-
-
-//工具和注解模块使用纯java8()
-configure(subprojects - project(":annotation") - project(":tools")){
-    tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
     }
 
     tasks.withType(Javadoc){
@@ -96,8 +72,6 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
-        
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         
         implementation "com.github.Anuken.Arc:natives-desktop:$arcVersion"
         implementation "com.github.Anuken.Arc:natives-freetype-desktop:$arcVersion"
@@ -129,7 +103,6 @@ project(":core") {
     //compileJava.options.fork = true
     dependencies {
     
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'        
         compileOnly project(":annotation")
         annotationProcessor project(":annotation")
         implementation project(":base")
