@@ -126,10 +126,10 @@ project(":annotation") {
 
 project(":core") {
     apply plugin: "java-library"
-    compileJava.options.fork = true
+    //compileJava.options.fork = true
     dependencies {
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
-        
+    
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'        
         compileOnly project(":annotation")
         annotationProcessor project(":annotation")
         implementation project(":base")

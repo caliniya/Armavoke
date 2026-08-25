@@ -26,6 +26,10 @@ public class ECProcessor extends Processor {
 
   public ObjectMap<String, ObjectSet<String>> nameMap = new ObjectMap<>();
   public Ar<AType> entityDef = new Ar<>();
+  
+  {
+    
+  }
 
   @Override
   protected void process() {
