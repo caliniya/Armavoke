@@ -29,18 +29,27 @@ public class ECProcessor extends Processor {
 
   @Override
   protected void process() {
-    
+
     entityDef.addAll(types(Entity.class));
-    
-    for(AType a : entityDef) {
-      //a.an
+
+    for (AType a : entityDef) {
+      for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
+          a.annotation(Entity.class).getElementValues().entrySet()) {
+        String key = entry.getKey().getSimpleName().toString();
+        Object value = entry.getValue().getValue();
+        if (key.equals("name")) {
+          nameMap.put((String) value, new ObjectSet<>());
+        }
+      }
     }
-    
+
     for (AType T : types(Component.class)) {
       for (AVar V : T.fields()) {
-       /** if(nameMap.co) {
-        	
-        }*/
+        /**
+         * if(nameMap.co) {
+         *
+         * <p>}
+         */
       }
     }
   }
