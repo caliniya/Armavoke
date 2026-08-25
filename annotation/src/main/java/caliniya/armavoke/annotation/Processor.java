@@ -69,7 +69,7 @@ public abstract class Processor extends AbstractProcessor {
     }
 
     /**
-     * 获取所有标注了指定注解的类型
+     * 获取所有标注了指定注解的类型(类)
      */
     public Ar<AType> types(Class<? extends Annotation> annotation) {
         return Ar.with(roundEnv.getElementsAnnotatedWith(annotation))
@@ -218,4 +218,4 @@ public abstract class Processor extends AbstractProcessor {
         int lastDot = fullName.lastIndexOf('.');
         return lastDot > 0 ? fullName.substring(0, lastDot) : "";
     }
-}
+};

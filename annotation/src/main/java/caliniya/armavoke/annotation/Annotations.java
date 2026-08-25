@@ -10,6 +10,13 @@ public class Annotations {
     String name();
   }
   
+  //这说明这个字段是从实体中其他组件读起来的，不应该将它注入到实体中以避免覆盖
+  // 如果没有找到这个字段 那么就应该报错
+  @Target({ElementType.FIELD})
+  public @interface Import{
+    
+  }
+  
   // 声明一种实体
   @Target({ElementType.TYPE})
   public @interface Entity{
