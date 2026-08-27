@@ -24,11 +24,11 @@ import caliniya.armavoke.base.anno.auto.AnnoProc;
 })
 public class ECProcessor extends Processor {
 
-  public ObjectMap<String, ObjectSet<String>> nameMap = new ObjectMap<>();
+  // 每种类型的实体都有哪些组件
+  public ObjectMap<String, ObjectSet<String>> ECMap = new ObjectMap<>();
   public Ar<AType> entityDef = new Ar<>();
-  
+
   {
-    
   }
 
   @Override
@@ -37,16 +37,11 @@ public class ECProcessor extends Processor {
     entityDef.addAll(types(Entity.class));
 
     for (AType a : entityDef) {
-      for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-          a.annotation(Entity.class).getElementValues().entrySet()) {
-        String key = entry.getKey().getSimpleName().toString();
-        Object value = entry.getValue().getValue();
-        if (key.equals("name")) {
-          nameMap.put((String) value, new ObjectSet<>());
-        }
-      }
+      ECMap.put(a.annotation(Entity.class).name() + "Entity", new ObjectSet<String>());
     }
-
+    
+    
+    
     for (AType T : types(Component.class)) {
       for (AVar V : T.fields()) {
         /**

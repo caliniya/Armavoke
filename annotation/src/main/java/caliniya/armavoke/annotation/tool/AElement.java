@@ -95,22 +95,8 @@ public class AElement<T extends Element> {
   }
 
   /** 获取指定注解 */
-  public <A extends Annotation> AnnotationMirror annotation(Class<A> annotation) {
-    return mirror.find(a -> a.getAnnotationType().toString().equals(annotation.getCanonicalName()));
-  }
-
-  public <T, A extends Annotation> T annoValue(Class<T> type, Class<A> anno, String name) {
-    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-        annotation(anno).getElementValues().entrySet()) {
-      String key = entry.getKey().getSimpleName().toString();
-      Object value = entry.getValue().getValue();
-      if (key.equals(name)) {
-        if (type.isAssignableFrom(value.getClass())) {
-          return type.cast(value);
-        }
-      }
-    }
-    return null;
+  public <A extends Annotation> A annotation(Class<A> annotation) {
+    return e.getAnnotation(annotation);
   }
 
   /** 转换为具体类型包装 */

@@ -8,7 +8,7 @@ import javax.tools.StandardLocation;
 import java.io.Writer;
 import java.util.*;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedAnnotationTypes("caliniya.armavoke.base.anno.auto.AnnoProc")
 public class AutoProcessor extends AbstractProcessor {
 
