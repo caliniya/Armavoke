@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Armavoke</string>
+    <string name="app_name">Vergvoke</string>
     
     <!-- Error Report Screen -->
     <string name="copy_error_report">Copy Error Report</string>

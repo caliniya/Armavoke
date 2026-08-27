@@ -20,7 +20,7 @@ repositories{
 }
 
 android {
-    namespace "caliniya.armavoke"
+    namespace "caliniya.vergvoke"
     buildToolsVersion "34.0.0"
     compileSdkVersion 34
     sourceSets {
@@ -39,7 +39,7 @@ android {
     }
     defaultConfig {
         multiDexEnabled false
-        applicationId "caliniya.armavoke"
+        applicationId "caliniya.vergvoke"
         minSdkVersion 24
         targetSdkVersion 34
         versionCode rootProject.ext.versionCode
@@ -112,7 +112,7 @@ tasks.register('run', Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'caliniya.armadax/caliniya.armadax.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'caliniya.vergvoke/caliniya.vergvoke.AndroidLauncher'
 }
 
 // 在 minifyDebugWithR8 任务之前检查

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Armavoke</string>
+    <string name="app_name">Vergvoke</string>
     <string name="copy_error_report">复制错误堆栈</string>
     <string name="restart">重启</string>
     

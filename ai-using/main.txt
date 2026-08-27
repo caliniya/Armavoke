@@ -22,9 +22,9 @@
 | android-old | android-old/ | sdk14的老安卓兼容版本，通常不用管他 |
 | tools | tools/ | 构建工具(AI一般用不上) |
 
-## 核心包结构 (core/src/caliniya/armavoke/)
+## 核心包结构 (core/src/caliniya/vergvoke/)
 
-Armavoke.java —— ApplicationCore 入口，事件总线、场景切换
+Vergvoke.java —— ApplicationCore 入口，事件总线、场景切换
 Init.java —— 初始化引导
 
 base/ —— 基础层
