@@ -103,7 +103,7 @@ project(":core") {
     //compileJava.options.fork = true
     dependencies {
     
-        compileOnly project(":annotation")
+        implementation project(":annotation")
         annotationProcessor project(":annotation")
         implementation project(":base")
         

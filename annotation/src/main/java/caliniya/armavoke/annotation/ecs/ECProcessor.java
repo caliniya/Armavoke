@@ -17,7 +17,7 @@ import caliniya.armavoke.annotation.Annotations.*;
 import caliniya.armavoke.base.anno.auto.AnnoProc;
 
 @AnnoProc
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedAnnotationTypes({
   "caliniya.armavoke.annotation.Annotations.Component",
   "caliniya.armavoke.annotation.Annotations.Entity"

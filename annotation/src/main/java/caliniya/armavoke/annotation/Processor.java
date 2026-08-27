@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * 注解处理器基类，提供通用功能
  */
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 public abstract class Processor extends AbstractProcessor {
 
     public static Types typeUtils;
@@ -180,26 +180,6 @@ public abstract class Processor extends AbstractProcessor {
                 return 8;
             default:
                 throw new IllegalArgumentException("Not a primitive type: " + typeName);
-        }
-    }
-
-    /**
-     * 获取基础类型的默认值
-     */
-    public static String primitiveDefault(String typeName) {
-        switch (typeName) {
-            case "boolean":
-                return "false";
-            case "byte":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-            case "double":
-            case "char":
-                return "0";
-            default:
-                return "null";
         }
     }
 
