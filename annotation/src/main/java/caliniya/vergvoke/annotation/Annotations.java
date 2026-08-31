@@ -8,7 +8,7 @@ public class Annotations {
   @Retention(RetentionPolicy.SOURCE)
   @Target({ElementType.TYPE})
   public @interface Component{
-    String name();
+    String name();//组件名字
   }
   
   //这说明这个字段是从实体中其他组件读起来的，不应该将它注入到实体中以避免覆盖
@@ -16,14 +16,13 @@ public class Annotations {
   @Retention(RetentionPolicy.SOURCE)
   @Target({ElementType.FIELD})
   public @interface Import{
-    
   }
   
   // 声明一种实体
   @Retention(RetentionPolicy.SOURCE)
   @Target({ElementType.TYPE})
   public @interface Entity{
-    Class<?>[] comps();
+    Class<?>[] comps();//实体包含哪些组件
     String name();
   }
   
