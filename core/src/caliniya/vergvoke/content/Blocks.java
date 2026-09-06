@@ -2,7 +2,7 @@ package caliniya.vergvoke.content;
 
 import caliniya.vergvoke.type.type.BulletType;
 import caliniya.vergvoke.world.*;
-import caliniya.vergvoke.world.defence.turret.Turret;
+import caliniya.vergvoke.world.blocks.defence.Turret;
 
 public class Blocks {
 

@@ -1,4 +1,4 @@
-package caliniya.vergvoke.base.shader;
+package caliniya.vergvoke.base.shaders;
 
 import arc.Core;
 import arc.files.Fi;

@@ -1,9 +1,6 @@
 package caliniya.vergvoke.ui.fragment;
 
 import arc.Core;
-import arc.Events;
-import arc.files.Fi;
-import arc.scene.Group;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.StringMap;
@@ -11,23 +8,14 @@ import arc.util.Log;
 import caliniya.vergvoke.base.type.TeamTypes;
 import caliniya.vergvoke.content.*;
 import caliniya.vergvoke.core.*;
-import caliniya.vergvoke.core.meta.stat.*;
 import caliniya.vergvoke.game.*;
 import caliniya.vergvoke.type.*;
-import caliniya.vergvoke.type.ability.ShieldAbility;
-import caliniya.vergvoke.type.ability.ShieldFieldAbility;
 import caliniya.vergvoke.game.data.RouteData;
 import caliniya.vergvoke.game.data.WorldData;
 import caliniya.vergvoke.io.DataIO;
-import caliniya.vergvoke.io.GameIO;
-import caliniya.vergvoke.map.Map;
-import caliniya.vergvoke.map.Maps;
 import caliniya.vergvoke.system.Systems;
 import caliniya.vergvoke.type.enhance.shield.ShieldBoostEnhancementType;
 import caliniya.vergvoke.ui.*;
-
-import static caliniya.vergvoke.base.type.EventType.*;
-import caliniya.vergvoke.ui.windows.DataWindow;
 
 public class MenuFragment {
 

@@ -4,18 +4,12 @@ import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import caliniya.vergvoke.annotation.Annotations.*;
 import caliniya.vergvoke.annotation.Processor;
-import caliniya.vergvoke.annotation.tool.AElement;
 import caliniya.vergvoke.annotation.tool.AType;
 import caliniya.vergvoke.annotation.tool.AVar;
 import caliniya.vergvoke.base.anno.auto.AnnoProc;
 import caliniya.vergvoke.base.tool.Ar;
-import java.util.*;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
-import javax.tools.Diagnostic;
-
-import javax.tools.StandardLocation;
 
 @AnnoProc
 @SupportedSourceVersion(SourceVersion.RELEASE_17)

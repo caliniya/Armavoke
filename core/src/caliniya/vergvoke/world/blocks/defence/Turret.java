@@ -1,4 +1,4 @@
-package caliniya.vergvoke.world.defence.turret;
+package caliniya.vergvoke.world.blocks.defence;
 
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
