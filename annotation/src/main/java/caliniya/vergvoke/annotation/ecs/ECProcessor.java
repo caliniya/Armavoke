@@ -32,12 +32,13 @@ public class ECProcessor extends Processor {
     entityDef.addAll(types(Entity.class));
 
     for (AType a : entityDef) {
-      ObjectSet<String> map = new ObjectSet<String>();
-      for (Class<?> c : a.annotation(Entity.class).comps()) {
-        if (map.contains(c.getSimpleName())) {
-          error(c.getSimpleName() + "Already exist");
+      ObjectSet<String> map = new ObjectSet<>();
+      for (String c : compsOf(a)) {
+        String simple = c.substring(c.lastIndexOf('.') + 1);
+        if (map.contains(simple)) {
+          error("Duplicate component in entity: " + simple, a);
         }
-        map.add(c.getSimpleName());
+        map.add(simple);
       }
       ECMap.put(a.annotation(Entity.class).name() + "Entity", map);
     }
@@ -52,4 +53,5 @@ public class ECProcessor extends Processor {
       }
     }
   }
+
 }
